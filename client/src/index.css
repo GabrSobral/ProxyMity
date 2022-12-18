@@ -1,0 +1,26 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+html {
+	font-size: 16px;
+}
+
+::-webkit-scrollbar {
+	width: 14px;
+}
+::-webkit-scrollbar-track {
+	@apply bg-gray-900 transition-all;
+}
+
+::-webkit-scrollbar-thumb {
+	border-radius: 6px;
+	border: 1px solid #00000010;
+
+	@apply bg-gray-800 shadow transition-all;
+}
+
+::-webkit-scrollbar-thumb:hover {
+	filter: brightness(0.6);
+}
