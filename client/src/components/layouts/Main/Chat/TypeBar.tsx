@@ -1,19 +1,15 @@
 import { useRef, useState } from 'react';
-import { Mic } from 'react-feather';
+import { Mic, Send } from 'react-feather';
 
 export function TypeBar() {
 	const textAreaRef = useRef<HTMLTextAreaElement>(null);
 	const [type, setType] = useState('');
 
-	console.log((textAreaRef.current?.scrollHeight || 0) / 16);
-
 	function adjustTextAreaHeight(value: string) {
 		if (!textAreaRef?.current) return;
 
-		// if(value === "")
-		textAreaRef.current.style.height = '3.5rem';
-		// else
-		textAreaRef.current.style.height = `${textAreaRef.current.scrollHeight / 16}rem`;
+		if (value === '') textAreaRef.current.style.height = '3.5rem';
+		else textAreaRef.current.style.height = `${textAreaRef.current.scrollHeight / 16}rem`;
 
 		setType(value);
 	}
@@ -22,7 +18,7 @@ export function TypeBar() {
 		<div className="mb-3 flex gap-4 px-4">
 			<form
 				action=""
-				className="w-full flex flex-1"
+				className="w-full flex flex-1 gap-2"
 			>
 				<textarea
 					ref={textAreaRef}
@@ -35,8 +31,10 @@ export function TypeBar() {
 				<button
 					type="submit"
 					title="Send message"
-					className="hidden"
-				></button>
+					className="rounded-full flex items-center justify-center bg-blue-500 min-w-[3.5rem] min-h-[3.5rem] max-w-[3.5rem] max-h-[3.5rem] mt-auto"
+				>
+					<Send className="text-lg text-white" />
+				</button>
 			</form>
 
 			<button

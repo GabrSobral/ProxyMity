@@ -9,6 +9,7 @@ export const contactsMock: ContactDialog[] = [
 			content: 'Iai mano, tranquilo?',
 		},
 		isOnline: false,
+		registeredAt: new Date(),
 	},
 	{
 		name: 'Dominique Rubens',
@@ -18,11 +19,13 @@ export const contactsMock: ContactDialog[] = [
 			content: 'Bom dia, gostaria de ouvir a palavra de Jeová??',
 		},
 		isOnline: true,
+		registeredAt: new Date(),
 	},
 	{
 		name: 'Diogo',
 		email: 'Diogo@gmail.com',
 		lastMessage: null,
 		isOnline: false,
+		registeredAt: new Date(),
 	},
 ];

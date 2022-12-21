@@ -1,4 +1,5 @@
 import clsx from 'clsx';
+import { useChat } from '../../../../contexts/chat-context/hook';
 import { ContactDialog } from '../../../../contexts/chat-context/reducers/contact-reducer';
 
 interface Props {
@@ -6,17 +7,32 @@ interface Props {
 }
 
 export function ContactItem({ contactItem }: Props) {
+	const { contactsDispatch, contactsState } = useChat();
+
 	const formatLastMessageDate = Intl.DateTimeFormat('pt-br', {
 		hour: 'numeric',
 		minute: 'numeric',
 	});
+
+	const isSelected = contactItem.email === contactsState.selectedContact?.email;
 	return (
-		<li className="w-full p-3 rounded-xl flex gap-4 cursor-pointer hover:bg-[#766AC8] transition-colors group">
+		<li
+			className={clsx(
+				'w-full p-3 rounded-xl flex gap-4 cursor-pointer hover:opacity-90 transition-colors group bg-gray-900',
+				{
+					'bg-[#766AC8]': isSelected,
+				}
+			)}
+			onClick={() =>
+				contactsDispatch({ type: 'SELECT_CONTACT', payload: contactItem })
+			}
+		>
 			<div
 				className={clsx(
-					'min-w-[3.5rem] min-h-[3.5rem] max-w-[3.5rem] max-h-[3.5rem] rounded-full bg-gray-900 brightness-75 group-hover:bg-[#766AC8] transition-colors',
+					'min-w-[3.5rem] min-h-[3.5rem] max-w-[3.5rem] max-h-[3.5rem] rounded-full bg-gray-900 brightness-75 transition-colors',
 					{
 						'ring-1 ring-green-500': contactItem.isOnline,
+						'bg-[#766AC8]': isSelected,
 					}
 				)}
 			></div>
