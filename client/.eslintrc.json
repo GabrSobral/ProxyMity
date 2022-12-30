@@ -1,6 +1,15 @@
 {
 	"plugins": ["@typescript-eslint"],
-	"extends": ["next/core-web-vitals", "plugin:@typescript-eslint/recommended", "prettier"],
+	"extends": [
+		"next/core-web-vitals",
+		"plugin:@typescript-eslint/recommended",
+		"plugin:import/errors",
+		"plugin:react/recommended",
+		"plugin:jsx-a11y/recommended",
+		"plugin:react-hooks/recommended",
+		"eslint:recommended",
+		"prettier"
+	],
 	"rules": {
 		"prefer-const": "error",
 		"@typescript-eslint/no-unused-vars": "error"

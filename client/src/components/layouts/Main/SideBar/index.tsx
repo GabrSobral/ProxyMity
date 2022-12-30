@@ -1,25 +1,45 @@
+import { useState } from 'react';
 import { Plus, Search } from 'react-feather';
 
 import { useChat } from '../../../../contexts/chat-context/hook';
+import { useUser } from '../../../../contexts/user-context/reducers/hook';
+import { Button } from '../../../elements/Button';
+import { Input } from '../../../elements/Input';
+import { Modal } from '../../../elements/Modal';
 import { ContactItem } from './ContactItem';
+import { NewContactModal } from './NewContactModal';
 
 export function SideBar() {
 	const { contactsState } = useChat();
+	const { userState } = useUser();
+	const [searchContact, setSearchContact] = useState('');
+
+	const [isNewContactModalVisible, setIsNewContactModalVisible] = useState(false);
 
 	return (
-		<aside className="h-screen w-[25rem] bg-slate-900 max-h-screen flex flex-col relative">
+		<aside className="h-screen w-[25rem] bg-white dark:bg-gray-900 max-h-screen flex flex-col relative">
 			<div className="w-full px-4 py-2 h-[4rem] sticky top-0">
-				<div className="relative">
-					<Search
-						size={20}
-						className="absolute pointer-events-none right-4 top-2/4 translate-y-[-50%] text-gray-400"
-					/>
-					<input
-						type="search"
-						placeholder="Search...."
-						className="px-4 py-3 rounded-lg bg-gray-800 focus:ring-2 focus:ring-purple-500 outline-none text-white text-sm w-full"
-					/>
-				</div>
+				<header>
+					<span className="">Hi, {userState.data?.name || '...'}</span>
+				</header>
+
+				<Input.Group>
+					<Input.Label className="sr-only">Search contact</Input.Label>
+
+					<Input.InputWrapper className="w-full">
+						<Input
+							placeholder="Search contact...."
+							type="search"
+							value={searchContact}
+							onChange={e => setSearchContact(e.target.value)}
+						/>
+
+						<Search
+							size={20}
+							className="absolute pointer-events-none right-4 top-2/4 translate-y-[-50%] text-gray-400"
+						/>
+					</Input.InputWrapper>
+				</Input.Group>
 			</div>
 
 			<ul className="flex flex-col gap-1 p-3 overflow-y-auto flex-1">
@@ -31,13 +51,18 @@ export function SideBar() {
 				))}
 			</ul>
 
-			<button
+			<Button
 				type="button"
-				onClick={() => {}}
-				className="absolute rounded-full flex items-center justify-center bg-blue-500 min-w-[3.5rem] min-h-[3.5rem] max-w-[3.5rem] max-h-[3.5rem] mt-auto bottom-6 right-6"
+				onClick={() => setIsNewContactModalVisible(true)}
+				className="absolute rounded-full min-w-[3.5rem] min-h-[3.5rem] max-w-[3.5rem] max-h-[3.5rem] mt-auto bottom-6 right-6"
 			>
 				<Plus className="text-white" />
-			</button>
+			</Button>
+
+			<NewContactModal
+				closeModal={() => setIsNewContactModalVisible(false)}
+				show={isNewContactModalVisible}
+			/>
 		</aside>
 	);
 }

@@ -1,5 +1,3 @@
-import { Socket } from 'socket.io';
-
 import { Contact } from '@application/entities/contact';
 import { Message } from '@application/entities/message';
 import { MessageRepository } from '@application/repositories/message-repository';
@@ -9,16 +7,11 @@ interface SendMessageRequest {
   recipientId: Contact['_id'];
 }
 
-export class SendMessage {
-  constructor(
-    private messageRepository: MessageRepository,
-    private webSocket: Socket,
-  ) {}
+export class SaveMessage {
+  constructor(private messageRepository: MessageRepository) {}
 
   async execute({ message, recipientId }: SendMessageRequest) {
-    this.webSocket.to(recipientId).emit('receive_message', { message });
-
-    // await this.messageRepository.create(message);
+    await this.messageRepository.create(message);
 
     console.log(this.messageRepository);
   }

@@ -10,6 +10,7 @@ import { Text } from '../components/elements/Text';
 export function SignUp() {
 	const [userEmail, setUserEmail] = useState('');
 	const [userName, setUserName] = useState('');
+	const [userPassword, setUserPassword] = useState('');
 
 	function handleSubmit(event: FormEvent) {
 		event.preventDefault();
@@ -56,6 +57,7 @@ export function SignUp() {
 								<Input
 									placeholder="Type your name"
 									type="text"
+									value={userName}
 									onChange={e => setUserName(e.target.value)}
 								/>
 							</Input.InputWrapper>
@@ -68,7 +70,21 @@ export function SignUp() {
 								<Input
 									placeholder="Type your e-mail"
 									type="email"
+									value={userEmail}
 									onChange={e => setUserEmail(e.target.value)}
+								/>
+							</Input.InputWrapper>
+						</Input.Group>
+
+						<Input.Group>
+							<Input.Label>Password</Input.Label>
+
+							<Input.InputWrapper className="w-full">
+								<Input
+									placeholder="Type your password"
+									type="password"
+									value={userPassword}
+									onChange={e => setUserPassword(e.target.value)}
 								/>
 							</Input.InputWrapper>
 						</Input.Group>

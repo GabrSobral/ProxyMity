@@ -1,9 +1,9 @@
-import { Response, Request } from 'express';
+import { FastifyReply, FastifyRequest } from 'fastify';
 
 import { SignUpContact } from '@application/use-cases/register-contact';
-import { PrismaClient } from '@prisma/client';
-import { PrismaContactRepository } from '@infra/database/prisma/repositories/prisma-contact-repository';
-import { JsonWebToken } from '@infra/authentication/jwt/JsonWebToken';
+import { ContactRepository } from '@application/repositories/contact-repository';
+
+import { IJsonWebToken } from '@infra/authentication/jwt/json-web-token';
 import { ContactViewModel } from '@infra/http/view-model/contact-view-model';
 
 interface IRequest {
@@ -13,14 +13,15 @@ interface IRequest {
 }
 
 export class SignUpControllerHandler {
-  async handle(request: Request, response: Response) {
-    const prismaClient = new PrismaClient();
-    const prismaContactRepository = new PrismaContactRepository(prismaClient);
-    const jsonWebTokenHandler = new JsonWebToken();
+  constructor(
+    private contactRepository: ContactRepository,
+    private jsonWebTokenHandler: IJsonWebToken,
+  ) {}
 
+  async handle(request: FastifyRequest, response: FastifyReply) {
     const signUpContact = new SignUpContact(
-      prismaContactRepository,
-      jsonWebTokenHandler,
+      this.contactRepository,
+      this.jsonWebTokenHandler,
     );
 
     const { name, email, password } = request.body as IRequest;
@@ -32,13 +33,13 @@ export class SignUpControllerHandler {
     });
 
     if (result.isLeft())
-      return response.status(400).json({
+      return response.status(400).send({
         message: result.value.message,
       });
 
     const { contact, access_token } = result.value;
 
-    return response.json({
+    return response.send({
       user: ContactViewModel.parse(contact),
       access_token,
     });

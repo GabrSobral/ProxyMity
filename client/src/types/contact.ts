@@ -4,6 +4,6 @@ export interface Contact {
 	email: string;
 
 	lastOnline: Date | null;
-	registeredAt: Date;
+	registeredAt: Date | null;
 	createdAt: Date;
 }

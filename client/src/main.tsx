@@ -6,12 +6,15 @@ import App from './pages/App';
 import { SignIn } from './pages/sign-in';
 import { SignUp } from './pages/sign-up';
 
+import { UserProvider } from './contexts/user-context/context';
+
 import './index.css';
 
 const router = createBrowserRouter([
 	{
 		path: '/',
 		element: <App />,
+		index: true,
 	},
 	{
 		path: '/sign-in',
@@ -25,6 +28,8 @@ const router = createBrowserRouter([
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
 	<React.StrictMode>
-		<RouterProvider router={router} />
+		<UserProvider>
+			<RouterProvider router={router} />
+		</UserProvider>
 	</React.StrictMode>
 );

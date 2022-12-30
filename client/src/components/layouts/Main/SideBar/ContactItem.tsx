@@ -18,21 +18,19 @@ export function ContactItem({ contactItem }: Props) {
 	return (
 		<li
 			className={clsx(
-				'w-full p-3 rounded-xl flex gap-4 cursor-pointer hover:opacity-90 transition-colors group bg-gray-900',
+				'w-full p-3 rounded-xl flex gap-4 cursor-pointer hover:opacity-90 transition-colors group bg-white dark:bg-gray-900',
 				{
-					'bg-[#766AC8]': isSelected,
+					'bg-red-500': isSelected,
 				}
 			)}
-			onClick={() =>
-				contactsDispatch({ type: 'SELECT_CONTACT', payload: contactItem })
-			}
+			onClick={() => contactsDispatch({ type: 'SELECT_CONTACT', payload: contactItem })}
 		>
 			<div
 				className={clsx(
 					'min-w-[3.5rem] min-h-[3.5rem] max-w-[3.5rem] max-h-[3.5rem] rounded-full bg-gray-900 brightness-75 transition-colors',
 					{
-						'ring-1 ring-green-500': contactItem.isOnline,
-						'bg-[#766AC8]': isSelected,
+						'ring-2 ring-green-500': true,
+						'bg-red-600': isSelected,
 					}
 				)}
 			></div>

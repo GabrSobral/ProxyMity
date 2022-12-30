@@ -1,9 +1,17 @@
-import { useRef, useState } from 'react';
+import { FormEvent, useRef, useState } from 'react';
 import { Mic, Send } from 'react-feather';
+import { v4 as uuidv4 } from 'uuid';
+import { useChat } from '../../../../contexts/chat-context/hook';
+import { useUser } from '../../../../contexts/user-context/reducers/hook';
+import { addMessageAsyncDB } from '../../../../services/database/use-cases/add-message';
+import { Message } from '../../../../types/message';
 
 export function TypeBar() {
 	const textAreaRef = useRef<HTMLTextAreaElement>(null);
 	const [type, setType] = useState('');
+
+	const { userState } = useUser();
+	const { contactsState, messagesDispatch } = useChat();
 
 	function adjustTextAreaHeight(value: string) {
 		if (!textAreaRef?.current) return;
@@ -14,11 +22,38 @@ export function TypeBar() {
 		setType(value);
 	}
 
+	async function sendMessage(event: FormEvent) {
+		event.preventDefault();
+
+		if (!userState.data || !contactsState.selectedContact) return;
+
+		const message: Message = {
+			id: uuidv4(),
+			content: type,
+			readAt: null,
+			writtenAt: new Date(),
+			receivedAt: null,
+			sentAt: null,
+			authorId: userState.data.id,
+			recipientId: contactsState.selectedContact?.id,
+		};
+
+		addMessageAsyncDB(message);
+
+		messagesDispatch({
+			type: 'ADD_MESSAGE',
+			payload: { contactId: contactsState.selectedContact?.id, message },
+		});
+
+		setType('');
+	}
+
 	return (
 		<div className="mb-3 flex gap-4 px-4">
 			<form
 				action=""
 				className="w-full flex flex-1 gap-2"
+				onSubmit={sendMessage}
 			>
 				<textarea
 					ref={textAreaRef}

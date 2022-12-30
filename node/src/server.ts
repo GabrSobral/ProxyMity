@@ -1,15 +1,51 @@
 import 'dotenv/config';
-import express from 'express';
+import Fastify from 'fastify';
+import cors from '@fastify/cors';
+import FastifyWS, { SocketStream } from '@fastify/websocket';
 
-import { routes } from '@infra/http/routes';
+import { Routes } from '@infra/http/fastify-routes';
+import { WebSocketEvents } from '@infra/websockets/events';
 
-const app = express();
+const server = Fastify();
 
-const PORT = process.env.PORT || 3001;
+export interface MapPayload {
+  socket: SocketStream;
+  email: string;
+}
 
-app.use(express.json());
-app.use(routes);
+async function bootstrap() {
+  const PORT = process.env.PORT || 3001;
 
-app.listen(PORT, () =>
-  console.log(`🔥 Server is running on http://localhost:${PORT}`),
-);
+  await server.register(cors, { origin: '*' });
+  await server.register(FastifyWS);
+
+  const routes = new Routes(server);
+  await routes.register();
+
+  await server.register(async (instance) => {
+    const clients = new Map<string, MapPayload>();
+    const webSocketEvents = new WebSocketEvents(clients);
+
+    instance.get('/', { websocket: true }, (socketStream, req) => {
+      socketStream.socket.on('message', (message) => {
+        const { event, payload } = JSON.parse(message.toString());
+
+        webSocketEvents[event]({ payload, socket: socketStream });
+      });
+
+      socketStream.socket.on('close', () => {
+        clients.forEach((item) => {
+          if (item.socket === socketStream) {
+            clients.delete(item.email);
+            console.log('🎉 socket disconnected  ', item.email);
+          }
+        });
+      });
+    });
+  });
+
+  server.listen({ port: Number(PORT), host: '0.0.0.0' }, () =>
+    console.log(`🔥 Server started at http://localhost:${PORT}`),
+  );
+}
+bootstrap();

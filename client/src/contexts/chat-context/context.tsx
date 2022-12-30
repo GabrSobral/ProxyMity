@@ -12,43 +12,26 @@ import {
 	ContactReducerState,
 	contactsInitialState,
 } from './reducers/contact-reducer';
+import {
+	messagesInitialState,
+	MessagesReducer,
+	MessagesReducerActions,
+	MessagesReducerState,
+} from './reducers/messages-reducer';
 
 interface ChatContextProps {
 	contactsState: ContactReducerState;
 	contactsDispatch: Dispatch<ContactReducerActions>;
+
+	messagesState: MessagesReducerState;
+	messagesDispatch: Dispatch<MessagesReducerActions>;
 }
 
 export const ChatContext = createContext({} as ChatContextProps);
 
 export function ChatProvider({ children }: { children: ReactNode }) {
 	const [contactsState, contactsDispatch] = useReducer(ContactReducer, contactsInitialState);
-
-	const registerContact = useCallback(async () => {
-		const contact: Contact = {
-			id: 'eita',
-			name: 'Gabriel Sobral',
-			email: 'Gabriel_Sobral@gmail.com',
-			lastOnline: null,
-			registeredAt: new Date(),
-			createdAt: new Date(),
-		};
-
-		await registerContactAsyncDB(contact);
-
-		contactsDispatch({
-			type: 'ADD_CONTACT',
-			payload: {
-				id: contact.id,
-				name: contact.name,
-				email: contact.email,
-
-				lastOnline: null,
-				lastMessage: null,
-				registeredAt: contact.registeredAt,
-				createdAt: contact.createdAt,
-			},
-		});
-	}, []);
+	const [messagesState, messagesDispatch] = useReducer(MessagesReducer, messagesInitialState);
 
 	const getContacts = useCallback(async () => {
 		const raw = await getContactsAsyncDB();
@@ -66,15 +49,20 @@ export function ChatProvider({ children }: { children: ReactNode }) {
 		contactsDispatch({ type: 'SET_CONTACTS', payload: contacts });
 	}, []);
 
+	const getMessagesFromContact = useCallback(() => {}, []);
+
 	useEffect(() => {
 		getContacts();
-	}, []);
+	}, [getContacts]);
 
 	return (
 		<ChatContext.Provider
 			value={{
 				contactsState,
 				contactsDispatch,
+
+				messagesState,
+				messagesDispatch,
 			}}
 		>
 			{children}
