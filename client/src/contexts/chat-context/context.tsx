@@ -49,7 +49,9 @@ export function ChatProvider({ children }: { children: ReactNode }) {
 		contactsDispatch({ type: 'SET_CONTACTS', payload: contacts });
 	}, []);
 
-	const getMessagesFromContact = useCallback(() => {}, []);
+	const getMessagesFromContact = useCallback(() => {
+		const messages = getMessagesFromContact();
+	}, []);
 
 	useEffect(() => {
 		getContacts();
