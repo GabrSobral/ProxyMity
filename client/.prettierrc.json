@@ -2,7 +2,7 @@
 	"semi": true,
 	"trailingComma": "es5",
 	"singleQuote": true,
-	"singleAttributePerLine": true,
+	"singleAttributePerLine": false,
 	"endOfLine": "lf",
 	"tabWidth": 2,
 	"useTabs": true,

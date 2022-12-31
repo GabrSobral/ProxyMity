@@ -1,13 +1,14 @@
 import clsx from 'clsx';
+import { useMemo } from 'react';
 import { useChat } from '../../../../contexts/chat-context/hook';
-import { ContactDialog } from '../../../../contexts/chat-context/reducers/contact-reducer';
+import { Contact } from '../../../../types/contact';
 
 interface Props {
-	contactItem: ContactDialog;
+	contactItem: Contact;
 }
 
 export function ContactItem({ contactItem }: Props) {
-	const { contactsDispatch, contactsState } = useChat();
+	const { contactsDispatch, contactsState, messagesState } = useChat();
 
 	const formatLastMessageDate = Intl.DateTimeFormat('pt-br', {
 		hour: 'numeric',
@@ -15,6 +16,20 @@ export function ContactItem({ contactItem }: Props) {
 	});
 
 	const isSelected = contactItem.email === contactsState.selectedContact?.email;
+
+	const lastMessage = useMemo(() => {
+		if (!messagesState?.contacts) return null;
+
+		const index = messagesState.contacts.findIndex(contact => contact.id === contactItem.id);
+
+		if (index >= 0) {
+			return messagesState.contacts[index].messages[
+				messagesState.contacts[index].messages.length - 1
+			];
+		}
+		return null;
+	}, [messagesState, contactItem.id]);
+
 	return (
 		<li
 			className={clsx(
@@ -36,21 +51,26 @@ export function ContactItem({ contactItem }: Props) {
 			></div>
 
 			<div className="flex flex-col gap-2 overflow-hidden">
-				<span className="text-gray-200 truncate font-medium flex items-center justify-between gap-3">
+				<span
+					className={clsx('truncate font-medium flex items-center justify-between gap-3', {
+						'text-white': contactItem === contactsState.selectedContact,
+						'text-gray-700': contactItem !== contactsState.selectedContact,
+					})}
+				>
 					{contactItem.name}
 
-					{contactItem.lastMessage?.date && (
+					{/* {lastMessage?.writtenAt && (
 						<span className="text-[12px] text-gray-400">
-							{formatLastMessageDate.format(contactItem.lastMessage?.date)}
+							{formatLastMessageDate.format(lastMessage?.writtenAt)}
 						</span>
-					)}
+					)} */}
 				</span>
 
 				<span
 					className="text-gray-400 truncate group-hover:text-gray-200"
-					title={contactItem.lastMessage?.content}
+					title={lastMessage?.content}
 				>
-					{contactItem.lastMessage?.content}
+					{lastMessage ? lastMessage.content : 'No messages was sent'}
 				</span>
 			</div>
 		</li>

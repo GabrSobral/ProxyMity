@@ -11,26 +11,23 @@ interface Params<T = any> {
 export class WebSocketEvents {
   constructor(private clients: Map<string, MapPayload>) {}
 
-  async connect({ payload, socket }: Params<{ email: string }>) {
-    const { email } = payload;
+  async connect({ payload, socket }: Params<{ id: string }>) {
+    const { id } = payload;
 
-    this.clients.set(email, {
-      email,
+    this.clients.set(id, {
+      id,
       socket,
     });
 
-    console.log('👌 new socket connected: ', email);
+    console.log('👌 new socket connected: ', id);
   }
 
-  async send_message({
-    payload,
-    socket,
-  }: Params<{ sender: string; receiver: string; message: Message }>) {
-    const { sender, receiver, message } = payload;
+  async send_message({ payload, socket }: Params<{ message: Message }>) {
+    const { message } = payload;
 
-    if (!message || !sender || !receiver) return;
+    if (!message) return;
 
-    const receiverSocket = this.clients.get(receiver);
+    const receiverSocket = this.clients.get(message.recipientId);
 
     if (!receiverSocket) return;
 
@@ -38,7 +35,6 @@ export class WebSocketEvents {
       JSON.stringify({
         event: 'receive_message',
         payload: {
-          sender,
           message,
         },
       }),
@@ -46,9 +42,9 @@ export class WebSocketEvents {
 
     socket.socket.send(
       JSON.stringify({
-        event: 'received_message',
+        event: 'sent_message',
         payload: {
-          message,
+          message: { ...message, sentAt: new Date() },
         },
       }),
     );

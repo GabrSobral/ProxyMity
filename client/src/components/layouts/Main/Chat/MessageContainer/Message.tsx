@@ -1,14 +1,25 @@
 import clsx from 'clsx';
-import { Check } from 'react-feather';
+import { Message } from 'postcss';
+import { useState } from 'react';
+import { Check, Clock, Send } from 'react-feather';
+
+import { useUser } from '../../../../../contexts/user-context/hook';
 
 interface MessageProps {
-	content: string;
-	receivedAt: Date;
-	writtenAt: Date;
-	isMine: boolean;
+	message: Message;
 }
 
-export function Message({ content, isMine, receivedAt, writtenAt }: MessageProps) {
+export function Message({ message }: MessageProps) {
+	const { userState } = useUser();
+
+	let currentStatus: 'wrote' | 'sent' | 'received' = 'wrote';
+
+	if (message.writtenAt && message.sentAt && !message.receivedAt) currentStatus = 'sent';
+	else if (message.writtenAt && message.sentAt && message.receivedAt) currentStatus = 'received';
+
+	const [status, setStatus] = useState<'wrote' | 'sent' | 'received'>(currentStatus);
+
+	const isMine = userState.data?.id === message.authorId;
 	const formatter = Intl.DateTimeFormat('pt-br', { hour: 'numeric', minute: 'numeric' });
 
 	return (
@@ -19,14 +30,18 @@ export function Message({ content, isMine, receivedAt, writtenAt }: MessageProps
 				'bg-gray-600': !isMine,
 			})}
 		>
-			<span className="text-white">{content}</span>
+			<span className="text-white">{message.content}</span>
 
 			<span className="text-[12px] flex items-center gap-1 text-white ml-auto bottom-[-9px] right-[-10px] relative">
-				{isMine ? formatter.format(writtenAt) : formatter.format(receivedAt)}
-				<Check
-					size={13}
-					className="text-white"
-				/>
+				{isMine
+					? formatter.format(message.writtenAt)
+					: message.receivedAt
+					? formatter.format(message.receivedAt)
+					: null}
+
+				{status === 'wrote' && <Clock size={13} className="text-white" />}
+				{status === 'sent' && <Check size={13} className="text-white" />}
+				{status === 'received' && <Send size={13} className="text-white" />}
 			</span>
 		</div>
 	);

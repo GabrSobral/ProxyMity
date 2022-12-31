@@ -2,11 +2,12 @@ import { useState } from 'react';
 import { Plus, Search } from 'react-feather';
 
 import { useChat } from '../../../../contexts/chat-context/hook';
-import { useUser } from '../../../../contexts/user-context/reducers/hook';
+import { useUser } from '../../../../contexts/user-context/hook';
+
 import { Button } from '../../../elements/Button';
 import { Input } from '../../../elements/Input';
-import { Modal } from '../../../elements/Modal';
 import { ContactItem } from './ContactItem';
+
 import { NewContactModal } from './NewContactModal';
 
 export function SideBar() {
@@ -42,12 +43,9 @@ export function SideBar() {
 				</Input.Group>
 			</div>
 
-			<ul className="flex flex-col gap-1 p-3 overflow-y-auto flex-1">
+			<ul className="flex flex-col gap-1 p-3 overflow-y-auto flex-1 mt-3">
 				{contactsState.contactsDialog.map(item => (
-					<ContactItem
-						key={item.email}
-						contactItem={item}
-					/>
+					<ContactItem key={item.email} contactItem={item} />
 				))}
 			</ul>
 

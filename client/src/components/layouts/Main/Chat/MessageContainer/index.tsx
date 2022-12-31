@@ -8,17 +8,10 @@ export function MessageContainer() {
 		item => item.id === contactsState.selectedContact?.id
 	);
 
-	console.log(contactsMessages);
-
 	return (
-		<section className="flex flex-1 flex-col gap-1 p-4">
+		<section className="flex flex-1 flex-col gap-1 p-4  overflow-y-auto">
 			{contactsMessages?.messages.map(message => (
-				<Message
-					content={message.content}
-					receivedAt={message.receivedAt || new Date()}
-					writtenAt={message.writtenAt}
-					isMine
-				/>
+				<Message key={message.id} message={message} />
 			))}
 		</section>
 	);

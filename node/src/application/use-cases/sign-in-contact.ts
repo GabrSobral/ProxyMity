@@ -28,7 +28,9 @@ export class SignInContact {
 
     if (!email || !password) return left(new Error('Email/Password invalid.'));
 
-    const result = await this.contactRepository.findByEmail(email);
+    const result = await this.contactRepository.findByEmail(
+      email.toLowerCase(),
+    );
 
     if (result.isLeft()) return left(result.value);
 
@@ -42,7 +44,7 @@ export class SignInContact {
 
     const token = this.jsonWebTokenHandler.sign(
       {
-        email: contact.email,
+        email: contact.email.toLowerCase(),
       },
       60 * 60, // 1 hour
     );

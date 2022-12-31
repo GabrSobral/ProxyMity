@@ -7,17 +7,17 @@ html {
 }
 
 ::-webkit-scrollbar {
-	width: 14px;
+	@apply w-2;
 }
 ::-webkit-scrollbar-track {
-	@apply bg-gray-900 transition-all;
+	@apply bg-gray-200 transition-all w-2;
 }
 
 ::-webkit-scrollbar-thumb {
 	border-radius: 6px;
-	border: 1px solid #00000010;
+	border: 1px solid #0000020;
 
-	@apply bg-gray-800 shadow transition-all;
+	@apply bg-gray-300 shadow transition-all w-2;
 }
 
 ::-webkit-scrollbar-thumb:hover {

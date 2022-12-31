@@ -42,7 +42,7 @@ export class SignUpContact {
 
     const newContact = Contact.create({
       name,
-      email,
+      email: email.toLowerCase(),
       password: encryptedPassword,
       lastOnline: null,
     });

@@ -9,8 +9,8 @@ import { WebSocketEvents } from '@infra/websockets/events';
 const server = Fastify();
 
 export interface MapPayload {
+  id: string;
   socket: SocketStream;
-  email: string;
 }
 
 async function bootstrap() {
@@ -36,8 +36,8 @@ async function bootstrap() {
       socketStream.socket.on('close', () => {
         clients.forEach((item) => {
           if (item.socket === socketStream) {
-            clients.delete(item.email);
-            console.log('🎉 socket disconnected  ', item.email);
+            clients.delete(item.id);
+            console.log('🎉 socket disconnected  ', item.id);
           }
         });
       });

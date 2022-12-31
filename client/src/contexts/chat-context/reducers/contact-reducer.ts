@@ -3,27 +3,20 @@ import { Contact } from '../../../types/contact';
 export type ContactReducerActions =
 	| {
 			type: 'ADD_CONTACT';
-			payload: ContactDialog;
+			payload: Contact;
 	  }
 	| {
 			type: 'SET_CONTACTS';
-			payload: ContactDialog[];
+			payload: Contact[];
 	  }
 	| {
 			type: 'SELECT_CONTACT';
-			payload: ContactDialog | null;
+			payload: Contact | null;
 	  };
 
-export interface ContactDialog extends Contact {
-	lastMessage: {
-		date: Date;
-		content: string;
-	} | null;
-}
-
 export interface ContactReducerState {
-	contactsDialog: ContactDialog[];
-	selectedContact: ContactDialog | null;
+	contactsDialog: Contact[];
+	selectedContact: Contact | null;
 }
 
 export const contactsInitialState: ContactReducerState = {

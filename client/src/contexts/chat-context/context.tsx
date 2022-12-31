@@ -1,12 +1,11 @@
-import { createContext, Dispatch, ReactNode, useCallback, useEffect, useReducer } from 'react';
+import { createContext, Dispatch, ReactNode, useEffect, useReducer } from 'react';
+import { addMessageAsyncDB } from '../../services/database/use-cases/add-message';
 
+import { getContactMessagesAsyncDB } from '../../services/database/use-cases/get-contact-messages';
 import { getContactsAsyncDB } from '../../services/database/use-cases/get-contacts';
-import { registerContactAsyncDB } from '../../services/database/use-cases/register-contact';
-
-import { Contact } from '../../types/contact';
+import { Message } from '../../types/message';
 
 import {
-	ContactDialog,
 	ContactReducer,
 	ContactReducerActions,
 	ContactReducerState,
@@ -33,29 +32,38 @@ export function ChatProvider({ children }: { children: ReactNode }) {
 	const [contactsState, contactsDispatch] = useReducer(ContactReducer, contactsInitialState);
 	const [messagesState, messagesDispatch] = useReducer(MessagesReducer, messagesInitialState);
 
-	const getContacts = useCallback(async () => {
-		const raw = await getContactsAsyncDB();
+	useEffect(() => {
+		if (!contactsState.selectedContact) return;
 
-		const contacts: ContactDialog[] = raw.map(item => ({
-			id: item.id,
-			name: item.name,
-			email: item.email,
-			lastMessage: null,
-			lastOnline: item.lastOnline,
-			registeredAt: item.registeredAt,
-			createdAt: item.createdAt,
-		}));
+		const contactId = contactsState.selectedContact.id;
 
-		contactsDispatch({ type: 'SET_CONTACTS', payload: contacts });
-	}, []);
+		getContactMessagesAsyncDB(contactId).then(messages => {
+			messagesDispatch({ type: 'SET_CONTACT_MESSAGES', payload: { contactId, messages } });
+		});
+	}, [contactsState.selectedContact]);
 
-	const getMessagesFromContact = useCallback(() => {
-		const messages = getMessagesFromContact();
+	useEffect(() => {
+		getContactsAsyncDB().then(contacts => {
+			contactsDispatch({ type: 'SET_CONTACTS', payload: contacts });
+		});
 	}, []);
 
 	useEffect(() => {
-		getContacts();
-	}, [getContacts]);
+		function handler(message: Message) {
+			addMessageAsyncDB(message);
+
+			messagesDispatch({
+				type: 'ADD_MESSAGE',
+				payload: { contactId: message.authorId, message },
+			});
+		}
+
+		addEventListener('@ws.receive_message', e => handler(e.detail.message));
+
+		return () => {
+			removeEventListener('@ws.receive_message', e => handler(e.detail.messag));
+		};
+	}, []);
 
 	return (
 		<ChatContext.Provider

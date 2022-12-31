@@ -14,7 +14,9 @@ export class SearchContact {
   constructor(private contactRepository: ContactRepository) {}
 
   async execute({ email }: Request): Promise<Either<Error, Response>> {
-    const contact = await this.contactRepository.findByEmail(email);
+    const contact = await this.contactRepository.findByEmail(
+      email.toLowerCase(),
+    );
 
     if (contact.isLeft()) return left(contact.value);
 
