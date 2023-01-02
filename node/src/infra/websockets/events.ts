@@ -55,10 +55,19 @@ export class WebSocketEvents {
       }),
       { binary: isBinary },
     );
+
+    this.send_typing({
+      payload: {
+        authorId: message.authorId,
+        recipientId: message.recipientId,
+        typing: false,
+      },
+      isBinary: true,
+      socket: receiverSocket.socket,
+    });
   }
 
   async send_typing({
-    socket,
     payload,
     isBinary,
   }: Params<{ typing: boolean; recipientId: string; authorId: string }>) {
