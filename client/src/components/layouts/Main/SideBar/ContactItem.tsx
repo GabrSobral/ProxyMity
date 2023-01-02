@@ -98,8 +98,10 @@ export function ContactItem({ contactItem }: Props) {
 
 				<span
 					className={clsx('truncate', {
-						'text-gray-200': isSelected,
-						'text-gray-400': !isSelected,
+						'text-gray-200': isSelected && !typing,
+						'text-gray-400': !isSelected && !typing,
+						'text-red-500 font-bold': !isSelected && typing,
+						'text-white font-bold': isSelected && typing,
 					})}
 					title={lastMessage?.content}
 				>
