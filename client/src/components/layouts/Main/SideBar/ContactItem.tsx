@@ -1,8 +1,8 @@
 import clsx from 'clsx';
 import { useEffect, useMemo, useState } from 'react';
 import { User } from 'react-feather';
+
 import { useChat } from '../../../../contexts/chat-context/hook';
-import { useUser } from '../../../../contexts/user-context/hook';
 import { Contact } from '../../../../types/contact';
 
 interface Props {
@@ -59,7 +59,10 @@ export function ContactItem({ contactItem }: Props) {
 					'bg-red-500': isSelected,
 				}
 			)}
-			onClick={() => contactsDispatch({ type: 'SELECT_CONTACT', payload: contactItem })}
+			onClick={() => {
+				if (contactItem !== contactsState.selectedContact)
+					contactsDispatch({ type: 'SELECT_CONTACT', payload: contactItem });
+			}}
 		>
 			<div
 				className={clsx(

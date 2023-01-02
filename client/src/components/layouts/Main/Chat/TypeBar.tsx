@@ -1,7 +1,6 @@
-import { FormEvent, useEffect, useRef, useState } from 'react';
-import { Mic, Send } from 'react-feather';
+import { FormEvent, useCallback, useEffect, useRef, useState } from 'react';
+import { Send } from 'react-feather';
 import { v4 as uuidv4 } from 'uuid';
-import LZString from 'lz-string';
 
 import { useChat } from '../../../../contexts/chat-context/hook';
 import { useWebSocket } from '../../../../contexts/websocket-context/hook';
@@ -27,66 +26,71 @@ export function TypeBar() {
 		else textAreaRef.current.style.height = `${textAreaRef.current.scrollHeight / 16}rem`;
 	}
 
-	async function sendMessage(event: FormEvent) {
-		event.preventDefault();
+	const sendMessage = useCallback(
+		async (event?: FormEvent) => {
+			if (event) event.preventDefault();
+			if (!userState.data || !contactsState.selectedContact || !type.trim()) return;
 
-		if (!userState.data || !contactsState.selectedContact || !type) return;
+			console.log('sendMessage');
 
-		const message: Message = {
-			id: uuidv4(),
-			content: type,
-			readAt: null,
-			writtenAt: new Date(),
-			receivedAt: null,
-			sentAt: null,
-			authorId: userState.data.id,
-			recipientId: contactsState.selectedContact?.id,
-		};
+			const message: Message = {
+				id: uuidv4(),
+				content: type.trim(),
+				readAt: null,
+				writtenAt: new Date(),
+				receivedAt: null,
+				sentAt: null,
+				authorId: userState.data.id,
+				recipientId: contactsState.selectedContact?.id,
+			};
 
-		addMessageAsyncDB(message);
+			addMessageAsyncDB(message);
 
-		messagesDispatch({
-			type: 'ADD_MESSAGE',
-			payload: { contactId: contactsState.selectedContact?.id, message },
-		});
+			messagesDispatch({
+				type: 'ADD_MESSAGE',
+				payload: { contactId: contactsState.selectedContact?.id, message },
+			});
 
-		socket.send(
-			toBinary(
-				JSON.stringify({
-					event: 'send_message',
-					payload: {
-						message,
-						sender: userState.data.id,
-						receiver: contactsState.selectedContact.id,
-					},
-				})
-			)
-		);
-
-		setType('');
-	}
-
-	function typing(value: string) {
-		if (value && !type) {
 			socket.send(
 				toBinary(
 					JSON.stringify({
-						event: 'send_typing',
+						event: 'send_message',
 						payload: {
-							typing: true,
-							recipientId: contactsState.selectedContact?.id,
-							authorId: userState.data?.id,
+							message,
+							sender: userState.data.id,
+							receiver: contactsState.selectedContact.id,
 						},
 					})
 				)
 			);
-		} else if (!value && type) {
+
+			setType('');
+		},
+		[socket, type, userState.data, contactsState.selectedContact]
+	);
+
+	useEffect(() => {
+		if (!textAreaRef.current) return;
+
+		function event(e: KeyboardEvent) {
+			if (e.key === 'Enter' && !e.shiftKey) {
+				e.preventDefault();
+				sendMessage();
+			}
+		}
+
+		textAreaRef.current.addEventListener('keydown', event);
+		return () => textAreaRef.current?.removeEventListener('keydown', event);
+	}, [textAreaRef.current, sendMessage]);
+
+	function typing(value: string) {
+		function handle(typing: boolean) {
 			socket.send(
 				toBinary(
 					JSON.stringify({
 						event: 'send_typing',
 						payload: {
-							typing: false,
+							typing,
 							recipientId: contactsState.selectedContact?.id,
 							authorId: userState.data?.id,
 						},
@@ -94,6 +98,9 @@ export function TypeBar() {
 				)
 			);
 		}
+
+		if (value && !type) handle(true);
+		else if (!value && type) handle(false);
 
 		setType(value);
 		adjustTextAreaHeight(value);
@@ -126,15 +133,6 @@ export function TypeBar() {
 					<Send className="text-lg text-white" />
 				</button>
 			</form>
-
-			<button
-				type="button"
-				title="Record an audio"
-				className="rounded-full flex items-center justify-center bg-red-500 min-w-[3.5rem] min-h-[3.5rem] max-w-[3.5rem] max-h-[3.5rem] mt-auto"
-				onClick={() => {}}
-			>
-				<Mic className="text-lg text-white" />
-			</button>
 		</div>
 	);
 }

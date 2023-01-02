@@ -50,7 +50,7 @@ export function SideBar() {
 			<Button
 				type="button"
 				onClick={() => setIsNewContactModalVisible(true)}
-				className="absolute rounded-full min-w-[3.5rem] min-h-[3.5rem] max-w-[3.5rem] max-h-[3.5rem] mt-auto bottom-6 right-6"
+				className="absolute rounded-full min-w-[3.5rem] min-h-[3.5rem] max-w-[3.5rem] max-h-[3.5rem] mt-auto bottom-6 right-6 p-2"
 			>
 				<Plus className="text-white" />
 			</Button>

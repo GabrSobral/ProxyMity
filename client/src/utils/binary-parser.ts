@@ -1,14 +1,9 @@
-export function toBinary(value: string) {
+export function toBinary(value: string): Uint8Array {
 	const textEncoder = new TextEncoder();
-	const utf8 = new Uint8Array(value.length);
-
-	textEncoder.encodeInto(value, utf8);
-
-	return utf8;
+	return textEncoder.encode(value);
 }
 
-export function toText(binary: Uint8Array) {
-	const textEncoder = new TextDecoder();
-
+export function toText(binary: Uint8Array): string {
+	const textEncoder = new TextDecoder('utf-8');
 	return textEncoder.decode(binary);
 }

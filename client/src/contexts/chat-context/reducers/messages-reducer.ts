@@ -32,6 +32,10 @@ export function MessagesReducer(
 
 			if (index >= 0) {
 				state.contacts[index].messages.push(message);
+
+				if (state.contacts[index].messages.length > 100) {
+					state.contacts[index].messages.shift();
+				}
 			} else {
 				state.contacts.push({ id: contactId, messages: [message] });
 			}

@@ -28,6 +28,7 @@ async function bootstrap() {
 
     instance.get('/', { websocket: true }, (socketStream, req) => {
       socketStream.socket.on('message', (message, isBinary) => {
+        console.log(message.toString());
         const { event, payload } = JSON.parse(message.toString());
 
         webSocketEvents[event]({ payload, socket: socketStream, isBinary });
