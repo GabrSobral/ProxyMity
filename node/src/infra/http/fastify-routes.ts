@@ -6,14 +6,16 @@ import { PrismaContactRepository } from '@infra/database/prisma/repositories/pri
 
 import { SignInControllerHandler } from './controllers/contact/sign-in-controller';
 import { SignUpControllerHandler } from './controllers/contact/sign-up-controller';
-import { SearchContactControllerHandler } from './controllers/contact/search-contact-controller';
+import { SearchContactByEmailControllerHandler } from './controllers/contact/search-contact-by-email-controller';
+import { SearchContactByIdControllerHandler } from './controllers/contact/search-contact-by-id-controller';
 
 export class Routes {
   constructor(private fastify: FastifyInstance) {}
   async register() {
     await this.fastify.register(this.signIn);
     await this.fastify.register(this.signUp);
-    await this.fastify.register(this.searchContact);
+    await this.fastify.register(this.searchContactByEmail);
+    await this.fastify.register(this.searchContactById);
   }
 
   async signIn(fastify: FastifyInstance) {
@@ -46,13 +48,28 @@ export class Routes {
     });
   }
 
-  async searchContact(fastify: FastifyInstance) {
+  async searchContactByEmail(fastify: FastifyInstance) {
     const prismaClient = new PrismaClient();
     const prismaContactRepository = new PrismaContactRepository(prismaClient);
 
-    const handler = new SearchContactControllerHandler(prismaContactRepository);
+    const handler = new SearchContactByEmailControllerHandler(
+      prismaContactRepository,
+    );
 
-    fastify.get('/contact/search/:email', async (request, reply) => {
+    fastify.get('/contact/search-by-email/:email', async (request, reply) => {
+      await handler.handle(request, reply);
+    });
+  }
+
+  async searchContactById(fastify: FastifyInstance) {
+    const prismaClient = new PrismaClient();
+    const prismaContactRepository = new PrismaContactRepository(prismaClient);
+
+    const handler = new SearchContactByIdControllerHandler(
+      prismaContactRepository,
+    );
+
+    fastify.get('/contact/search-by-id/:id', async (request, reply) => {
       await handler.handle(request, reply);
     });
   }

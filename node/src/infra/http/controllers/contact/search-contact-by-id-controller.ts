@@ -1,25 +1,24 @@
 import { FastifyReply, FastifyRequest } from 'fastify';
 
 import { ContactRepository } from '@application/repositories/contact-repository';
-import { SearchContact } from '@application/use-cases/search-contact';
+import { SearchContactById } from '@application/use-cases/search-contact-by-id';
 
 import { ContactViewModel } from '@infra/http/view-model/contact-view-model';
 
 interface IRequest {
-  email: string;
-  password: string;
+  id: string;
 }
 
-export class SearchContactControllerHandler {
+export class SearchContactByIdControllerHandler {
   constructor(private contactRepository: ContactRepository) {}
 
   async handle(request: FastifyRequest, response: FastifyReply) {
-    const searchContact = new SearchContact(this.contactRepository);
+    const searchContact = new SearchContactById(this.contactRepository);
 
-    const { email } = request.params as IRequest;
+    const { id } = request.params as IRequest;
 
     const result = await searchContact.execute({
-      email,
+      id,
     });
 
     if (result.isLeft())

@@ -41,7 +41,25 @@ export class PrismaContactRepository implements ContactRepository {
       return right(PrismaContactMapper.toDomain(contact));
     } catch (error) {
       return left(
-        new Error('Error on try to get contact with email on database'),
+        new Error('Error on try to get contact with this email on database'),
+      );
+    }
+  }
+
+  async findById(id: string): Promise<Either<Error, Contact | null>> {
+    try {
+      const contact = await this.prisma.contact.findUnique({
+        where: {
+          id,
+        },
+      });
+
+      if (!contact) return right(null);
+
+      return right(PrismaContactMapper.toDomain(contact));
+    } catch (error) {
+      return left(
+        new Error('Error on try to get contact with this id on database'),
       );
     }
   }

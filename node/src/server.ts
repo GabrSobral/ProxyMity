@@ -27,10 +27,10 @@ async function bootstrap() {
     const webSocketEvents = new WebSocketEvents(clients);
 
     instance.get('/', { websocket: true }, (socketStream, req) => {
-      socketStream.socket.on('message', (message) => {
+      socketStream.socket.on('message', (message, isBinary) => {
         const { event, payload } = JSON.parse(message.toString());
 
-        webSocketEvents[event]({ payload, socket: socketStream });
+        webSocketEvents[event]({ payload, socket: socketStream, isBinary });
       });
 
       socketStream.socket.on('close', () => {
@@ -40,6 +40,8 @@ async function bootstrap() {
             console.log('🎉 socket disconnected  ', item.id);
           }
         });
+
+        socketStream.destroy();
       });
     });
   });

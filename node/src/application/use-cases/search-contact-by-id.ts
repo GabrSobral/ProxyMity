@@ -3,20 +3,18 @@ import { ContactRepository } from '@application/repositories/contact-repository'
 import { Either, left, right } from '@helpers/Either';
 
 interface Request {
-  email: string;
+  id: string;
 }
 
 interface Response {
   contact: Contact | null;
 }
 
-export class SearchContact {
+export class SearchContactById {
   constructor(private contactRepository: ContactRepository) {}
 
-  async execute({ email }: Request): Promise<Either<Error, Response>> {
-    const contact = await this.contactRepository.findByEmail(
-      email.toLowerCase(),
-    );
+  async execute({ id }: Request): Promise<Either<Error, Response>> {
+    const contact = await this.contactRepository.findById(id);
 
     if (contact.isLeft()) return left(contact.value);
 
