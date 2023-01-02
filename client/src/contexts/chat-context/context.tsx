@@ -1,8 +1,10 @@
 import { createContext, Dispatch, ReactNode, useEffect, useReducer } from 'react';
+import { APISearchContactById } from '../../services/api/search-contact-by-id';
 import { addMessageAsyncDB } from '../../services/database/use-cases/add-message';
 
 import { getContactMessagesAsyncDB } from '../../services/database/use-cases/get-contact-messages';
 import { getContactsAsyncDB } from '../../services/database/use-cases/get-contacts';
+import { registerContactAsyncDB } from '../../services/database/use-cases/register-contact';
 import { Message } from '../../types/message';
 
 import {
@@ -49,7 +51,9 @@ export function ChatProvider({ children }: { children: ReactNode }) {
 	}, []);
 
 	useEffect(() => {
-		function handler(message: Message) {
+		function handler(message?: Message) {
+			if (!message) return;
+
 			addMessageAsyncDB(message);
 
 			messagesDispatch({
@@ -58,12 +62,29 @@ export function ChatProvider({ children }: { children: ReactNode }) {
 			});
 		}
 
-		addEventListener('@ws.receive_message', e => handler(e.detail.message));
+		addEventListener('@ws.receive_message', (e: CustomEventInit<{ message: Message }>) =>
+			handler(e.detail?.message)
+		);
 
 		return () => {
-			removeEventListener('@ws.receive_message', e => handler(e.detail.messag));
+			removeEventListener('@ws.receive_message', (e: CustomEventInit<{ message: Message }>) =>
+				handler(e.detail?.message)
+			);
 		};
 	}, []);
+
+	useEffect(() => {
+		const contactsNotRegistered = messagesState.contacts.filter(mContact =>
+			contactsState.contactsDialog.every(contact => contact.id !== mContact.id)
+		);
+
+		for (const contact of contactsNotRegistered) {
+			APISearchContactById({ id: contact.id }).then(({ data }) => {
+				registerContactAsyncDB(data);
+				contactsDispatch({ type: 'ADD_CONTACT', payload: data });
+			});
+		}
+	}, [messagesState, contactsState.contactsDialog]);
 
 	return (
 		<ChatContext.Provider

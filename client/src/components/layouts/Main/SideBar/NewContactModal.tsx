@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { PlusCircle } from 'react-feather';
 
 import { useChat } from '../../../../contexts/chat-context/hook';
-import { APISearchContact } from '../../../../services/api/search-contact';
+import { APISearchContactByEmail } from '../../../../services/api/search-contact-by-email';
 import { registerContactAsyncDB } from '../../../../services/database/use-cases/register-contact';
 
 import { Button } from '../../../elements/Button';
@@ -26,17 +26,14 @@ export function NewContactModal({ closeModal, show }: Props) {
 	const { contactsDispatch } = useChat();
 
 	async function searchContact() {
-		const { data } = await APISearchContact({ email: newContactEmail });
+		const { data } = await APISearchContactByEmail({ email: newContactEmail });
 
 		if (data) {
 			await registerContactAsyncDB(data);
 
 			contactsDispatch({
 				type: 'ADD_CONTACT',
-				payload: {
-					...data,
-					lastMessage: null,
-				},
+				payload: data,
 			});
 
 			setMessage({ type: 'success', content: 'Nice! You added your friend.' });
@@ -46,12 +43,7 @@ export function NewContactModal({ closeModal, show }: Props) {
 	}
 
 	return (
-		<Modal
-			closeModal={closeModal}
-			show={show}
-			className="w-[30rem]"
-			showCloseButton
-		>
+		<Modal closeModal={closeModal} show={show} className="w-[30rem]" showCloseButton>
 			<Modal.Title>Add new contact</Modal.Title>
 			<Modal.Description>Type the e-mail of you friend, to add him.</Modal.Description>
 
@@ -79,11 +71,7 @@ export function NewContactModal({ closeModal, show }: Props) {
 				</span>
 			)}
 
-			<Button
-				type="button"
-				onClick={searchContact}
-				className="w-full"
-			>
+			<Button type="button" onClick={searchContact} className="w-full">
 				<PlusCircle className="text-white" />
 				Add
 			</Button>

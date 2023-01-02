@@ -7,22 +7,20 @@ import { useUser } from '../../../../contexts/user-context/hook';
 import { Button } from '../../../elements/Button';
 import { Input } from '../../../elements/Input';
 import { ContactItem } from './ContactItem';
+import { Header } from './Header';
 
 import { NewContactModal } from './NewContactModal';
 
 export function SideBar() {
 	const { contactsState } = useChat();
-	const { userState } = useUser();
 	const [searchContact, setSearchContact] = useState('');
 
 	const [isNewContactModalVisible, setIsNewContactModalVisible] = useState(false);
 
 	return (
 		<aside className="h-screen w-[25rem] bg-white dark:bg-gray-900 max-h-screen flex flex-col relative">
-			<div className="w-full px-4 py-2 h-[4rem] sticky top-0">
-				<header>
-					<span className="">Hi, {userState.data?.name || '...'}</span>
-				</header>
+			<div className="w-full px-4 py-2 sticky top-0 flex flex-col gap-2">
+				<Header />
 
 				<Input.Group>
 					<Input.Label className="sr-only">Search contact</Input.Label>
@@ -43,7 +41,7 @@ export function SideBar() {
 				</Input.Group>
 			</div>
 
-			<ul className="flex flex-col gap-1 p-3 overflow-y-auto flex-1 mt-3">
+			<ul className="flex flex-col gap-1 p-3 overflow-y-auto flex-1">
 				{contactsState.contactsDialog.map(item => (
 					<ContactItem key={item.email} contactItem={item} />
 				))}

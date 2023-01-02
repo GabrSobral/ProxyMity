@@ -13,8 +13,8 @@ interface Response {
 	data: Contact;
 }
 
-export async function APISearchContact({ email }: Request) {
-	const { data } = await api.get<Response>(`/contact/search/${email}`);
+export async function APISearchContactByEmail({ email }: Request) {
+	const { data } = await api.get<Response>(`/contact/search-by-email/${email}`);
 
 	return data;
 }

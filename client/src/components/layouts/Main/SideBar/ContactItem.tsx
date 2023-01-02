@@ -1,6 +1,8 @@
 import clsx from 'clsx';
-import { useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { User } from 'react-feather';
 import { useChat } from '../../../../contexts/chat-context/hook';
+import { useUser } from '../../../../contexts/user-context/hook';
 import { Contact } from '../../../../types/contact';
 
 interface Props {
@@ -9,6 +11,7 @@ interface Props {
 
 export function ContactItem({ contactItem }: Props) {
 	const { contactsDispatch, contactsState, messagesState } = useChat();
+	const [typing, setTyping] = useState(false);
 
 	const formatLastMessageDate = Intl.DateTimeFormat('pt-br', {
 		hour: 'numeric',
@@ -30,10 +33,28 @@ export function ContactItem({ contactItem }: Props) {
 		return null;
 	}, [messagesState, contactItem.id]);
 
+	useEffect(() => {
+		if (!contactItem.id) return;
+
+		const eventHandler = (event: CustomEventInit<{ typing: boolean; authorId: string }>) => {
+			const data = event.detail!;
+
+			if (data.authorId === contactItem.id) {
+				setTyping(data.typing);
+			}
+		};
+
+		addEventListener('@ws.receive_typing', eventHandler);
+
+		return () => {
+			removeEventListener('@ws.receive_typing', eventHandler);
+		};
+	}, [contactItem.id]);
+
 	return (
 		<li
 			className={clsx(
-				'w-full p-3 rounded-xl flex gap-4 cursor-pointer hover:opacity-90 transition-colors group bg-white dark:bg-gray-900',
+				'w-full p-3 rounded-xl flex gap-4 cursor-pointer hover:opacity-90 transition-colors group bg-white dark:bg-gray-900 shadow',
 				{
 					'bg-red-500': isSelected,
 				}
@@ -42,13 +63,22 @@ export function ContactItem({ contactItem }: Props) {
 		>
 			<div
 				className={clsx(
-					'min-w-[3.5rem] min-h-[3.5rem] max-w-[3.5rem] max-h-[3.5rem] rounded-full bg-gray-900 brightness-75 transition-colors',
+					'min-w-[3.5rem] min-h-[3.5rem] max-w-[3.5rem] max-h-[3.5rem] rounded-full transition-colors flex items-center justify-center shadow',
 					{
-						'ring-2 ring-green-500': true,
+						'ring-2 ring-green-500': false,
 						'bg-red-600': isSelected,
+						'bg-gray-50': !isSelected,
 					}
 				)}
-			></div>
+			>
+				<User
+					size={32}
+					className={clsx('', {
+						'text-red-500': !isSelected,
+						'text-white': isSelected,
+					})}
+				/>
+			</div>
 
 			<div className="flex flex-col gap-2 overflow-hidden">
 				<span
@@ -67,10 +97,13 @@ export function ContactItem({ contactItem }: Props) {
 				</span>
 
 				<span
-					className="text-gray-400 truncate group-hover:text-gray-200"
+					className={clsx('truncate', {
+						'text-gray-200': isSelected,
+						'text-gray-400': !isSelected,
+					})}
 					title={lastMessage?.content}
 				>
-					{lastMessage ? lastMessage.content : 'No messages was sent'}
+					{typing ? 'Typing...' : lastMessage ? lastMessage.content : 'No messages was sent'}
 				</span>
 			</div>
 		</li>

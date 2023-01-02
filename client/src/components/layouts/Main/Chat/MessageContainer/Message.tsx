@@ -1,12 +1,12 @@
 import clsx from 'clsx';
-import { Message } from 'postcss';
 import { useState } from 'react';
 import { Check, Clock, Send } from 'react-feather';
 
 import { useUser } from '../../../../../contexts/user-context/hook';
+import { Message as IMessage } from '../../../../../types/message';
 
 interface MessageProps {
-	message: Message;
+	message: IMessage;
 }
 
 export function Message({ message }: MessageProps) {
@@ -24,24 +24,24 @@ export function Message({ message }: MessageProps) {
 
 	return (
 		<div
-			className={clsx('w-fit h-fit p-2 px-4 rounded  flex gap-1', {
+			className={clsx('w-fit h-fit p-2 px-4 rounded  flex gap-1 shadow', {
 				'ml-auto': isMine,
-				'bg-blue-500': isMine,
-				'bg-gray-600': !isMine,
+				'bg-red-100': isMine,
+				'bg-white': !isMine,
 			})}
 		>
-			<span className="text-white">{message.content}</span>
+			<span className="text-gray-700">{message.content}</span>
 
-			<span className="text-[12px] flex items-center gap-1 text-white ml-auto bottom-[-9px] right-[-10px] relative">
+			<span className="text-[12px] flex items-center gap-1 text-gray-500 ml-auto bottom-[-9px] right-[-10px] relative">
 				{isMine
 					? formatter.format(message.writtenAt)
 					: message.receivedAt
 					? formatter.format(message.receivedAt)
 					: null}
 
-				{status === 'wrote' && <Clock size={13} className="text-white" />}
-				{status === 'sent' && <Check size={13} className="text-white" />}
-				{status === 'received' && <Send size={13} className="text-white" />}
+				{status === 'wrote' && <Clock size={13} className="text-gray-500" />}
+				{status === 'sent' && <Check size={13} className="text-gray-500" />}
+				{status === 'received' && <Send size={13} className="text-gray-500" />}
 			</span>
 		</div>
 	);

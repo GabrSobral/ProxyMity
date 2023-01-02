@@ -1,6 +1,7 @@
-import { FormEvent, useRef, useState } from 'react';
+import { FormEvent, useEffect, useRef, useState } from 'react';
 import { Mic, Send } from 'react-feather';
 import { v4 as uuidv4 } from 'uuid';
+import LZString from 'lz-string';
 
 import { useChat } from '../../../../contexts/chat-context/hook';
 import { useWebSocket } from '../../../../contexts/websocket-context/hook';
@@ -9,6 +10,7 @@ import { useUser } from '../../../../contexts/user-context/hook';
 import { addMessageAsyncDB } from '../../../../services/database/use-cases/add-message';
 import { Message } from '../../../../types/message';
 import { Input } from '../../../elements/Input';
+import { toBinary, toText } from '../../../../utils/binary-parser';
 
 export function TypeBar() {
 	const textAreaRef = useRef<HTMLTextAreaElement>(null);
@@ -23,8 +25,6 @@ export function TypeBar() {
 
 		if (value === '') textAreaRef.current.style.height = '3.5rem';
 		else textAreaRef.current.style.height = `${textAreaRef.current.scrollHeight / 16}rem`;
-
-		setType(value);
 	}
 
 	async function sendMessage(event: FormEvent) {
@@ -51,17 +51,52 @@ export function TypeBar() {
 		});
 
 		socket.send(
-			JSON.stringify({
-				event: 'send_message',
-				payload: {
-					message,
-					sender: userState.data.id,
-					receiver: contactsState.selectedContact.id,
-				},
-			})
+			toBinary(
+				JSON.stringify({
+					event: 'send_message',
+					payload: {
+						message,
+						sender: userState.data.id,
+						receiver: contactsState.selectedContact.id,
+					},
+				})
+			)
 		);
 
 		setType('');
+	}
+
+	function typing(value: string) {
+		if (value && !type) {
+			socket.send(
+				toBinary(
+					JSON.stringify({
+						event: 'send_typing',
+						payload: {
+							typing: true,
+							recipientId: contactsState.selectedContact?.id,
+							authorId: userState.data?.id,
+						},
+					})
+				)
+			);
+		} else if (!value && type) {
+			socket.send(
+				toBinary(
+					JSON.stringify({
+						event: 'send_typing',
+						payload: {
+							typing: false,
+							recipientId: contactsState.selectedContact?.id,
+							authorId: userState.data?.id,
+						},
+					})
+				)
+			);
+		}
+
+		setType(value);
+		adjustTextAreaHeight(value);
 	}
 
 	return (
@@ -77,7 +112,7 @@ export function TypeBar() {
 								placeholder="Message"
 								className="max-h-[20rem] min-h-[3.5rem] resize-none flex flex-1 py-3"
 								value={type}
-								onChange={e => adjustTextAreaHeight(e.target.value)}
+								onChange={e => typing(e.target.value)}
 							/>
 						</Input>
 					</Input.InputWrapper>
