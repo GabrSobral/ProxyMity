@@ -9,7 +9,7 @@ import { useUser } from '../../../../contexts/user-context/hook';
 import { addMessageAsyncDB } from '../../../../services/database/use-cases/add-message';
 import { Message } from '../../../../types/message';
 import { Input } from '../../../elements/Input';
-import { toBinary, toText } from '../../../../utils/binary-parser';
+import { toBinary } from '../../../../utils/binary-parser';
 
 export function TypeBar() {
 	const textAreaRef = useRef<HTMLTextAreaElement>(null);
@@ -30,8 +30,6 @@ export function TypeBar() {
 		async (event?: FormEvent) => {
 			if (event) event.preventDefault();
 			if (!userState.data || !contactsState.selectedContact || !type.trim()) return;
-
-			console.log('sendMessage');
 
 			const message: Message = {
 				id: uuidv4(),

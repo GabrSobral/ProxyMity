@@ -1,6 +1,6 @@
 import { FormEvent, useState } from 'react';
 import { Send } from 'react-feather';
-import { Link } from 'react-router-dom';
+import { Link, redirect } from 'react-router-dom';
 
 import { Button } from '../components/elements/Button';
 import { Heading } from '../components/elements/Heading';
@@ -18,38 +18,26 @@ export function SignUp() {
 
 	return (
 		<div className="h-screen w-screen flex">
-			<aside className="flex flex-[0.55] bg-blue-500 h-screen"></aside>
+			<aside className="flex flex-[0.60] bg-[url('./src/assets/sign-background.svg')] bg-no-repeat bg-black bg-cover h-screen relative"></aside>
 
-			<main className="flex flex-[0.45] bg-white h-screen p-4">
+			<main className="flex flex-[0.40] bg-white h-screen p-4 min-w-[30rem] shadow-lg">
 				<section className="flex flex-col gap-8 w-full max-w-[30rem] m-auto">
 					<header className="flex flex-col gap-3">
-						<Heading
-							asChild
-							size="lg"
-						>
-							<h1>Sign up</h1>
+						<Heading asChild size="lg">
+							<h1>Sign Up</h1>
 						</Heading>
 
-						<Text
-							asChild
-							size="md"
-						>
+						<Text asChild size="md">
 							<p>
 								Already have an account?{' '}
-								<Link
-									to="/sign-in"
-									className="text-red-500 font-semibold"
-								>
+								<Link to="/sign-in" className="text-red-500 font-semibold">
 									Sign In
 								</Link>
 							</p>
 						</Text>
 					</header>
 
-					<form
-						onSubmit={handleSubmit}
-						className="flex flex-col gap-3"
-					>
+					<form onSubmit={handleSubmit} className="flex flex-col gap-3">
 						<Input.Group>
 							<Input.Label>Name</Input.Label>
 
@@ -91,7 +79,7 @@ export function SignUp() {
 
 						<Button
 							type="submit"
-							className="w-full"
+							className="w-full bg-gradient-to-r from-[#1C64CE] border-0 to-[#B809A6]"
 						>
 							<Send className="text-white text-lg" />
 							Sign Up

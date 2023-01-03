@@ -65,11 +65,8 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
 		}
 
 		socket.addEventListener('message', handler);
-
-		return () => {
-			socket.removeEventListener('message', handler);
-		};
-	}, []);
+		return () => socket.removeEventListener('message', handler);
+	}, [socket]);
 
 	return (
 		<WebSocketContext.Provider

@@ -1,17 +1,17 @@
-import { FormEvent, Fragment, useLayoutEffect, useState } from 'react';
 import { Send } from 'react-feather';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, redirect } from 'react-router-dom';
+import { FormEvent, Fragment, useState } from 'react';
 
-import { Button } from '../components/elements/Button';
-import { Heading } from '../components/elements/Heading';
-import { Input } from '../components/elements/Input';
-import { LoadingSpinning } from '../components/elements/LoadingSpinning';
 import { Text } from '../components/elements/Text';
+import { Input } from '../components/elements/Input';
+import { Button } from '../components/elements/Button';
 import { useUser } from '../contexts/user-context/hook';
+import { Heading } from '../components/elements/Heading';
+import { LoadingSpinning } from '../components/elements/LoadingSpinning';
 
 import { APISignIn } from '../services/api/sign-in';
 import { saveUserAsyncDB } from '../services/database/use-cases/save-user';
-import { getToken, setToken } from '../services/token/handler';
+import { setToken } from '../services/token/handler';
 
 export function SignIn() {
 	const [userEmail, setUserEmail] = useState('');
@@ -20,11 +20,6 @@ export function SignIn() {
 	const [isLoading, setIsLoading] = useState(false);
 
 	const { userDispatch } = useUser();
-	const navigate = useNavigate();
-
-	useLayoutEffect(() => {
-		if (getToken()) navigate('/');
-	}, []);
 
 	async function handleSubmit(event: FormEvent) {
 		event.preventDefault();
@@ -48,7 +43,7 @@ export function SignIn() {
 
 			setIsLoading(false);
 
-			navigate('/');
+			redirect('/');
 		} catch (error) {
 			setIsLoading(false);
 		}
@@ -56,13 +51,13 @@ export function SignIn() {
 
 	return (
 		<div className="h-screen w-screen flex">
-			<aside className="flex flex-[0.55] bg-blue-500 h-screen"></aside>
+			<aside className="flex flex-[0.60] bg-[url('./src/assets/sign-background.svg')] bg-no-repeat bg-black bg-cover h-screen relative"></aside>
 
-			<main className="flex flex-[0.45] bg-white h-screen p-4">
+			<main className="flex flex-[0.40] bg-white h-screen p-4 min-w-[30rem] shadow-lg">
 				<section className="flex flex-col gap-8 w-full max-w-[30rem] m-auto">
 					<header className="flex flex-col gap-3">
 						<Heading asChild size="lg">
-							<h1>Sign in</h1>
+							<h1>Sign In</h1>
 						</Heading>
 
 						<Text asChild size="md">
@@ -102,7 +97,11 @@ export function SignIn() {
 							</Input.InputWrapper>
 						</Input.Group>
 
-						<Button type="submit" className="w-full" disabled={!(userEmail && userPassword)}>
+						<Button
+							type="submit"
+							className="w-full bg-gradient-to-r from-[#1C64CE] border-0 to-[#B809A6]"
+							disabled={!(userEmail && userPassword)}
+						>
 							{isLoading ? (
 								<LoadingSpinning color="white" size={24} lineSize={4} />
 							) : (

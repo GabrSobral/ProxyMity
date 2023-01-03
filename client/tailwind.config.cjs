@@ -23,6 +23,15 @@ module.exports = {
 		},
 		extend: {
 			colors: {
+				purple: {
+					200: '#B809A6',
+					500: '#9218DE',
+					700: '#561564',
+					900: '#0F063C',
+				},
+				blue: {
+					500: '#1868CE',
+				},
 				orange: {
 					100: '#FEEBCB',
 					300: '#F6AD55',
@@ -42,6 +51,7 @@ module.exports = {
 					950: '#1E1F1E',
 				},
 				green: {
+					100: '#3EE0B9',
 					400: '#48BB78',
 					600: '#25855A',
 				},

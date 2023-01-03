@@ -60,17 +60,19 @@ export function ChatProvider({ children }: { children: ReactNode }) {
 				type: 'ADD_MESSAGE',
 				payload: { contactId: message.authorId, message },
 			});
+
+			if (!document.hasFocus() && Notification.permission === 'granted')
+				new Notification('New message', { body: message.content, tag: 'newMessage' });
 		}
 
 		addEventListener('@ws.receive_message', (e: CustomEventInit<{ message: Message }>) =>
 			handler(e.detail?.message)
 		);
 
-		return () => {
+		return () =>
 			removeEventListener('@ws.receive_message', (e: CustomEventInit<{ message: Message }>) =>
 				handler(e.detail?.message)
 			);
-		};
 	}, []);
 
 	useEffect(() => {
