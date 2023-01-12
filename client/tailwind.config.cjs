@@ -7,6 +7,7 @@ module.exports = {
 		'./index.html',
 		'./src/pages/**/*.{js,ts,jsx,tsx}',
 		'./src/components/**/*.{js,ts,jsx,tsx}',
+		'./node_modules/tw-elements/dist/js/**/*.js',
 	],
 	theme: {
 		fontSize: {
@@ -61,5 +62,5 @@ module.exports = {
 			},
 		},
 	},
-	plugins: [require('@headlessui/tailwindcss')],
+	plugins: [require('@headlessui/tailwindcss'), require('tw-elements/dist/plugin')],
 };

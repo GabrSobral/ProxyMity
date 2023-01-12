@@ -16,9 +16,11 @@ export function ScrollToBottomButton({ messageContainerRef }: Props) {
 		const onScroll = () => {
 			if (!messageContainerRef.current) return;
 
-			setIsVisible(
-				messageContainerRef.current.scrollTop <= messageContainerRef.current.scrollHeight - 440
-			);
+			const newVisible =
+				messageContainerRef.current.scrollTop + messageContainerRef.current.clientHeight <=
+				messageContainerRef.current.scrollHeight;
+
+			setIsVisible(!newVisible);
 		};
 
 		messageContainerRef.current?.addEventListener('scroll', onScroll);
@@ -38,11 +40,11 @@ export function ScrollToBottomButton({ messageContainerRef }: Props) {
 
 	return (
 		<div className="relative max-h-0 w-full">
-			{isVisible && (
+			{!isVisible && (
 				<Button
 					type="button"
 					onClick={() => scrollToBottom()}
-					className="absolute rounded-full min-w-[2.25rem] min-h-[2.25rem] max-w-[2.25rem] max-h-[2.25rem] mt-auto bottom-4 right-8 ml-auto p-2"
+					className="absolute rounded-full min-w-[3.25rem] min-h-[3.25rem] max-w-[3.25rem] max-h-[3.25rem] mt-auto bottom-8 right-8 ml-auto p-2"
 				>
 					<ChevronDown className="text-white" />
 				</Button>

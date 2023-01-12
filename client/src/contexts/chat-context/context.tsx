@@ -61,8 +61,10 @@ export function ChatProvider({ children }: { children: ReactNode }) {
 				payload: { contactId: message.authorId, message },
 			});
 
+			contactsDispatch({ type: 'BRING_TO_TOP', payload: { contactId: message.authorId } });
+
 			if (!document.hasFocus() && Notification.permission === 'granted')
-				new Notification('New message', { body: message.content, tag: 'newMessage' });
+				new Notification('New message', { body: message.content });
 		}
 
 		addEventListener('@ws.receive_message', (e: CustomEventInit<{ message: Message }>) =>

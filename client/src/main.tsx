@@ -9,6 +9,7 @@ import { UserProvider } from './contexts/user-context/context';
 import { getToken } from './services/token/handler';
 
 import './index.css';
+import 'tw-elements';
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
 	// <React.StrictMode>

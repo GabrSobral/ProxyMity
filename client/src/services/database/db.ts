@@ -29,7 +29,8 @@ export class DexieDatabase extends Dexie {
         createdAt
       `,
 			messages: `
-				++id,
+				++orderId,
+				id,
 				content,
 				
 				authorId,

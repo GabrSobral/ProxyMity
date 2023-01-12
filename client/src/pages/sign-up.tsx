@@ -18,7 +18,7 @@ export function SignUp() {
 
 	return (
 		<div className="h-screen w-screen flex">
-			<aside className="flex flex-[0.60] bg-[url('./src/assets/sign-background.svg')] bg-no-repeat bg-black bg-cover h-screen relative"></aside>
+			<aside className="flex items-center justify-center flex-[0.60] bg-[url('./src/assets/sign-background.svg')] bg-no-repeat bg-black bg-cover h-screen relative"></aside>
 
 			<main className="flex flex-[0.40] bg-white h-screen p-4 min-w-[30rem] shadow-lg">
 				<section className="flex flex-col gap-8 w-full max-w-[30rem] m-auto">

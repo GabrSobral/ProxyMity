@@ -12,6 +12,10 @@ export type ContactReducerActions =
 	| {
 			type: 'SELECT_CONTACT';
 			payload: Contact | null;
+	  }
+	| {
+			type: 'BRING_TO_TOP';
+			payload: { contactId: string };
 	  };
 
 export interface ContactReducerState {
@@ -38,6 +42,20 @@ export function ContactReducer(
 			return {
 				...state,
 				contactsDialog: [action.payload, ...state.contactsDialog],
+			};
+		}
+
+		case 'BRING_TO_TOP': {
+			const { contactId } = action.payload;
+
+			if (state.contactsDialog.length <= 1 || contactId === state.contactsDialog[0]?.id)
+				return state;
+
+			return {
+				...state,
+				contactsDialog: state.contactsDialog.sort((first, second) =>
+					first.id === contactId ? -1 : second.id === contactId ? 1 : 0
+				),
 			};
 		}
 		default:

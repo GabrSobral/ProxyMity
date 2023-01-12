@@ -5,8 +5,8 @@ export async function getContactMessagesAsyncDB(contactId: string) {
 		.where({ recipientId: contactId })
 		.or('authorId')
 		.equalsIgnoreCase(contactId)
-		.limit(100)
-		.sortBy('writtenAt');
+		.limit(5)
+		.toArray();
 
 	return messages;
 }

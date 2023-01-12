@@ -7,7 +7,7 @@ export function ChatHeader() {
 	return (
 		<header className="w-full px-4 py-2 h-[4rem] bg-white dark:bg-gray-900 flex gap-4">
 			<div className="min-w-[3rem] min-h-[3rem] max-w-[3rem] max-h-[3rem] rounded-full bg-gray-50 transition-colors flex items-center justify-center shadow">
-				<User size={24} className="text-red-500" />
+				<User size={24} className="text-purple-500" />
 			</div>
 
 			<div>

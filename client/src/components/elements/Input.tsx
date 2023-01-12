@@ -25,10 +25,7 @@ function InputRoot({ children, className, ...rest }: InputRootProps) {
 
 	return (
 		<inputContext.Provider value={{ inputId }}>
-			<div
-				className={twMerge(clsx('flex flex-col gap-2 w-full', className))}
-				{...rest}
-			>
+			<div className={twMerge(clsx('flex flex-col gap-2 w-full', className))} {...rest}>
 				{children}
 			</div>
 		</inputContext.Provider>
@@ -73,7 +70,7 @@ function InputInput({ asChild, className, ref, ...rest }: InputInputProps) {
 			ref={ref || null}
 			className={twMerge(
 				clsx(
-					'min-h-[44px] outline-none hover:ring-1 transition-all dark:ring-gray-600 ring-gray-300 py-[0.5rem] px-4 rounded-md border-solid border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-whiteAlpha-900 focus:outline-red-500 focus:ring-0 bg-transparent placeholder:text-[#00000057] dark:placeholder:text-gray-400 w-full',
+					'min-h-[44px] outline-none hover:ring-1 transition-all dark:ring-gray-600 ring-gray-300 py-[0.5rem] px-4 rounded-md border-solid border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-whiteAlpha-900 focus:outline-purple-500 focus:ring-0 bg-transparent placeholder:text-[#00000057] dark:placeholder:text-gray-400 w-full',
 					className
 				)
 			)}

@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { User } from 'react-feather';
 
 import { useChat } from '../../../../contexts/chat-context/hook';
+import { getLastMessage } from '../../../../services/database/use-cases/get-last-messages';
 import { Contact } from '../../../../types/contact';
 
 interface Props {
@@ -19,6 +20,8 @@ export function ContactItem({ contactItem }: Props) {
 	});
 
 	const isSelected = contactItem.email === contactsState.selectedContact?.email;
+
+	getLastMessage({ contactId: contactItem.id }).then(data => console.log(data));
 
 	const lastMessage = useMemo(() => {
 		if (!messagesState?.contacts) return null;
@@ -56,7 +59,7 @@ export function ContactItem({ contactItem }: Props) {
 			className={clsx(
 				'w-full p-3 rounded-xl flex gap-4 cursor-pointer hover:opacity-90 transition-colors group bg-white dark:bg-gray-900 shadow',
 				{
-					'bg-red-500': isSelected,
+					'bg-gradient-to-r from-[#1C64CE] border-0 to-[#B809A6]': isSelected,
 				}
 			)}
 			onClick={() => {
@@ -66,21 +69,13 @@ export function ContactItem({ contactItem }: Props) {
 		>
 			<div
 				className={clsx(
-					'min-w-[3.5rem] min-h-[3.5rem] max-w-[3.5rem] max-h-[3.5rem] rounded-full transition-colors flex items-center justify-center shadow',
+					'min-w-[3.5rem] min-h-[3.5rem] max-w-[3.5rem] max-h-[3.5rem] rounded-full transition-colors flex items-center justify-center shadow bg-gray-50',
 					{
 						'ring-2 ring-green-500': false,
-						'bg-red-600': isSelected,
-						'bg-gray-50': !isSelected,
 					}
 				)}
 			>
-				<User
-					size={32}
-					className={clsx('', {
-						'text-red-500': !isSelected,
-						'text-white': isSelected,
-					})}
-				/>
+				<User size={32} className="text-purple-500" />
 			</div>
 
 			<div className="flex flex-col gap-2 overflow-hidden">
