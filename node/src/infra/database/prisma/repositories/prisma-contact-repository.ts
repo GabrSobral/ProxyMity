@@ -19,6 +19,7 @@ export class PrismaContactRepository implements ContactRepository {
           createdAt: contact.createdAt,
           lastOnline: contact.lastOnline,
           password: contact.password,
+          avatarConfig: contact.avatarConfig,
         },
       });
 

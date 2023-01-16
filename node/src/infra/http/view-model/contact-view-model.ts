@@ -8,6 +8,7 @@ export class ContactViewModel {
       email: contact.email,
       createdAt: contact.createdAt,
       lastOnline: contact.lastOnline,
+      avatarConfig: contact.avatarConfig,
     };
   }
 }

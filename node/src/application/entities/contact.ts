@@ -8,6 +8,7 @@ interface ContactProps {
   password: string;
   lastOnline: Date | null;
   createdAt: Date;
+  avatarConfig: string;
 }
 
 export class Contact {
@@ -49,6 +50,13 @@ export class Contact {
   }
   public get lastOnline() {
     return this.props.lastOnline;
+  }
+
+  public set avatarConfig(avatarConfig: string) {
+    this.props.avatarConfig = avatarConfig;
+  }
+  public get avatarConfig() {
+    return this.props.avatarConfig;
   }
 
   public get createdAt() {

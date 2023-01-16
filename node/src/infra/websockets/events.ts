@@ -48,9 +48,10 @@ export class WebSocketEvents {
 
     socket.socket.send(
       JSON.stringify({
-        event: 'sent_message',
+        event: 'receive_message_status',
         payload: {
-          message: { ...message, sentAt: new Date() },
+          status: 'sent',
+          messageId: message.id,
         },
       }),
       { binary: isBinary },
@@ -82,6 +83,30 @@ export class WebSocketEvents {
         payload: {
           typing,
           authorId,
+        },
+      }),
+      { binary: isBinary },
+    );
+  }
+
+  async send_read_message({
+    isBinary,
+    payload,
+  }: Params<{
+    contactId: string;
+    recipientId: string;
+  }>) {
+    const { contactId, recipientId } = payload;
+
+    const receiverSocket = this.clients.get(recipientId);
+
+    if (!receiverSocket) return;
+
+    receiverSocket.socket.socket.send(
+      JSON.stringify({
+        event: 'receive_read_message',
+        payload: {
+          contactId,
         },
       }),
       { binary: isBinary },

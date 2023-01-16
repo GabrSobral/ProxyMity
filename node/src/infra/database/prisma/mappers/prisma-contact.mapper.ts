@@ -11,6 +11,7 @@ export class PrismaContactMapper {
         lastOnline: raw.lastOnline,
         createdAt: raw.createdAt,
         password: raw.password,
+        avatarConfig: raw.avatarConfig,
       },
       raw.id,
     );
@@ -24,6 +25,7 @@ export class PrismaContactMapper {
       lastOnline: contact.lastOnline,
       createdAt: contact.createdAt,
       password: contact.password,
+      avatarConfig: contact.avatarConfig,
     };
   }
 }
