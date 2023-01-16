@@ -11,7 +11,7 @@ export function Chat() {
 	const container = useRef<HTMLDivElement>(null);
 
 	return (
-		<main className="flex flex-col flex-1 bg-[url('./src/assets/chat-background.svg')] bg-cover bg-no-repeat">
+		<main className="flex flex-col flex-1 bg-[url('./src/assets/chat-background.svg')] bg-cover bg-no-repeat rounded-lg overflow-hidden">
 			{contactsState.selectedContact && (
 				<Fragment>
 					<ChatHeader />

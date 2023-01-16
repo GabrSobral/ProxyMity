@@ -1,10 +1,12 @@
 import clsx from 'clsx';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { PlusCircle } from 'react-feather';
+import { generateAvatar } from '../../../../constants/avatar.config';
 
 import { useChat } from '../../../../contexts/chat-context/hook';
 import { APISearchContactByEmail } from '../../../../services/api/search-contact-by-email';
 import { registerContactAsyncDB } from '../../../../services/database/use-cases/register-contact';
+import { Contact } from '../../../../types/contact';
 
 import { Button } from '../../../elements/Button';
 import { Input } from '../../../elements/Input';
@@ -25,18 +27,22 @@ export function NewContactModal({ closeModal, show }: Props) {
 	const [message, setMessage] = useState<IMessage | null>(null);
 	const { contactsDispatch } = useChat();
 
+	useEffect(() => setMessage(null), [show]);
+
 	async function searchContact() {
 		const { data } = await APISearchContactByEmail({ email: newContactEmail });
 
 		if (data) {
-			await registerContactAsyncDB(data);
+			const contact: Contact = { ...data, avatarConfig: JSON.parse(data.avatarConfig as string) };
+			registerContactAsyncDB(contact);
 
 			contactsDispatch({
 				type: 'ADD_CONTACT',
-				payload: data,
+				payload: contact,
 			});
 
 			setMessage({ type: 'success', content: 'Nice! You added your friend.' });
+			closeModal();
 		} else {
 			setMessage({ type: 'error', content: "Oops! We don't find any user with this e-mail." });
 		}

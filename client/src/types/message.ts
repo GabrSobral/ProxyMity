@@ -1,16 +1,18 @@
 import { Contact } from './contact';
 
 export interface Message {
-	orderId: number;
+	dbId?: number;
 
 	id: string;
 	content: string;
+
+	contactRef?: string;
 
 	recipientId: Contact['id'];
 	authorId: Contact['id'];
 
 	writtenAt: Date;
-	sentAt: Date | null;
-	receivedAt: Date | null;
-	readAt: Date | null;
+	sentAt: Date | 'none';
+	receivedAt: Date | 'none';
+	readAt: Date | 'none';
 }

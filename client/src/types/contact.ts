@@ -1,3 +1,5 @@
+import { AvatarProps } from '@bigheads/core';
+
 export interface Contact {
 	id: string;
 	name: string;
@@ -6,4 +8,6 @@ export interface Contact {
 	lastOnline: Date | null;
 	registeredAt: Date | null;
 	createdAt: Date;
+
+	avatarConfig: AvatarProps;
 }

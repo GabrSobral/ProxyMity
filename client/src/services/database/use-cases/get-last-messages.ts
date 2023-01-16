@@ -1,15 +1,11 @@
 import { database } from '../db';
 
 interface Props {
-	contactId: string;
+	contactRef: string;
 }
 
-export async function getLastMessage({ contactId }: Props) {
-	const lastMessage = await database.messages
-		.where({ recipientId: contactId })
-		.or('authorId')
-		.equalsIgnoreCase(contactId)
-		.toArray();
+export async function getLastMessage({ contactRef }: Props) {
+	const lastMessage = await database.messages.where({ contactRef }).last();
 
-	console.log(lastMessage);
+	return lastMessage;
 }

@@ -31,6 +31,20 @@ type Events =
 				typing: boolean;
 				authorId: string;
 			};
+	  }
+	| {
+			event: 'receive_read_message';
+			payload: {
+				typing: boolean;
+				authorId: string;
+			};
+	  }
+	| {
+			event: 'receive_message_status';
+			payload: {
+				messageId: Message['id'];
+				status: 'wrote' | 'sent' | 'received' | 'read';
+			};
 	  };
 
 export function WebSocketProvider({ children }: { children: ReactNode }) {
@@ -54,11 +68,19 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
 			const receiveMessageEvent = new CustomEvent('@ws.receive_message', { detail: payload });
 			const sentMessageEvent = new CustomEvent('@ws.sent_message', { detail: payload });
 			const receiveTypingEvent = new CustomEvent('@ws.receive_typing', { detail: payload });
+			const receiveReadMessageEvent = new CustomEvent('@ws.receive_read_message', {
+				detail: payload,
+			});
+			const receiveMessageStatus = new CustomEvent('@ws.receive_message_status', {
+				detail: payload,
+			});
 
 			const events = {
 				receive_message: () => dispatchEvent(receiveMessageEvent),
 				sent_message: () => dispatchEvent(sentMessageEvent),
 				receive_typing: () => dispatchEvent(receiveTypingEvent),
+				receive_read_message: () => dispatchEvent(receiveReadMessageEvent),
+				receive_message_status: () => dispatchEvent(receiveMessageStatus),
 			};
 
 			events[event]();

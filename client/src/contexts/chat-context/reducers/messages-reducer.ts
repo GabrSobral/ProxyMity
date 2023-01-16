@@ -8,6 +8,10 @@ export type MessagesReducerActions =
 	| {
 			type: 'SET_CONTACT_MESSAGES';
 			payload: { contactId: string; messages: Message[] };
+	  }
+	| {
+			type: 'READ_MESSAGES';
+			payload: { contactId: string };
 	  };
 
 export interface MessagesReducerState {
@@ -48,15 +52,29 @@ export function MessagesReducer(
 			const index = state.contacts.findIndex(contact => contact.id === contactId);
 
 			if (index >= 0) {
-				const messagesNotLoaded = messages.filter(message => {
-					return state.contacts[index].messages.includes(message);
-				});
+				// const messagesNotLoaded = messages.filter(message => {
+				// 	return state.contacts[index].messages.some(item => item.id === message.id);
+				// });
 
-				state.contacts[index].messages = [...messagesNotLoaded, ...state.contacts[index].messages];
-				// state.contacts[index].messages = messages;
+				// state.contacts[index].messages = [...messagesNotLoaded, ...state.contacts[index].messages];
+				state.contacts[index].messages = messages;
 			} else {
 				state.contacts.push({ id: contactId, messages });
 			}
+			return { ...state };
+		}
+
+		case 'READ_MESSAGES': {
+			const contactIndex = state.contacts.findIndex(item => item.id === action.payload.contactId);
+
+			if (contactIndex > -1) {
+				state.contacts[contactIndex].messages.forEach(message => {
+					if (message && message.readAt === 'none') {
+						message.readAt = new Date();
+					}
+				});
+			}
+
 			return { ...state };
 		}
 

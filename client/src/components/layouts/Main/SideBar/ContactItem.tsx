@@ -1,17 +1,19 @@
 import clsx from 'clsx';
-import { useEffect, useMemo, useState } from 'react';
-import { User } from 'react-feather';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { generateAvatar } from '../../../../constants/avatar.config';
 
 import { useChat } from '../../../../contexts/chat-context/hook';
-import { getLastMessage } from '../../../../services/database/use-cases/get-last-messages';
+import { useUser } from '../../../../contexts/user-context/hook';
 import { Contact } from '../../../../types/contact';
+import { Avatar } from '../../../modules/Avatar';
 
 interface Props {
 	contactItem: Contact;
 }
 
 export function ContactItem({ contactItem }: Props) {
-	const { contactsDispatch, contactsState, messagesState } = useChat();
+	const { contactsDispatch, contactsState, messagesState, selectContact } = useChat();
+	const { userState } = useUser();
 	const [typing, setTyping] = useState(false);
 
 	const formatLastMessageDate = Intl.DateTimeFormat('pt-br', {
@@ -20,8 +22,6 @@ export function ContactItem({ contactItem }: Props) {
 	});
 
 	const isSelected = contactItem.email === contactsState.selectedContact?.email;
-
-	getLastMessage({ contactId: contactItem.id }).then(data => console.log(data));
 
 	const lastMessage = useMemo(() => {
 		if (!messagesState?.contacts) return null;
@@ -35,6 +35,16 @@ export function ContactItem({ contactItem }: Props) {
 		}
 		return null;
 	}, [messagesState, contactItem.id]);
+
+	const notificationsCount = useMemo(() => {
+		const index = messagesState.contacts.findIndex(contact => contact.id === contactItem.id);
+
+		if (index >= 0) {
+			return messagesState.contacts[index].messages.filter(
+				item => !item.readAt && item.authorId !== userState.data?.id
+			).length;
+		}
+	}, [messagesState, contactItem.id, userState.data?.id]);
 
 	useEffect(() => {
 		if (!contactItem.id) return;
@@ -57,28 +67,22 @@ export function ContactItem({ contactItem }: Props) {
 	return (
 		<li
 			className={clsx(
-				'w-full p-3 rounded-xl flex gap-4 cursor-pointer hover:opacity-90 transition-colors group bg-white dark:bg-gray-900 shadow',
+				'w-full py-2 px-3 rounded-xl flex gap-4 cursor-pointer hover:opacity-90 transition-colors group bg-white dark:bg-gray-900 shadow',
 				{
 					'bg-gradient-to-r from-[#1C64CE] border-0 to-[#B809A6]': isSelected,
 				}
 			)}
-			onClick={() => {
-				if (contactItem !== contactsState.selectedContact)
-					contactsDispatch({ type: 'SELECT_CONTACT', payload: contactItem });
-			}}
+			onClick={() => selectContact({ contact: contactItem })}
 		>
 			<div
-				className={clsx(
-					'min-w-[3.5rem] min-h-[3.5rem] max-w-[3.5rem] max-h-[3.5rem] rounded-full transition-colors flex items-center justify-center shadow bg-gray-50',
-					{
-						'ring-2 ring-green-500': false,
-					}
-				)}
+				className={clsx('min-w-[4rem] min-h-[4rem] max-w-[4rem] max-h-[4rem]', {
+					'ring-2 ring-green-500': false,
+				})}
 			>
-				<User size={32} className="text-purple-500" />
+				<Avatar userConfig={contactItem.avatarConfig} />
 			</div>
 
-			<div className="flex flex-col gap-2 overflow-hidden">
+			<div className="flex flex-col gap-1 overflow-hidden w-full">
 				<span
 					className={clsx('truncate font-medium flex items-center justify-between gap-3', {
 						'text-white': contactItem === contactsState.selectedContact,
@@ -88,14 +92,14 @@ export function ContactItem({ contactItem }: Props) {
 					{contactItem.name}
 
 					{/* {lastMessage?.writtenAt && (
-						<span className="text-[12px] text-gray-400">
+						<span className="text-[12px] text-gray-400 ml-auto ">
 							{formatLastMessageDate.format(lastMessage?.writtenAt)}
 						</span>
 					)} */}
 				</span>
 
 				<span
-					className={clsx('truncate', {
+					className={clsx('truncate flex justify-between gap-4', {
 						'text-gray-200': isSelected && !typing,
 						'text-gray-400': !isSelected && !typing,
 						'text-red-500 font-bold': !isSelected && typing,
@@ -103,7 +107,13 @@ export function ContactItem({ contactItem }: Props) {
 					})}
 					title={lastMessage?.content}
 				>
-					{typing ? 'Typing...' : lastMessage ? lastMessage.content : 'No messages was sent'}
+					{typing ? 'Typing...' : lastMessage ? lastMessage.content : 'Start a conversation...'}
+
+					{notificationsCount !== 0 && (
+						<div className="rounded-full bg-purple-500 w-6 h-6 flex items-center justify-center text-white text-[12px]">
+							{notificationsCount}
+						</div>
+					)}
 				</span>
 			</div>
 		</li>

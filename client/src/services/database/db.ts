@@ -17,7 +17,8 @@ export class DexieDatabase extends Dexie {
 				name, 
 				email, 
 				
-				createdAt
+				createdAt,
+				avatarConfig
 			`,
 			contacts: `
         ++id, 
@@ -26,12 +27,16 @@ export class DexieDatabase extends Dexie {
 				
         lastOnline, 
         registeredAt, 
-        createdAt
+        createdAt,
+
+				avatarConfig
       `,
 			messages: `
-				++orderId,
+				++dbId,
 				id,
 				content,
+
+				contactRef,
 				
 				authorId,
 				recipientId,
@@ -39,7 +44,9 @@ export class DexieDatabase extends Dexie {
 				sentAt,
 				receivedAt,
 				writtenAt,
-				readAt
+				readAt,
+
+				[contactRef+readAt+authorId]
 			`,
 		});
 	}

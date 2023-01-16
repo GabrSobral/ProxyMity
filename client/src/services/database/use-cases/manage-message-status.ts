@@ -3,7 +3,6 @@ import { Message } from '../../../types/message';
 
 const statusFunctions = {
 	sent: async (message: Message) => {
-		console.log('sentAt', message.sentAt);
 		await database.messages.update(message.id, { sentAt: message.sentAt });
 	},
 	received: async (message: Message) => {

@@ -10,6 +10,8 @@
 		"format": "prettier --write ."
 	},
 	"dependencies": {
+		"@bigheads/core": "^0.3.3",
+		"@formkit/auto-animate": "^1.0.0-beta.5",
 		"@headlessui/react": "^1.7.7",
 		"@headlessui/tailwindcss": "^0.1.2",
 		"@radix-ui/react-slot": "^1.0.1",

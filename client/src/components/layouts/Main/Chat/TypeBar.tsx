@@ -36,20 +36,24 @@ export function TypeBar() {
 			const message: Message = {
 				id: uuidv4(),
 				content: type.trim(),
-				readAt: null,
+				contactRef: '',
+				readAt: 'none',
 				writtenAt: new Date(),
-				receivedAt: null,
-				sentAt: null,
+				receivedAt: 'none',
+				sentAt: 'none',
 				authorId: userState.data.id,
 				recipientId: contactsState.selectedContact?.id,
 			};
 
-			addMessageAsyncDB(message);
+			addMessageAsyncDB({ ...message, contactRef: message.authorId + message.recipientId });
 
 			contactsDispatch({ type: 'BRING_TO_TOP', payload: { contactId: message.recipientId } });
 			messagesDispatch({
 				type: 'ADD_MESSAGE',
-				payload: { contactId: contactsState.selectedContact?.id, message },
+				payload: {
+					contactId: contactsState.selectedContact?.id,
+					message: { ...message, contactRef: message.authorId + message.recipientId },
+				},
 			});
 
 			socket.send(
@@ -57,7 +61,7 @@ export function TypeBar() {
 					JSON.stringify({
 						event: 'send_message',
 						payload: {
-							message,
+							message: { ...message, readAt: null, receivedAt: null, sentAt: null },
 							sender: userState.data.id,
 							receiver: contactsState.selectedContact.id,
 						},

@@ -39,6 +39,7 @@ export function SignIn() {
 				createdAt: response.data.createdAt,
 				email: response.data.email,
 				name: response.data.name,
+				avatarConfig: JSON.parse(response.data.avatarConfig as string),
 			});
 
 			setIsLoading(false);
