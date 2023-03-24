@@ -1,6 +1,6 @@
+import { useState } from 'react';
 import { Plus, Search } from 'react-feather';
-import autoAnimate from '@formkit/auto-animate';
-import { useEffect, useRef, useState } from 'react';
+import { useAutoAnimate } from '@formkit/auto-animate/react';
 
 import { useChat } from '../../../../contexts/chat-context/hook';
 
@@ -15,13 +15,9 @@ import { Heading } from '../../../elements/Heading';
 export function SideBar() {
 	const { contactsState } = useChat();
 	const [searchContact, setSearchContact] = useState('');
-	const contactContainerRef = useRef(null);
+	const [contactContainerRef] = useAutoAnimate<HTMLUListElement>({ duration: 200 });
 
 	const [isNewContactModalVisible, setIsNewContactModalVisible] = useState(false);
-
-	useEffect(() => {
-		contactContainerRef.current && autoAnimate(contactContainerRef.current, { duration: 200 });
-	}, [contactContainerRef]);
 
 	return (
 		<aside className="h-screen w-[30rem] bg-white dark:bg-gray-900 max-h-screen flex flex-col relative">
