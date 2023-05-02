@@ -34,7 +34,7 @@ model Contact {
   password   String
 
   avatarConfig String
-
+ 
   MessageAuthor    Message[] @relation("author")
   MessageRecipient Message[] @relation("recipient")
 }
