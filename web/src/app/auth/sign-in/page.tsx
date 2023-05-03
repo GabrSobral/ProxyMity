@@ -2,7 +2,7 @@
 
 import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
-import { FormEvent, Fragment, useState } from 'react';
+import { FormEvent, Fragment, useEffect, useState } from 'react';
 import { Eye, EyeClosed, SignIn as SignInIcon, Warning, X } from '@phosphor-icons/react';
 
 import { Input } from '@/@design-system/Input';
@@ -13,7 +13,7 @@ import { useAuthStore } from '../authStore';
 import { useUserStore } from '@/stores/user';
 
 import { APISignIn } from '@/services/api/sign-in';
-import { setToken } from '@/services/token/handler';
+import { getToken, setToken } from '@/services/token/handler';
 import { saveUserAsyncDB } from '@/services/database/use-cases/save-user';
 
 export default function SignIn() {
@@ -27,6 +27,14 @@ export default function SignIn() {
 
 	const { email, password } = useAuthStore(store => store.signIn.states);
 	const { setEmailValue, setPasswordValue } = useAuthStore(store => store.signIn.actions);
+
+	useEffect(() => {
+		const session = getToken();
+
+		if (session) {
+			router.replace('/products/chats');
+		}
+	}, []);
 
 	async function handleSubmit(event: FormEvent) {
 		event.preventDefault();
@@ -48,7 +56,7 @@ export default function SignIn() {
 
 			setIsLoading(false);
 
-			router.push('/products/chats');
+			router.replace('/products/chats');
 		} catch (error: any) {
 			console.log(error?.response?.data || error?.message);
 			if (String(error?.message).includes('Key already exists in the object store')) {
@@ -119,7 +127,7 @@ export default function SignIn() {
 					</Input.Wrapper>
 				</Input.Group>
 
-				<Button type="submit" className="w-full">
+				<Button type="submit" className="w-full" disabled={!(email && password)}>
 					{isLoading ? (
 						<LoadingSpinning size={32} lineSize={2} color="white" />
 					) : (
