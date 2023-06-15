@@ -21,16 +21,12 @@ export class SignInContact {
     private readonly jsonWebTokenHandler: IJsonWebToken,
   ) {}
 
-  async execute(
-    request: SignInRequest,
-  ): Promise<Either<Error, SignInResponse>> {
+  async execute(request: SignInRequest): Promise<Either<Error, SignInResponse>> {
     const { email, password } = request;
 
     if (!email || !password) return left(new Error('Email/Password invalid.'));
 
-    const result = await this.contactRepository.findByEmail(
-      email.toLowerCase(),
-    );
+    const result = await this.contactRepository.findByEmail(email.toLowerCase());
 
     if (result.isLeft()) return left(result.value);
 

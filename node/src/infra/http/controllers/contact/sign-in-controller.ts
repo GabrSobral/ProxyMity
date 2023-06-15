@@ -1,6 +1,6 @@
 import { FastifyReply, FastifyRequest } from 'fastify';
 
-import { SignInContact } from '@application/use-cases/sign-in-contact';
+import { SignInContact } from '@application/use-cases/sign-in-user';
 import { ContactRepository } from '@application/repositories/contact-repository';
 
 import { IJsonWebToken } from '@infra/authentication/jwt/json-web-token';

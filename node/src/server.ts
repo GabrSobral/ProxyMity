@@ -4,7 +4,7 @@ import cors from '@fastify/cors';
 import FastifyWS, { SocketStream } from '@fastify/websocket';
 
 import { Routes } from '@infra/http/fastify-routes';
-import { WebSocketEvents } from '@infra/websockets/events';
+import { WebSocketEvents } from '@infra/websockets/WebSocketEvents';
 
 const server = Fastify();
 
@@ -14,7 +14,7 @@ export interface MapPayload {
 }
 
 async function bootstrap() {
-  const PORT = process.env.PORT || 3001;
+  const PORT = process.env.PORT || 3333;
 
   await server.register(cors, { origin: '*' });
   await server.register(FastifyWS);
@@ -27,10 +27,10 @@ async function bootstrap() {
     const webSocketEvents = new WebSocketEvents(clients);
 
     instance.get('/', { websocket: true }, (socketStream, req) => {
-      socketStream.socket.on('message', (message, isBinary) => {
+      socketStream.socket.on('message', (message) => {
         const { event, payload } = JSON.parse(message.toString());
 
-        webSocketEvents[event]({ payload, socket: socketStream, isBinary });
+        webSocketEvents[event]({ payload, socket: socketStream });
       });
 
       socketStream.socket.on('close', () => {
@@ -50,4 +50,5 @@ async function bootstrap() {
     console.log(`🔥 Server started at http://localhost:${PORT}`),
   );
 }
+
 bootstrap();

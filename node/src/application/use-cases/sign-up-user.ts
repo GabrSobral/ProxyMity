@@ -1,9 +1,13 @@
 import bcrypt from 'bcrypt';
 
 import { Either, Left, right } from '@helpers/Either';
+
 import { ContactRepository } from '../repositories/contact-repository';
+
 import { IJsonWebToken } from '@infra/authentication/jwt/json-web-token';
+
 import { Contact } from '@application/entities/contact';
+
 import { generateAvatar } from 'src/utils/avatar.config';
 
 interface SignUpContactRequest {
