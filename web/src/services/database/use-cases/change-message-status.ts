@@ -2,10 +2,10 @@ import { database } from '../db';
 
 const options = {
 	async sent(messageId: string) {
-		await database.messages.update(messageId, { sentAt: new Date() });
+		await database.messages.where({ id: messageId }).modify({ sentAt: new Date() });
 	},
 	async received(messageId: string) {
-		await database.messages.update(messageId, { receivedAt: new Date() });
+		await database.messages.where({ id: messageId }).modify({ receivedAt: new Date() });
 	},
 };
 
@@ -14,6 +14,6 @@ interface ChangeMessageStatusProps {
 	status: 'sent' | 'received';
 }
 
-export async function changeMessageStatus({ messageId, status }: ChangeMessageStatusProps) {
+export async function changeMessageStatusAsyncDB({ messageId, status }: ChangeMessageStatusProps) {
 	await options[status](messageId);
 }

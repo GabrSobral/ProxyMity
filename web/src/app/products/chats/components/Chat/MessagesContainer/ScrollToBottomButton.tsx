@@ -1,8 +1,6 @@
-import { AnimatePresence, motion } from 'framer-motion';
 import { CaretDown } from '@phosphor-icons/react';
 import { useEffect, RefObject, useState } from 'react';
-
-import { Button } from '@/@design-system/Button';
+import { AnimatePresence, motion } from 'framer-motion';
 
 interface Props {
 	messageContainerRef: RefObject<HTMLUListElement>;
@@ -12,24 +10,25 @@ export function ScrollToBottomButton({ messageContainerRef }: Props) {
 	const [isVisible, setIsVisible] = useState(false);
 
 	useEffect(() => {
-		if (!messageContainerRef.current) {
+		const containerRef = messageContainerRef.current;
+
+		if (!containerRef) {
 			return;
 		}
 		const handleScroll = () => {
-			const container = messageContainerRef.current;
+			const container = containerRef;
 
 			if (container) {
-				const isScrolledToBottom =
-					container.scrollHeight - container.clientHeight <= container.scrollTop + 1;
+				const isScrolledToBottom = container.scrollHeight - container.clientHeight <= container.scrollTop + 1;
 
 				setIsVisible(!isScrolledToBottom);
 			}
 		};
 
-		messageContainerRef.current.addEventListener('scroll', handleScroll);
+		containerRef.addEventListener('scroll', handleScroll);
 
 		return () => {
-			messageContainerRef.current?.removeEventListener('scroll', handleScroll);
+			containerRef.removeEventListener('scroll', handleScroll);
 		};
 	}, [messageContainerRef]);
 

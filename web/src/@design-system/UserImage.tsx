@@ -12,19 +12,23 @@ interface Props extends ImageProps {
 	showPlaceholder?: boolean;
 }
 
-export function UserImage({
-	status,
-	containerClassName,
-	statusClassName,
-	showPlaceholder,
-	...rest
-}: Props) {
+export function UserImage({ status, containerClassName, statusClassName, showPlaceholder, ...rest }: Props) {
 	return (
-		<div className={twMerge('relative', containerClassName)}>
+		<div
+			style={{
+				maxHeight: rest.height,
+				maxWidth: rest.width,
+				minHeight: rest.height,
+				minWidth: rest.width,
+			}}
+			className={twMerge(`relative`, containerClassName)}
+		>
 			{showPlaceholder ? (
 				<div
 					className={twMerge(
-						`min-w-[${rest.width}px] min-h-[${rest.height}px] rounded-full z-0 shadow-xl flex items-center justify-center`,
+						`min-w-[${rest.width || 54}px] min-h-[${rest.height || 54}px] max-w-[${rest.width || 54}px] max-h-[${
+							rest.height || 54
+						}px] rounded-full z-0 shadow-xl flex items-center justify-center`,
 						rest.className
 					)}
 				>
@@ -35,7 +39,9 @@ export function UserImage({
 					width={54}
 					height={54}
 					className={twMerge(
-						`min-w-[${rest.width}px] min-h-[${rest.height}px] rounded-full z-0 shadow-xl`,
+						`min-w-[${rest.width || 54}px] min-h-[${rest.height || 54}px] max-w-[${rest.width || 54}px] max-h-[${
+							rest.height || 54
+						}px] rounded-full z-0 shadow-xl`,
 						rest.className
 					)}
 					{...rest}
@@ -46,7 +52,9 @@ export function UserImage({
 				title="Online"
 				className={twMerge(
 					clsx(
-						'absolute bottom-1 right-0 z-10  min-w-[18px] min-h-[18px] rounded-full border-4 border-gray-800',
+						`absolute bottom-1 right-0 z-10  min-w-[${Number(rest.width || 54) / 3}px] min-h-[${
+							Number(rest.height || 54) / 3
+						}px] rounded-full border-4 border-gray-800`,
 						{
 							'bg-green-500': status === 'online',
 							'bg-red-400': status === 'busy',

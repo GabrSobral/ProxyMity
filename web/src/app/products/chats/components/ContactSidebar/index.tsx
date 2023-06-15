@@ -1,7 +1,9 @@
 'use client';
 
-import { Input } from '@/@design-system/Input';
 import { MagnifyingGlass } from '@phosphor-icons/react';
+
+import { Input } from '@/@design-system/Input';
+
 import { OnlineNow } from './OnlineNow';
 import { MessagesList } from './MessagesList';
 

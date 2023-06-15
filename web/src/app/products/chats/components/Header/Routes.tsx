@@ -1,7 +1,7 @@
 import clsx from 'clsx';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { ChatCenteredText, Gear } from '@phosphor-icons/react';
+import { ChatCenteredText } from '@phosphor-icons/react';
 
 export function Routes() {
 	const pathname = usePathname();
@@ -9,7 +9,7 @@ export function Routes() {
 	const pages = [
 		{
 			title: 'Chats',
-			path: '/',
+			path: '/products/chats',
 			icon: <ChatCenteredText size={28} weight="fill" />,
 		},
 	];
@@ -34,13 +34,10 @@ export function Routes() {
 					</span>
 
 					<div
-						className={clsx(
-							'absolute h-1 rounded bg bg-purple-300 bottom-0 m-auto transition-all',
-							{
-								'w-0': page.path !== pathname,
-								'w-full': page.path === pathname,
-							}
-						)}
+						className={clsx('absolute h-1 rounded bg bg-purple-300 bottom-0 m-auto transition-all', {
+							'w-0': page.path !== pathname,
+							'w-full': page.path === pathname,
+						})}
 					/>
 				</Link>
 			))}

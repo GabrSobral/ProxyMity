@@ -31,10 +31,12 @@ export default function SignIn() {
 	useEffect(() => {
 		const session = getToken();
 
-		if (session) {
+		console.log(session);
+
+		if (JSON.stringify(session) !== '{}') {
 			router.replace('/products/chats');
 		}
-	}, []);
+	}, [router]);
 
 	async function handleSubmit(event: FormEvent) {
 		event.preventDefault();

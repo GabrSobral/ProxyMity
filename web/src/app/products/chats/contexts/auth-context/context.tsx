@@ -5,16 +5,14 @@ import { useUserStore } from '@/stores/user';
 
 import { createContext, ReactNode, useEffect } from 'react';
 
-interface AuthContextProps {}
-
-export const AuthContext = createContext({} as AuthContextProps);
+export const AuthContext = createContext({});
 
 export function AuthProvider({ children }: { children: ReactNode }) {
 	const setUser = useUserStore(store => store.actions.setUser);
 
 	useEffect(() => {
 		getUserAsyncDB().then(setUser);
-	}, []);
+	}, [setUser]);
 
 	return <AuthContext.Provider value={{}}>{children}</AuthContext.Provider>;
 }

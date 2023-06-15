@@ -47,7 +47,13 @@ export function MessagesContainer() {
 						</Heading>
 					</div>
 				) : (
-					contactMessages?.messages.map(message => <Message key={message.id} message={message} />)
+					contactMessages?.messages.map((message, i) => (
+						<Message
+							key={message.id}
+							message={message}
+							previousIsFromUser={contactMessages?.messages[i - 1]?.authorId === message.authorId}
+						/>
+					))
 				)}
 			</ul>
 

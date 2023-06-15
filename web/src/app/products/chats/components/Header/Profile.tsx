@@ -1,19 +1,23 @@
-import { Popover, Transition } from '@headlessui/react';
-import { Gear, SignOut } from '@phosphor-icons/react';
 import clsx from 'clsx';
 import Image from 'next/image';
 import { useState } from 'react';
+import { Gear, SignOut } from '@phosphor-icons/react';
+import { Popover, Transition } from '@headlessui/react';
+
+import { useUserStore } from '@/stores/user';
 
 type Status = 'online' | 'busy' | 'invisible';
 
 export function Profile() {
+	const userData = useUserStore(store => store.state.data);
+
 	const [status, setStatus] = useState<Status>('online');
 
 	return (
 		<div className="flex items-center gap-3">
 			<div className="flex flex-col gap-1">
-				<span className="text-gray-100 ">Good Morning, Gabriel</span>
-				<span className="text-xs text-gray-300">Gabriel.Sobral1378@gmail.com</span>
+				<span className="text-gray-100 ">Good Morning, {userData?.name}</span>
+				<span className="text-xs text-gray-300">{userData?.email}</span>
 			</div>
 
 			<div className="relative">

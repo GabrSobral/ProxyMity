@@ -10,7 +10,7 @@ export class DexieDatabase extends Dexie {
 	messages!: Table<Message>;
 
 	constructor() {
-		super('realchat');
+		super('proxymity-chat');
 		this.version(1).stores({
 			user: `
 				++id, 

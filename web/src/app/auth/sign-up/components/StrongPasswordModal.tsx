@@ -18,8 +18,7 @@ export function StrongPasswordModal({ isVisible, closeModal }: Props) {
 
 	function generatePassword() {
 		const passwordLength = 18;
-		const charSet =
-			'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+-=[]{}|;:,.<>?';
+		const charSet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+-=[]{}|;:,.<>?';
 
 		let password = '';
 		for (let i = 0; i < passwordLength; i++) {
@@ -50,20 +49,18 @@ export function StrongPasswordModal({ isVisible, closeModal }: Props) {
 		<Modal show={isVisible} closeModal={closeModal} className="gap-3 max-w-[36rem]">
 			<Modal.Title>Generate a strong password</Modal.Title>
 			<Modal.Description className="break-words">
-				A strong and random password helps protect your online accounts and personal information
-				from cyber threats
+				A strong and random password helps protect your online accounts and personal information from cyber threats
 			</Modal.Description>
 
 			<Modal.Description>
-				By using a mix of characters and symbols, you can reduce the risk of unauthorized access and
-				identity theft.
+				By using a mix of characters and symbols, you can reduce the risk of unauthorized access and identity theft.
 			</Modal.Description>
 
 			<Modal.Description>Protect yourself by choosing a strong password.</Modal.Description>
 
 			<Modal.Description className="text-orange-300 flex items-center gap-2">
 				<Warning size={24} className="text-orange-300" />
-				Don't forget to save this password before create your account!
+				Don&lsquo;t forget to save this password before create your account!
 			</Modal.Description>
 
 			<div className="bg-gray-950 p-2 px-4 rounded-[10px] flex items-center justify-between mt-4 shadow-inner">
@@ -107,11 +104,7 @@ export function StrongPasswordModal({ isVisible, closeModal }: Props) {
 					onClick={copyToClipboard}
 					className="p-2 px-3 transition-all flex items-center gap-2 text-purple-300 tracking-wider text-md rounded-[10px] border border-solid border-purple-500 w-fit"
 				>
-					{isCopied ? (
-						<Check size={28} className="text-purple-300" />
-					) : (
-						<Copy size={28} className="text-purple-300" />
-					)}
+					{isCopied ? <Check size={28} className="text-purple-300" /> : <Copy size={28} className="text-purple-300" />}
 					{isCopied ? 'Copied' : 'Copy'}
 				</button>
 

@@ -1,14 +1,11 @@
 'use client';
 
-import clsx from 'clsx';
-import Link from 'next/link';
 import Image from 'next/image';
-
-import { usePathname } from 'next/navigation';
-import { Bell, ChatCenteredText, Gear, Moon, Sun } from '@phosphor-icons/react';
+import { useState } from 'react';
+import { Moon, Sun } from '@phosphor-icons/react';
 
 import { Switch } from '@design-system/Switch';
-import { useState } from 'react';
+
 import { NotificationButton } from './NotificationButton';
 import { Routes } from './Routes';
 import { Profile } from './Profile';
@@ -19,7 +16,7 @@ export function Header() {
 	return (
 		<header className="bg-gray-800  h-[80px] border-b border-solid border-gray-900">
 			<div className="max-w-[1366px] flex items-center gap-8 px-6 m-auto">
-				<Image src="/horizontal-logo.svg" alt="ProxyMity Logo" width={166} height={49} />
+				<Image src="/horizontal-logo.svg" alt="ProxyMity Logo" width={166} height={49} priority />
 				<Routes />
 
 				<div className="flex items-center gap-4 ml-auto">

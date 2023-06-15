@@ -1,7 +1,7 @@
 'use client';
 
-import { useRouter } from 'next/router';
 import { motion } from 'framer-motion';
+import { useRouter } from 'next/navigation';
 import { FormEvent, Fragment, useEffect, useState } from 'react';
 import { Eye, EyeClosed, UserPlus, Warning, X } from '@phosphor-icons/react';
 
@@ -12,11 +12,11 @@ import { LoadingSpinning } from '@/@design-system/LoadingSpinning';
 import { StrongPasswordModal } from './components/StrongPasswordModal';
 
 import { useAuthStore } from '../authStore';
+import { useUserStore } from '@/stores/user';
 
+import { APISignUp } from '@/services/api/sign-up';
 import { getToken, setToken } from '@/services/token/handler';
 import { saveUserAsyncDB } from '@/services/database/use-cases/save-user';
-import { APISignUp } from '@/services/api/sign-up';
-import { useUserStore } from '@/stores/user';
 
 export default function SignUp() {
 	const router = useRouter();
@@ -30,9 +30,7 @@ export default function SignUp() {
 	const setUser = useUserStore(store => store.actions.setUser);
 
 	const { name, email, password } = useAuthStore(store => store.signUp.states);
-	const { setNameValue, setEmailValue, setPasswordValue } = useAuthStore(
-		store => store.signUp.actions
-	);
+	const { setNameValue, setEmailValue, setPasswordValue } = useAuthStore(store => store.signUp.actions);
 
 	useEffect(() => {
 		const session = getToken();
@@ -40,7 +38,7 @@ export default function SignUp() {
 		if (session) {
 			router.replace('/products/chats');
 		}
-	}, []);
+	}, [router]);
 
 	async function handleSubmit(event: FormEvent) {
 		event.preventDefault();
@@ -94,16 +92,12 @@ export default function SignUp() {
 				animate={{ opacity: 1 }}
 				exit={{ opacity: 0 }}
 				transition={{ duration: 0.5 }}
+				onSubmit={handleSubmit}
 			>
 				<Input.Group>
 					<Input.Label>Name</Input.Label>
 					<Input.Wrapper className="w-full">
-						<Input
-							type="text"
-							placeholder="Type your name"
-							value={name}
-							onChange={e => setNameValue(e.target.value)}
-						/>
+						<Input type="text" placeholder="Type your name" value={name} onChange={e => setNameValue(e.target.value)} />
 					</Input.Wrapper>
 				</Input.Group>
 

@@ -4,5 +4,8 @@ export const generateOneTimePreKeys = (identityPrivateKey: Uint8Array, quantity:
 	const dh = new DiffieHellman(identityPrivateKey);
 	const array = new Array(quantity);
 
-	return array.map(_ => dh.signPublicKey());
+	return array.map(x => {
+		console.log(x);
+		dh.signPublicKey();
+	});
 };

@@ -7,7 +7,7 @@ export function OnlineNow() {
 	const contacts = useContactStore(store => store.state.contacts);
 
 	return (
-		<section className="relative flex flex-col gap-3 bg-gray-900 rounded-[10px] p-3">
+		<section className="relative flex flex-col gap-1 bg-gray-900 rounded-[10px] p-3">
 			<h2 className="text-lg font-semibold text-white tracking-wide">Online now (3)</h2>
 
 			<div className="relative">

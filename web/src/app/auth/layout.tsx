@@ -3,9 +3,11 @@
 import clsx from 'clsx';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ReactNode } from 'react';
 import { motion } from 'framer-motion';
+import { ReactNode, Suspense } from 'react';
 import { usePathname } from 'next/navigation';
+
+import { LoadingSpinning } from '@/@design-system/LoadingSpinning';
 
 export default function AuthenticationLayout({ children }: { children: ReactNode }) {
 	const pathname = usePathname();
@@ -14,13 +16,7 @@ export default function AuthenticationLayout({ children }: { children: ReactNode
 		<div className="flex-1 flex items-center justify-center bg-[url('/sign-background.svg')] bg-no-repeat bg-cover">
 			<motion.div className="p-4 rounded-[1rem] ring-1 ring-gray-700 w-96 flex flex-col gap-4 shadow-lg bg-gray-800/40 backdrop-blur-sm transition-all">
 				<header className="flex items-center justify-center relative h-[80px]">
-					<Image
-						src="/Logo.svg"
-						alt="ProxyMity Logo"
-						width={170}
-						height={170}
-						className="absolute -top-[5rem]"
-					/>
+					<Image src="/Logo.svg" alt="ProxyMity Logo" width={170} height={170} className="absolute -top-[5rem]" />
 				</header>
 
 				<div className="flex w-full bg-gray-900 relative rounded-[10px] shadow-inner">
@@ -51,7 +47,9 @@ export default function AuthenticationLayout({ children }: { children: ReactNode
 					</Link>
 				</div>
 
-				<div className="overflow-hidden p-1">{children}</div>
+				<div className="overflow-hidden p-1">
+					<Suspense fallback={<LoadingSpinning size={32} color="white" lineSize={3} />}>{children}</Suspense>
+				</div>
 			</motion.div>
 		</div>
 	);
