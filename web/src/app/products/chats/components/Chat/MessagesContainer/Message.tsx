@@ -14,15 +14,23 @@ import { changeMessageStatusAsyncDB } from '@/services/database/use-cases/change
 import { useMessageStore } from '@/stores/messages';
 
 interface Props {
-	previousIsFromUser?: boolean;
+	previousMessage?: Message;
 	message: Message;
 }
 
 const formatter = Intl.DateTimeFormat('pt-br', { hour: 'numeric', minute: 'numeric' });
 
-export function Message({ previousIsFromUser = false, message }: Props) {
+const selectTimeToShow = (isMine: boolean, message: Message) =>
+	isMine
+		? formatter.format(message.writtenAt)
+		: message.receivedAt && message.receivedAt !== 'none'
+		? formatter.format(message.receivedAt)
+		: null;
+
+export function Message({ message, previousMessage }: Props) {
 	const userData = useUserStore(store => store.state.data);
 	const { updateContactMessageStatus, setReplyMessageFromContact } = useMessageStore(store => store.actions);
+
 	const [isMessageConfigVisible, setIsMessageConfigVisible] = useState(false);
 
 	const [status, setStatus] = useState<'sent' | 'received' | 'read' | 'wrote'>(() => {
@@ -34,6 +42,9 @@ export function Message({ previousIsFromUser = false, message }: Props) {
 	});
 
 	const isMine = message.authorId === userData?.id;
+	const previousIsFromUser = previousMessage?.authorId === message.authorId;
+
+	const timeToShow = selectTimeToShow(isMine, message);
 
 	//🟡 Receive a message that has the status changed, and update it on react state and IndexedDB
 	useEffect(() => {
@@ -91,11 +102,11 @@ export function Message({ previousIsFromUser = false, message }: Props) {
 						<Image
 							src="https://github.com/diego3g.png"
 							alt="User Photo"
-							width={35}
-							height={35}
-							className="min-w-[35px] min-h-[35px] rounded-full z-0 shadow-xl"
+							width={30}
+							height={30}
+							className="min-w-[30px] min-h-[30px] rounded-full z-0 shadow-xl"
 						/>
-						<span className="text-gray-200 text-sm">Diego</span>
+						<span className="text-gray-200 text-xs">Diego</span>
 					</Fragment>
 				)}
 
@@ -116,31 +127,35 @@ export function Message({ previousIsFromUser = false, message }: Props) {
 							</div>
 						))}
 
-					{isMine
-						? formatter.format(message.writtenAt)
-						: message.receivedAt && message.receivedAt !== 'none'
-						? formatter.format(message.receivedAt)
-						: null}
+					{timeToShow}
 				</span>
 			</div>
 
 			<div className={clsx('flex items-center gap-2', { 'flex-row-reverse': isMine })}>
 				<div
-					className={clsx('w-fit rounded-[12px] p-3 text-white font-light text-sm shadow z-[13]', {
+					className={clsx('w-fit rounded-[12px] text-white font-light text-sm shadow z-[13] p-1 min-w-[100px]', {
 						'bg-gray-950 rounded-tl-none': !isMine,
 						'bg-purple-500 rounded-tr-none': isMine,
 					})}
 				>
-					<p>{message.content}</p>
+					{message.repliedMessage && (
+						<div className={clsx('bg-black p-2 rounded-[8px] w-full flex flex-col', { 'ml-auto': isMine })}>
+							<span className="text-purple-300 text-xs">{'Typescript'}</span>
+							<span className="text-gray-200 text-sm">
+								{typeof message.repliedMessage === 'object' ? message.repliedMessage?.content : null}
+							</span>
+						</div>
+					)}
+					<p className="p-1">{message.content}</p>
 				</div>
 
 				<AnimatePresence>
 					{isMessageConfigVisible && (
 						<motion.button
 							className="p-2 bg-gray-700 shadow-lg z-10 rounded-full"
-							initial={{ opacity: 0, x: 10 }}
+							initial={{ opacity: 0, x: isMine ? 10 : -10 }}
 							animate={{ opacity: 1, x: 0 }}
-							exit={{ opacity: 0, x: 10 }}
+							exit={{ opacity: 0, x: isMine ? 10 : -10 }}
 							onClick={() =>
 								setReplyMessageFromContact({ contactId: isMine ? message.recipientId : message.authorId, message })
 							}

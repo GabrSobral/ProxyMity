@@ -113,10 +113,6 @@ export function ChatProvider({ children }: { children: ReactNode }) {
 		return () => removeEventListener('@ws.receive_message', handler);
 	}, [selectedContact?.id, socket, userData, addMessage, bringToTop]);
 
-	useEffect(() => {
-		console.log(messageContacts);
-	}, [messageContacts]);
-
 	//🟡 Receive the "read" message status from another user, and update it at state and IndexedDB
 	useEffect(() => {
 		function handler(event: CustomEventInit<ExtractPayloadType<'receive_read_message', Events>>) {

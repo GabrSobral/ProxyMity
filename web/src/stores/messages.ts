@@ -1,24 +1,9 @@
 import { create } from 'zustand';
 import { Draft, Immutable, produce } from 'immer';
 
-import { Contact } from '@/types/contact';
+import { Message } from '@/types/message';
 
-export type Message = Immutable<{
-	dbId?: number;
-
-	id: string;
-	content: string;
-
-	contactRef?: string;
-
-	recipientId: Contact['id'];
-	authorId: Contact['id'];
-
-	writtenAt: Date;
-	sentAt: Date | 'none';
-	receivedAt: Date | 'none';
-	readAt: Date | 'none';
-}>;
+export type IMessage = Immutable<Message>;
 
 interface IMessagesStore {
 	state: {

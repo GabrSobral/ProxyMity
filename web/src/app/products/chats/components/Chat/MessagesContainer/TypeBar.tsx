@@ -52,6 +52,19 @@ export function TypeBar() {
 	const sendMessage = useCallback(async () => {
 		if (!userData.data || !selectedContact || !type.trim()) return;
 
+		const repliedMessage = (() => {
+			if (
+				selectedContactMessage?.replyMessage &&
+				selectedContactMessage.replyMessage.repliedMessage &&
+				typeof selectedContactMessage.replyMessage.repliedMessage === 'object'
+			) {
+				return {
+					...selectedContactMessage?.replyMessage,
+					repliedMessage: selectedContactMessage?.replyMessage.repliedMessage.id,
+				};
+			}
+		})();
+
 		const message: Message = {
 			id: uuidv4(),
 			content: type.trim(),
@@ -62,6 +75,7 @@ export function TypeBar() {
 			sentAt: 'none',
 			authorId: userData.data.id,
 			recipientId: selectedContact?.id,
+			repliedMessage: repliedMessage || null,
 		};
 
 		addMessageAsyncDB({ ...message, contactRef: message.authorId + message.recipientId });
@@ -83,7 +97,18 @@ export function TypeBar() {
 
 		saveTypeMessageFromContact({ contactId: selectedContact.id, typeMessage: '' });
 		setType('');
-	}, [userData.data, selectedContact, type, bringToTop, addMessage, socket, saveTypeMessageFromContact]);
+		removeReplyMessageFromContact({ contactId: selectedContact.id });
+	}, [
+		userData.data,
+		selectedContact,
+		type,
+		selectedContactMessage?.replyMessage,
+		bringToTop,
+		addMessage,
+		socket,
+		saveTypeMessageFromContact,
+		removeReplyMessageFromContact,
+	]);
 
 	function typing(value: string) {
 		function handle(typing: boolean) {
@@ -119,15 +144,21 @@ export function TypeBar() {
 		return () => inputRef.current?.removeEventListener('keydown', event);
 	}, [sendMessage, typebarRef]);
 
+	useEffect(() => {
+		if (selectedContactMessage?.replyMessage) {
+			typebarRef.current?.focus();
+		}
+	}, [selectedContactMessage?.replyMessage, typebarRef]);
+
 	return (
 		<div className="flex flex-col gap-2 m-1 mt-auto">
 			<AnimatePresence mode="popLayout">
 				{selectedContactMessage?.replyMessage && (
 					<motion.div
 						className="w-full p-2 flex gap-2 bg-black rounded-lg"
-						initial={{ opacity: 0, y: 20 }}
+						initial={{ opacity: 0, y: 40 }}
 						animate={{ opacity: 1, y: 0 }}
-						exit={{ opacity: 0, y: 20 }}
+						exit={{ opacity: 0, y: 40 }}
 					>
 						<div className="bg-gray-950 w-full p-2 rounded-md flex flex-col gap-1">
 							<span className="text-purple-300 text-xs">{selectedContact?.name}</span>

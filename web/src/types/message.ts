@@ -15,4 +15,6 @@ export interface Message {
 	sentAt: Date | 'none';
 	receivedAt: Date | 'none';
 	readAt: Date | 'none';
+
+	repliedMessage: Message | Message['id'] | null;
 }

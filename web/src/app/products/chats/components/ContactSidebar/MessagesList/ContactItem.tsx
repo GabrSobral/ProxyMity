@@ -69,10 +69,10 @@ export const ContactItem = forwardRef(({ contact, index }: Props, ref: Forwarded
 		>
 			<div
 				className={clsx(
-					'absolute h-full bg-gradient-to-r from-[#1C64CE] border-0 to-[#B809A6] transition-all rounded-xl left-0 top-0 z-0 duration-[0.3s]',
+					'absolute h-full bg-gradient-to-r from-[#1C64CE] border-0 to-[#B809A6] transition-all rounded-xl top-0 z-0 duration-[0.3s] mx-auto',
 					{
-						'w-full': isSelectedContact,
-						'w-0': !isSelectedContact,
+						'w-full left-0 opacity-100': isSelectedContact,
+						'w-0 left-2/4 opacity-10': !isSelectedContact,
 					}
 				)}
 			/>
