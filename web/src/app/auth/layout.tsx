@@ -3,18 +3,39 @@
 import clsx from 'clsx';
 import Link from 'next/link';
 import Image from 'next/image';
-import { motion } from 'framer-motion';
-import { ReactNode, Suspense } from 'react';
-import { usePathname } from 'next/navigation';
+import { ReactNode, Suspense, useEffect } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
+import { usePathname, useRouter } from 'next/navigation';
 
 import { LoadingSpinning } from '@/@design-system/LoadingSpinning';
 
+import { getToken } from '@/services/token/handler';
+
 export default function AuthenticationLayout({ children }: { children: ReactNode }) {
 	const pathname = usePathname();
+	const router = useRouter();
+
+	useEffect(() => {
+		const session = getToken();
+
+		if (JSON.stringify(session) !== '{}') {
+			router.replace('/products/chats');
+		}
+	}, [router]);
+
+	const currentPage = pathname.includes('sign-in') ? 'sign-in' : 'sign-up';
 
 	return (
 		<div className="flex-1 flex items-center justify-center bg-[url('/sign-background.svg')] bg-no-repeat bg-cover">
-			<motion.div className="p-4 rounded-[1rem] ring-1 ring-gray-700 w-96 flex flex-col gap-4 shadow-lg bg-gray-800/40 backdrop-blur-sm transition-all">
+			<motion.div
+				className={clsx(
+					'p-4 duration-300 rounded-[1rem] perspectiv ring-1 ring-gray-700 w-96 flex flex-col gap-4 shadow-lg bg-gray-800/40 backdrop-blur-sm transition-all max-h-full'
+					// {
+					// 	'h-[28.5rem]': currentPage === 'sign-in',
+					// 	'h-[36.75rem]': currentPage === 'sign-up',
+					// }
+				)}
+			>
 				<header className="flex items-center justify-center relative h-[80px]">
 					<Image src="/Logo.svg" alt="ProxyMity Logo" width={170} height={170} className="absolute -top-[5rem]" />
 				</header>
@@ -24,8 +45,8 @@ export default function AuthenticationLayout({ children }: { children: ReactNode
 						className={clsx(
 							'absolute h-[80%] -translate-y-2/4 top-2/4 w-[calc(50%-12px)] rounded-[10px]  z-20 gradient transition-all shadow-lg duration-300',
 							{
-								'left-[6px]': pathname.includes('sign-in'),
-								'left-[calc(50%+6px)]': pathname.includes('sign-up'),
+								'left-[6px]': currentPage === 'sign-in',
+								'left-[calc(50%+6px)]': currentPage === 'sign-up',
 							}
 						)}
 					/>
@@ -47,8 +68,10 @@ export default function AuthenticationLayout({ children }: { children: ReactNode
 					</Link>
 				</div>
 
-				<div className="overflow-hidden p-1">
-					<Suspense fallback={<LoadingSpinning size={32} color="white" lineSize={3} />}>{children}</Suspense>
+				<div className="overflow-hidden p-1 flex items-center justify-center flex-1 flex-col">
+					<AnimatePresence mode="wait">
+						<Suspense fallback={<LoadingSpinning size={32} color="white" lineSize={3} />}>{children}</Suspense>
+					</AnimatePresence>
 				</div>
 			</motion.div>
 		</div>

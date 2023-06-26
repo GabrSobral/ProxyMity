@@ -15,12 +15,12 @@ export function Routes() {
 	];
 
 	return (
-		<nav className="h-full flex items-center gap-4 min-h-[79px] max-h-[79px]">
+		<nav className="h-full flex items-center gap-4 min-h-[59px] max-h-[59px]">
 			{pages.map(page => (
 				<Link
 					href="/"
 					className={clsx(
-						'text-md font-medium tracking-wider hover:underline min-h-[79px] max-h-[79px] flex items-center relative pr-2',
+						'text-md font-medium tracking-wider hover:underline min-h-[59px] max-h-[59px] flex items-center relative pr-2',
 						{
 							'text-purple-300': page.path === pathname,
 							'text-gray-200': page.path !== pathname,

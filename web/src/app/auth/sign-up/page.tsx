@@ -2,7 +2,7 @@
 
 import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
-import { FormEvent, Fragment, useEffect, useState } from 'react';
+import { FormEvent, Fragment, useState } from 'react';
 import { Eye, EyeClosed, UserPlus, Warning, X } from '@phosphor-icons/react';
 
 import { Input } from '@/@design-system/Input';
@@ -15,8 +15,16 @@ import { useAuthStore } from '../authStore';
 import { useUserStore } from '@/stores/user';
 
 import { APISignUp } from '@/services/api/sign-up';
-import { getToken, setToken } from '@/services/token/handler';
+import { setToken } from '@/services/token/handler';
 import { saveUserAsyncDB } from '@/services/database/use-cases/save-user';
+
+export const metadata = {
+	title: 'ProxyMity - Sign Up',
+	description: '',
+	icons: {
+		icon: '/favicon.svg',
+	},
+};
 
 export default function SignUp() {
 	const router = useRouter();
@@ -31,14 +39,6 @@ export default function SignUp() {
 
 	const { name, email, password } = useAuthStore(store => store.signUp.states);
 	const { setNameValue, setEmailValue, setPasswordValue } = useAuthStore(store => store.signUp.actions);
-
-	useEffect(() => {
-		const session = getToken();
-
-		if (session) {
-			router.replace('/products/chats');
-		}
-	}, [router]);
 
 	async function handleSubmit(event: FormEvent) {
 		event.preventDefault();
@@ -75,7 +75,12 @@ export default function SignUp() {
 	return (
 		<Fragment>
 			{error && (
-				<div className="w-full border border-solid border-red-500 p-2 px-3 rounded-[10px] mb-3 flex gap-2">
+				<motion.div
+					initial={{ opacity: 0 }}
+					animate={{ opacity: 1 }}
+					exit={{ opacity: 0 }}
+					className="w-full border border-solid border-red-500 p-2 px-3 rounded-[10px] mb-3 flex gap-2"
+				>
 					<Warning size={24} className="text-red-500 " />
 
 					<span className="tracking-wide text-red-500">{error}</span>
@@ -83,11 +88,11 @@ export default function SignUp() {
 					<button type="button" onClick={() => setError(null)} className="ml-auto">
 						<X size={24} className="text-white" />
 					</button>
-				</div>
+				</motion.div>
 			)}
 
 			<motion.form
-				className="flex flex-col gap-4"
+				className="flex flex-col gap-4 w-full"
 				initial={{ opacity: 0 }}
 				animate={{ opacity: 1 }}
 				exit={{ opacity: 0 }}

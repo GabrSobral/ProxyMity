@@ -62,8 +62,12 @@ export function TypeBar() {
 					...selectedContactMessage?.replyMessage,
 					repliedMessage: selectedContactMessage?.replyMessage.repliedMessage.id,
 				};
+			} else {
+				return selectedContactMessage?.replyMessage;
 			}
 		})();
+
+		console.log({ repliedMessage });
 
 		const message: Message = {
 			id: uuidv4(),

@@ -14,7 +14,7 @@ export function Header() {
 	const [theme, setTheme] = useState('dark');
 
 	return (
-		<header className="bg-gray-800  h-[80px] border-b border-solid border-gray-900">
+		<header className="bg-gray-800  h-[60px] border-b border-solid border-gray-900">
 			<div className="max-w-[1366px] flex items-center gap-8 px-6 m-auto">
 				<Image src="/horizontal-logo.svg" alt="ProxyMity Logo" width={166} height={49} priority />
 				<Routes />

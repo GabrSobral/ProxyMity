@@ -7,26 +7,20 @@ import { Input } from './Input';
 import { twMerge } from 'tailwind-merge';
 
 interface ListBoxContextProps {
-	value: any;
-	getReadableValue: (value: any) => string;
+	value: unknown;
+	getReadableValue: (value: unknown) => string;
 }
 
 const ListBoxContext = createContext({} as ListBoxContextProps);
 
 export interface ListBoxGroupProps {
 	children: ReactNode;
-	value: any;
-	onChange: (newValue: any) => void;
-	getReadableValue: (value: any) => string;
+	value: unknown;
+	onChange: (newValue: unknown) => void;
+	getReadableValue: (value: unknown) => string;
 	className?: string;
 }
-function ListBoxGroup({
-	onChange,
-	value,
-	getReadableValue,
-	children,
-	className,
-}: ListBoxGroupProps) {
+function ListBoxGroup({ onChange, value, getReadableValue, children, className }: ListBoxGroupProps) {
 	return (
 		<ListBoxContext.Provider value={{ getReadableValue, value }}>
 			<Listbox value={value} onChange={onChange}>
@@ -42,9 +36,7 @@ interface ListboxLabelProps {
 }
 function ListBoxLabel({ children, className }: ListboxLabelProps) {
 	return (
-		<Listbox.Label
-			className={clsx('text-gray-700 dark:text-whiteAlpha-900 font-medium', className)}
-		>
+		<Listbox.Label className={clsx('text-gray-700 dark:text-whiteAlpha-900 font-medium', className)}>
 			{children}
 		</Listbox.Label>
 	);
@@ -65,10 +57,7 @@ function ListBoxInput({ className }: ListboxInputProps) {
 				>
 					<span className="block truncate">{getReadableValue(value)}</span>
 					<span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
-						<CaretDown
-							className="h-5 w-5 text-gray-700 dark:text-whiteAlpha-900"
-							aria-hidden="true"
-						/>
+						<CaretDown className="h-5 w-5 text-gray-700 dark:text-whiteAlpha-900" aria-hidden="true" />
 					</span>
 				</Listbox.Button>
 			</Input>
@@ -82,12 +71,7 @@ interface ListboxOptionsProps {
 }
 function ListboxOptions({ children, className }: ListboxOptionsProps) {
 	return (
-		<Transition
-			as={Fragment}
-			leave="transition ease-in duration-100"
-			leaveFrom="opacity-100"
-			leaveTo="opacity-0"
-		>
+		<Transition as={Fragment} leave="transition ease-in duration-100" leaveFrom="opacity-100" leaveTo="opacity-0">
 			<Listbox.Options
 				className={clsx(
 					'z-10 absolute mt-1 max-h-60 w-full overflow-auto rounded-md bg-white dark:bg-gray-900 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm',
@@ -102,7 +86,7 @@ function ListboxOptions({ children, className }: ListboxOptionsProps) {
 
 interface ListboxOptionProps {
 	className?: string;
-	value: any;
+	value: unknown;
 }
 function ListBoxOption({ className, value }: ListboxOptionProps) {
 	const { getReadableValue } = useContext(ListBoxContext);
@@ -125,9 +109,7 @@ function ListBoxOption({ className, value }: ListboxOptionProps) {
 		>
 			{({ selected, active }) => (
 				<Fragment>
-					<span
-						className={twMerge(clsx('block font-normal break-words', { 'font-medium': selected }))}
-					>
+					<span className={twMerge(clsx('block font-normal break-words', { 'font-medium': selected }))}>
 						{getReadableValue(value)}
 					</span>
 

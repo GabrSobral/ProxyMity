@@ -2,7 +2,7 @@
 
 import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
-import { FormEvent, Fragment, useEffect, useState } from 'react';
+import { FormEvent, Fragment, useState } from 'react';
 import { Eye, EyeClosed, SignIn as SignInIcon, Warning, X } from '@phosphor-icons/react';
 
 import { Input } from '@/@design-system/Input';
@@ -13,8 +13,16 @@ import { useAuthStore } from '../authStore';
 import { useUserStore } from '@/stores/user';
 
 import { APISignIn } from '@/services/api/sign-in';
-import { getToken, setToken } from '@/services/token/handler';
+import { setToken } from '@/services/token/handler';
 import { saveUserAsyncDB } from '@/services/database/use-cases/save-user';
+
+export const metadata = {
+	title: 'ProxyMity - Sign In',
+	description: '',
+	icons: {
+		icon: '/favicon.svg',
+	},
+};
 
 export default function SignIn() {
 	const router = useRouter();
@@ -27,16 +35,6 @@ export default function SignIn() {
 
 	const { email, password } = useAuthStore(store => store.signIn.states);
 	const { setEmailValue, setPasswordValue } = useAuthStore(store => store.signIn.actions);
-
-	useEffect(() => {
-		const session = getToken();
-
-		console.log(session);
-
-		if (JSON.stringify(session) !== '{}') {
-			router.replace('/products/chats');
-		}
-	}, [router]);
 
 	async function handleSubmit(event: FormEvent) {
 		event.preventDefault();
@@ -73,7 +71,12 @@ export default function SignIn() {
 	return (
 		<Fragment>
 			{error && (
-				<div className="w-full border border-solid border-red-500 p-2 px-3 rounded-[10px] mb-3 flex gap-2">
+				<motion.div
+					initial={{ opacity: 0 }}
+					animate={{ opacity: 1 }}
+					exit={{ opacity: 0 }}
+					className="w-full border border-solid border-red-500 p-2 px-3 rounded-[10px] mb-3 flex gap-2"
+				>
 					<Warning size={24} className="text-red-500 " />
 
 					<span className="tracking-wide text-red-500">{error}</span>
@@ -81,12 +84,12 @@ export default function SignIn() {
 					<button type="button" onClick={() => setError(null)} className="ml-auto">
 						<X size={24} className="text-white" />
 					</button>
-				</div>
+				</motion.div>
 			)}
 
 			<motion.form
 				onSubmit={handleSubmit}
-				className="flex flex-col gap-4"
+				className="flex flex-col gap-4 w-full"
 				initial={{ opacity: 0 }}
 				animate={{ opacity: 1 }}
 				exit={{ opacity: 0 }}

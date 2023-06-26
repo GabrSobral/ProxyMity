@@ -1,3 +1,5 @@
+'use client';
+
 import { createContext, ReactNode, useEffect } from 'react';
 
 import { generateSignedKey } from './functions/generateSignedKeysPair';
