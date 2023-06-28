@@ -2,20 +2,20 @@ import { randomUUID } from 'node:crypto';
 
 import { Replace } from '@helpers/Replace';
 
-interface ContactProps {
+interface UserProps {
   name: string;
   email: string;
   password: string;
   lastOnline: Date | null;
   createdAt: Date;
-  avatarConfig: string;
+  photoUrl: string | null;
 }
 
-export class Contact {
+export class User {
   private _id: string;
-  private props: ContactProps;
+  private props: UserProps;
 
-  private constructor(props: ContactProps, id?: string) {
+  private constructor(props: UserProps, id?: string) {
     this._id = id ?? randomUUID();
     this.props = props;
   }
@@ -52,25 +52,24 @@ export class Contact {
     return this.props.lastOnline;
   }
 
-  public set avatarConfig(avatarConfig: string) {
-    this.props.avatarConfig = avatarConfig;
+  public set photoUrl(photoUrl: string | null) {
+    this.props.photoUrl = photoUrl;
   }
-  public get avatarConfig() {
-    return this.props.avatarConfig;
+  public get photoUrl() {
+    return this.props.photoUrl;
   }
 
   public get createdAt() {
     return this.props.createdAt;
   }
 
-  static create(
-    props: Replace<ContactProps, { createdAt?: Date }>,
-    id?: string,
-  ) {
-    const instance = new Contact(
+  static create(props: Replace<UserProps, { createdAt?: Date; photoUrl?: string; lastOnline?: Date }>, id?: string) {
+    const instance = new User(
       {
         ...props,
-        createdAt: props?.createdAt ?? new Date(),
+        createdAt: props?.createdAt || new Date(),
+        photoUrl: props?.photoUrl || null,
+        lastOnline: props?.lastOnline || null,
       },
       id ?? randomUUID(),
     );

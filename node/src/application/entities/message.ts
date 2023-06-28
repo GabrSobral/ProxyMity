@@ -1,20 +1,25 @@
 import { randomUUID } from 'node:crypto';
-import { Contact } from './contact';
+
+import { User } from './user';
+import { Conversation } from './conversation';
+
+import { Replace } from '@helpers/Replace';
 
 interface MessageProps {
   content: string;
 
-  sentAt: Date | null;
-  receivedAt: Date | null;
   writtenAt: Date;
-  readAt: Date | null;
+  sentAt: Date | null;
+  receivedByAllAt: Date | null;
+  readByAllAt: Date | null;
 
-  recipientId: Contact['_id'];
-  authorId: Contact['_id'];
+  conversationId: Conversation['_id'];
+  repliedMessageId: Message['_id'] | null;
+  authorId: User['_id'];
 }
 
 export class Message {
-  private _id: string;
+  private readonly _id: string;
   private props: MessageProps;
 
   private constructor(props: MessageProps, id?: string) {
@@ -40,8 +45,7 @@ export class Message {
   public get sentAt() {
     return this.props.sentAt;
   }
-
-  public sent() {
+  public send() {
     this.props.sentAt = new Date();
   }
 
@@ -50,18 +54,26 @@ export class Message {
   }
 
   public get readAt() {
-    return this.props.readAt;
+    return this.props.readByAllAt;
   }
   public read() {
-    this.props.readAt = new Date();
+    this.props.readByAllAt = new Date();
   }
 
   public get receivedAt() {
-    return this.props.receivedAt;
+    return this.props.receivedByAllAt;
+  }
+
+  public get conversationId() {
+    return this.props.conversationId;
+  }
+
+  public get repliedMessageId() {
+    return this.props.repliedMessageId;
   }
 
   public receive() {
-    this.props.receivedAt = new Date();
+    this.props.receivedByAllAt = new Date();
   }
 
   public set authorId(authorId: string) {
@@ -71,16 +83,23 @@ export class Message {
     return this.props.authorId;
   }
 
-  public set recipientId(recipientId: string) {
-    this.props.recipientId = recipientId;
-  }
-  public get recipientId() {
-    return this.props.recipientId;
-  }
-
-  static create(props: MessageProps, id?: string) {
-    const instance = new Message(props, id ?? randomUUID());
-
-    return instance;
+  static create(
+    props: Replace<
+      MessageProps,
+      { writtenAt?: Date; receivedByAllAt?: Date; readByAllAt?: Date; sentAt?: Date; repliedMessageId?: Message['_id'] }
+    >,
+    id?: string,
+  ) {
+    return new Message(
+      {
+        ...props,
+        writtenAt: props.writtenAt || new Date(),
+        sentAt: props.sentAt || null,
+        receivedByAllAt: props.receivedByAllAt || null,
+        readByAllAt: props.readByAllAt || null,
+        repliedMessageId: props.repliedMessageId || null,
+      },
+      id ?? randomUUID(),
+    );
   }
 }
