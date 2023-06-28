@@ -2,15 +2,17 @@ import { PrismaClient } from '@prisma/client';
 import { FastifyInstance } from 'fastify';
 
 import { JsonWebToken } from '@infra/authentication/jwt/JsonWebToken';
-import { PrismaContactRepository } from '@infra/database/prisma/repositories/prisma-contact-repository';
+import { PrismaUserRepository } from '@infra/database/prisma/repositories/prisma-user-repository';
 
 import { SignInControllerHandler } from './controllers/contact/sign-in-controller';
 import { SignUpControllerHandler } from './controllers/contact/sign-up-controller';
+
 import { SearchContactByEmailControllerHandler } from './controllers/contact/search-contact-by-email-controller';
 import { SearchContactByIdControllerHandler } from './controllers/contact/search-contact-by-id-controller';
 
 export class Routes {
   constructor(private fastify: FastifyInstance) {}
+
   async register() {
     await this.fastify.register(this.signIn);
     await this.fastify.register(this.signUp);
@@ -21,56 +23,42 @@ export class Routes {
   async signIn(fastify: FastifyInstance) {
     const prismaClient = new PrismaClient();
     const jsonWebTokenHandler = new JsonWebToken();
-    const prismaContactRepository = new PrismaContactRepository(prismaClient);
+    const prismaUserRepository = new PrismaUserRepository(prismaClient);
 
-    const handler = new SignInControllerHandler(
-      jsonWebTokenHandler,
-      prismaContactRepository,
-    );
+    const handler = new SignInControllerHandler(jsonWebTokenHandler, prismaUserRepository);
 
-    fastify.post('/contact/sign-in', async (request, reply) => {
-      await handler.handle(request, reply);
-    });
+    fastify.post('/contact/sign-in', handler.handle);
   }
 
   async signUp(fastify: FastifyInstance) {
     const prismaClient = new PrismaClient();
     const jsonWebTokenHandler = new JsonWebToken();
-    const prismaContactRepository = new PrismaContactRepository(prismaClient);
+    const prismaUserRepository = new PrismaUserRepository(prismaClient);
 
-    const handler = new SignUpControllerHandler(
-      prismaContactRepository,
-      jsonWebTokenHandler,
-    );
+    const handler = new SignUpControllerHandler(prismaUserRepository, jsonWebTokenHandler);
 
-    fastify.post('/contact/sign-up', async (request, reply) => {
-      await handler.handle(request, reply);
-    });
+    fastify.post('/contact/sign-up', handler.handle);
   }
 
   async searchContactByEmail(fastify: FastifyInstance) {
     const prismaClient = new PrismaClient();
-    const prismaContactRepository = new PrismaContactRepository(prismaClient);
+    const prismaUserRepository = new PrismaUserRepository(prismaClient);
 
-    const handler = new SearchContactByEmailControllerHandler(
-      prismaContactRepository,
-    );
+    const handler = new SearchContactByEmailControllerHandler(prismaUserRepository);
 
-    fastify.get('/contact/search-by-email/:email', async (request, reply) => {
-      await handler.handle(request, reply);
-    });
+    fastify.get('/contact/search-by-email/:email', handler.handle);
   }
 
   async searchContactById(fastify: FastifyInstance) {
     const prismaClient = new PrismaClient();
-    const prismaContactRepository = new PrismaContactRepository(prismaClient);
+    const prismaUserRepository = new PrismaUserRepository(prismaClient);
 
-    const handler = new SearchContactByIdControllerHandler(
-      prismaContactRepository,
-    );
+    const handler = new SearchContactByIdControllerHandler(prismaUserRepository);
 
-    fastify.get('/contact/search-by-id/:id', async (request, reply) => {
-      await handler.handle(request, reply);
-    });
+    fastify.get('/contact/search-by-id/:id', handler.handle);
+  }
+
+  async createConversation(fastify: FastifyInstance) {
+    const prismaClient = new PrismaClient();
   }
 }

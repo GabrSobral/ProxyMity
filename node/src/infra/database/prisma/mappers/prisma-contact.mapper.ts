@@ -1,23 +1,23 @@
-import { Contact as PrismaContact } from '@prisma/client';
+import { User as PrismaUser } from '@prisma/client';
 
-import { Contact } from '@application/entities/contact';
+import { User } from '@application/entities/user';
 
 export class PrismaContactMapper {
-  static toDomain(raw: PrismaContact): Contact {
-    return Contact.create(
+  static toDomain(raw: PrismaUser): User {
+    return User.create(
       {
         name: raw.name,
         email: raw.email,
         lastOnline: raw.lastOnline,
         createdAt: raw.createdAt,
         password: raw.password,
-        avatarConfig: raw.avatarConfig,
+        photoUrl: raw.photoUrl,
       },
       raw.id,
     );
   }
 
-  static toPrisma(contact: Contact): PrismaContact {
+  static toPrisma(contact: User): PrismaUser {
     return {
       id: contact.id,
       name: contact.name,
@@ -25,7 +25,7 @@ export class PrismaContactMapper {
       lastOnline: contact.lastOnline,
       createdAt: contact.createdAt,
       password: contact.password,
-      avatarConfig: contact.avatarConfig,
+      photoUrl: contact.photoUrl,
     };
   }
 }

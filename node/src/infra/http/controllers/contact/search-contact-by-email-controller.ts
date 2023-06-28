@@ -1,7 +1,6 @@
 import { FastifyReply, FastifyRequest } from 'fastify';
 
-import { ContactRepository } from '@application/repositories/contact-repository';
-import { SearchContactByEmail } from '@application/use-cases/search-contact-by-email';
+import { UserRepository } from '@application/repositories/user-repository';
 
 import { ContactViewModel } from '@infra/http/view-model/contact-view-model';
 
@@ -9,15 +8,15 @@ interface IRequest {
   email: string;
 }
 
-export class SearchContactByEmailControllerHandler {
-  constructor(private contactRepository: ContactRepository) {}
+export class SearchUserByEmailControllerHandler {
+  constructor(private contactRepository: UserRepository) {}
 
   async handle(request: FastifyRequest, response: FastifyReply) {
-    const searchContact = new SearchContactByEmail(this.contactRepository);
+    const searchUser = new SearchUserByEmail(this.contactRepository);
 
     const { email } = request.params as IRequest;
 
-    const result = await searchContact.execute({
+    const result = await searchUser.execute({
       email,
     });
 

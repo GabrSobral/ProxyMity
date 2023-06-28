@@ -10,22 +10,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Message {
-  id          String
-  content     String
-  authorId    String
-  recipientId String
-  sentAt      DateTime?
-  receivedAt  DateTime?
-  readAt      DateTime?
-
-  repicient Contact @relation("recipient", fields: [recipientId], references: [id])
-  author    Contact @relation("author", fields: [authorId], references: [id])
-
-  @@id([recipientId, authorId, id])
-}
-
-model Contact {
+model User {
   id         String    @id
   name       String
   email      String    @unique
@@ -33,8 +18,57 @@ model Contact {
   lastOnline DateTime?
   password   String
 
-  avatarConfig String
- 
-  MessageAuthor    Message[] @relation("author")
-  MessageRecipient Message[] @relation("recipient")
+  photoUrl String?
+
+  participants Participant[]
+}
+
+model Participant {
+  userId        String
+  conversationId String
+  createdAt DateTime
+  removedAt DateTime?
+
+  user User @relation(fields: [userId], references: [id])
+  conversation Conversation @relation(fields: [conversationId], references: [id])
+
+  @@id([userId, conversationId])
+}
+
+model Message {
+  id               String @id
+  content          String
+  authorId         String
+  recipientId      String
+  repliedMessageId String? @unique
+  sentAt           DateTime?
+  receivedAt       DateTime?
+  readAt           DateTime?
+  conversationId   String 
+
+  conversation     Conversation @relation(fields: [conversationId], references: [id])
+  repliedMessage   Message? @relation("repliedMessage", fields: [repliedMessageId], references: [id])
+  parentMessage    Message? @relation("repliedMessage")
+}
+
+model Conversation {
+  id String @id
+  created_at DateTime
+  groupId String @unique
+  isGroup Boolean @default(false)
+
+  messages Message[]
+  group Group @relation(fields: [groupId], references: [id])
+
+  participants Participant[]
+}
+
+model Group {
+  id String @id
+  name String
+  description String
+  createdAt DateTime
+  updatedAt DateTime?
+
+  conversation Conversation?
 }
