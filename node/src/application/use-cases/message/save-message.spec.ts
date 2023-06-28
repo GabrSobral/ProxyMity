@@ -95,4 +95,29 @@ describe('SaveMessageUseCase', () => {
     expect(inMemoryConversationRepository.items).toHaveLength(1);
     expect(inMemoryMessageStatusRepository.items).toHaveLength(2);
   });
+
+  it('should not be able to save a message with an invalid conversation Id', async () => {
+    const inMemoryMessagesRepository = new InMemoryMessagesRepository();
+    const inMemoryParticipantRepository = new InMemoryParticipantRepository();
+    const inMemoryConversationRepository = new InMemoryConversationRepository();
+    const inMemoryMessageStatusRepository = new InMemoryMessageStatusRepository();
+
+    const saveMessageUseCase = new SaveMessageUseCase(
+      inMemoryMessagesRepository,
+      inMemoryParticipantRepository,
+      inMemoryConversationRepository,
+      inMemoryMessageStatusRepository,
+    );
+
+    const message1 = Message.create({
+      authorId: 'userId',
+      content: 'Message Content',
+      conversationId: '<invalid-id>',
+    });
+
+    const result = await saveMessageUseCase.execute({ message: message1 });
+
+    expect(result.isLeft()).toBeTruthy();
+    expect(inMemoryMessagesRepository.items).toHaveLength(0);
+  });
 });
