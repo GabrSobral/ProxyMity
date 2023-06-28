@@ -21,11 +21,20 @@
     "forceConsistentCasingInFileNames": false,
     "noFallthroughCasesInSwitch": false,
     "resolveJsonModule": true,
+    "composite": true,
     "paths": {
-      "@application/*": ["./src/application/*"],
-      "@helpers/*": ["./src/helpers/*"],
-      "@infra/*": ["./src/infra/*"],
-      "@test/*": ["./test/*"]
+      "@application/*": [
+        "./src/application/*"
+      ],
+      "@helpers/*": [
+        "./src/helpers/*"
+      ],
+      "@infra/*": [
+        "./src/infra/*"
+      ],
+      "@test/*": [
+        "./test/*"
+      ]
     }
   }
 }

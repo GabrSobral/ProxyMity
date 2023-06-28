@@ -1,0 +1,16 @@
+{
+  "extends": "./tsconfig.json",
+  "include": [
+    "vitest/**/*",
+  ],
+  "exclude": [],
+  "compilerOptions": {
+    "composite": true,
+    "lib": [],
+    "types": [
+      "vitest/globals",
+      "node",
+      "jsdom"
+    ],
+  }
+}
