@@ -1,16 +1,15 @@
 import { User } from '@application/entities/user';
 import { Message } from '@application/entities/message';
-import { MessageStatus } from '@application/entities/message-status';
 
 import { MessageRepository } from '@application/repositories/message-repository';
 import { MessageStatusRepository } from '@application/repositories/message-status-repository';
 
-import { Either, right } from '@helpers/Either';
+import { Either, left, right } from '@helpers/Either';
 
 interface Request {
   message: Message;
   conversationIsGroup: boolean;
-  status: 'received' | 'sent';
+  status: 'received' | 'sent' | 'read';
   userId: User['_id'];
 }
 
@@ -29,8 +28,6 @@ export class UpdateMessageStatusUseCase {
   }
 
   private async updateGroupMessage({ message, status, userId }: Request): Promise<Either<Error, Message>> {
-    const messageStatus = MessageStatus.create({ messageId: message.id, userId });
-
     const options = {
       sent: async () => {
         message.send();
@@ -38,7 +35,43 @@ export class UpdateMessageStatusUseCase {
       },
       received: async () => {
         message.receive();
-        await this.messageStatusRepository.receive(messageStatus);
+        await this.messageStatusRepository.receive({ messageId: message.id, userId });
+
+        const result = await this.messageStatusRepository.getToReceiveMessagesStatusByUserId(
+          userId,
+          message.conversationId,
+        );
+
+        if (result.isLeft()) {
+          return left(new Error('Database operation error.'));
+        }
+
+        const messagesStatus = result.value;
+        const allParticipantsReceivedTheMessage = messagesStatus.every(item => item.receivedAt);
+
+        if (allParticipantsReceivedTheMessage) {
+          await this.messageRepository.updateStatus(message.id, 'received');
+        }
+      },
+      read: async () => {
+        message.read();
+        await this.messageStatusRepository.read({ messageId: message.id, userId });
+
+        const result = await this.messageStatusRepository.getToReadMessagesStatusByUserId(
+          userId,
+          message.conversationId,
+        );
+
+        if (result.isLeft()) {
+          return left(new Error('Database operation error.'));
+        }
+
+        const messagesStatus = result.value;
+        const allParticipantsReadTheMessage = messagesStatus.every(item => item.readAt);
+
+        if (allParticipantsReadTheMessage) {
+          await this.messageRepository.updateStatus(message.id, 'read');
+        }
       },
     };
 
@@ -51,6 +84,7 @@ export class UpdateMessageStatusUseCase {
     const options = {
       sent: () => message.send(),
       received: () => message.receive(),
+      read: () => message.read(),
     };
 
     options[status]();

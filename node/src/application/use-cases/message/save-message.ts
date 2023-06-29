@@ -31,10 +31,12 @@ export class SaveMessageUseCase {
       return left(new Error(`Error on try to send message. Conversation not found: ${message.conversationId}`));
     }
 
+    const conversationId = conversation.value.id;
+
     await this.messageRepository.create(message);
 
     if (conversation.value.isGroup) {
-      const participants = await this.participantsRepository.getByConversationId(conversation.value.id);
+      const participants = await this.participantsRepository.getByConversationId(conversationId);
 
       if (participants.isLeft()) {
         return left(new Error(`Error on try to get participants: ${participants.value}`));
@@ -43,7 +45,12 @@ export class SaveMessageUseCase {
       await Promise.all(
         participants.value.map(async participant => {
           if (participant.userId !== message.authorId) {
-            const messageStatus = MessageStatus.create({ messageId: message.id, userId: participant.userId });
+            const messageStatus = MessageStatus.create({
+              messageId: message.id,
+              userId: participant.userId,
+              conversationId,
+            });
+
             await this.messageStatusRepository.create(messageStatus);
           }
         }),

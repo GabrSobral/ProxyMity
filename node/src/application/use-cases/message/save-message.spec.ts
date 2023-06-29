@@ -47,6 +47,12 @@ describe('SaveMessageUseCase', () => {
 
     await saveMessageUseCase.execute({ message: message1 });
 
+    const allMessagesStatusFromConversation = inMemoryMessageStatusRepository.items.filter(
+      item => item.conversationId === conversation.id,
+    );
+
+    expect(allMessagesStatusFromConversation).toHaveLength(0);
+
     expect(inMemoryMessagesRepository.items).toHaveLength(1);
     expect(inMemoryParticipantRepository.items).toHaveLength(2);
     expect(inMemoryConversationRepository.items).toHaveLength(1);
@@ -89,6 +95,12 @@ describe('SaveMessageUseCase', () => {
     });
 
     await saveMessageUseCase.execute({ message: message1 });
+
+    const allMessagesStatusFromConversation = inMemoryMessageStatusRepository.items.filter(
+      item => item.conversationId === conversation.id,
+    );
+
+    expect(allMessagesStatusFromConversation).toHaveLength(2);
 
     expect(inMemoryMessagesRepository.items).toHaveLength(1);
     expect(inMemoryParticipantRepository.items).toHaveLength(3);

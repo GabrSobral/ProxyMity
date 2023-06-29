@@ -2,10 +2,12 @@ import { User } from './user';
 import { Message } from './message';
 
 import { Replace } from '@helpers/Replace';
+import { Conversation } from './conversation';
 
 interface MessageStatusProps {
   userId: User['_id'];
   messageId: Message['_id'];
+  conversationId: Conversation['_id'];
   readAt: Date | null;
   receivedAt: Date | null;
 }
@@ -23,6 +25,10 @@ export class MessageStatus {
 
   public get messageId() {
     return this.props.messageId;
+  }
+
+  public get conversationId() {
+    return this.props.conversationId;
   }
 
   public get readAt() {
