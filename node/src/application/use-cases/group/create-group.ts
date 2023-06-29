@@ -7,6 +7,7 @@ import { ParticipantRepository } from '@application/repositories/participant-rep
 import { ConversationRepository } from '@application/repositories/conversation-repository';
 
 import { Either, left, right } from '@helpers/Either';
+import { Participant } from '@application/entities/participant';
 
 interface Request {
   name: string;
@@ -39,7 +40,6 @@ export class CreateGroupUseCase {
 
     const conversation = Conversation.create({
       isGroup: true,
-      participants,
       groupId: group.id,
       createdAt: group.createdAt,
     });
@@ -47,8 +47,10 @@ export class CreateGroupUseCase {
     await this.conversationRepository.create(conversation);
 
     await Promise.all(
-      participants.map(async (participantId) => {
-        await this.participantRepository.add({ conversationId: conversation.id, userId: participantId });
+      participants.map(async participantId => {
+        const participant = Participant.create({ conversationId: conversation.id, userId: participantId });
+
+        await this.participantRepository.add(participant);
       }),
     );
 
