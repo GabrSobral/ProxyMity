@@ -14,7 +14,7 @@ interface Response {
 }
 
 export async function APISearchContactByEmail({ email }: Request) {
-	const { data } = await api.get<Response>(`/contact/search-by-email/${email}`);
+	const { data } = await api.get<Response>(`/user/search-by-email/${email}`);
 
 	return data;
 }

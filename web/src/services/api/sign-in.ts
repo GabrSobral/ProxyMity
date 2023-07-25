@@ -16,7 +16,7 @@ interface Response {
 }
 
 export async function APISignIn({ email, password }: Request) {
-	const { data } = await api.post<Response>('/contact/sign-in', {
+	const { data } = await api.post<Response>('/user/sign-in', {
 		email,
 		password,
 	});

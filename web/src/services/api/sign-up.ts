@@ -16,8 +16,8 @@ interface Response {
 	access_token: string;
 }
 
-export async function APISignUp({ email, password }: Request) {
-	const { data } = await api.post<Response>('/contact/sign-up', {
+export async function APISignUp({ name, email, password }: Request) {
+	const { data } = await api.post<Response>('/user/sign-up', {
 		name,
 		email,
 		password,

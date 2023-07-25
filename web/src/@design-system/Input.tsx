@@ -1,5 +1,4 @@
 import { Slot } from '@radix-ui/react-slot';
-import clsx from 'clsx';
 import {
 	createContext,
 	ForwardedRef,
@@ -25,7 +24,7 @@ function InputRoot({ children, className, ...rest }: InputRootProps) {
 
 	return (
 		<inputContext.Provider value={{ inputId }}>
-			<div className={twMerge(clsx('flex flex-col gap-2 w-full', className))} {...rest}>
+			<div className={twMerge('flex flex-col gap-2 w-full', className)} {...rest}>
 				{children}
 			</div>
 		</inputContext.Provider>
@@ -46,7 +45,7 @@ function InputLabel({ children, ...rest }: InputLabelProps) {
 }
 
 function Wrapper({ children, className }: InputRootProps) {
-	return <div className={twMerge(clsx('relative w-fit', className))}>{children}</div>;
+	return <div className={twMerge('relative w-fit', className)}>{children}</div>;
 }
 
 interface InputInputProps<T = RefObject<HTMLInputElement> | ForwardedRef<HTMLInputElement>>
@@ -65,9 +64,7 @@ function InputInput({ asChild, className, inputRef, ...rest }: InputInputProps) 
 			id={inputId}
 			ref={inputRef || null}
 			className={twMerge(
-				clsx(
-					'outline-none flex hover:ring-1 transition-all ring-gray-700 rounded-[10px] bg-gray-900 text-gray-200 focus:outline-purple-500 focus:ring-0 placeholder:text-gray-400 w-full p-4'
-				),
+				'outline-none flex hover:ring-1 transition-all ring-gray-700 rounded-[10px] bg-gray-900 text-gray-200 focus:outline-purple-500 focus:ring-0 placeholder:text-gray-400 w-full p-4',
 				className
 			)}
 			{...rest}

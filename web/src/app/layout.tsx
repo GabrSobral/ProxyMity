@@ -1,7 +1,7 @@
 import '../style/globals.css';
 import { Inter } from 'next/font/google';
 
-import { AuthProvider } from './products/chats/contexts/auth-context/context';
+import { AuthWrapperProvider } from '@/contexts/auth-context/context';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -17,7 +17,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 	return (
 		<html lang="pt-br">
 			<body className="w-screen h-screen flex flex-col bg-gray-800" style={inter.style}>
-				<AuthProvider>{children}</AuthProvider>
+				<AuthWrapperProvider>{children}</AuthWrapperProvider>
 			</body>
 		</html>
 	);

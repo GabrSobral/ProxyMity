@@ -1,3 +1,5 @@
+'use client';
+
 import { useEffect, useState } from 'react';
 import { ArrowClockwise, Check, Copy, Eye, EyeClosed, Key, Warning } from '@phosphor-icons/react';
 

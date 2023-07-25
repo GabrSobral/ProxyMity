@@ -14,7 +14,7 @@ interface Response {
 }
 
 export async function APISearchContactById({ id }: Request) {
-	const { data } = await api.get<Response>(`/contact/search-by-id/${id}`);
+	const { data } = await api.get<Response>(`/user/search-by-id/${id}`);
 
 	return data;
 }

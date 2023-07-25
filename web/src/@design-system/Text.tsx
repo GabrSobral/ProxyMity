@@ -31,9 +31,9 @@ export function Text({
 						'text-sm': size === 'md',
 						'text-md': size === 'lg',
 					},
-					defaultTextColor,
-					className
-				)
+					defaultTextColor
+				),
+				className
 			)}
 			{...rest}
 		>

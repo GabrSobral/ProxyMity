@@ -36,7 +36,7 @@ interface ListboxLabelProps {
 }
 function ListBoxLabel({ children, className }: ListboxLabelProps) {
 	return (
-		<Listbox.Label className={clsx('text-gray-700 dark:text-whiteAlpha-900 font-medium', className)}>
+		<Listbox.Label className={twMerge('text-gray-700 dark:text-whiteAlpha-900 font-medium', className)}>
 			{children}
 		</Listbox.Label>
 	);
@@ -53,7 +53,7 @@ function ListBoxInput({ className }: ListboxInputProps) {
 			<Input asChild>
 				<Listbox.Button
 					title={getReadableValue(value)}
-					className={twMerge(clsx('mt-2 relative pr-10 text-left min-w-[12rem] w-fit', className))}
+					className={twMerge('mt-2 relative pr-10 text-left min-w-[12rem] w-fit', className)}
 				>
 					<span className="block truncate">{getReadableValue(value)}</span>
 					<span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
@@ -73,7 +73,7 @@ function ListboxOptions({ children, className }: ListboxOptionsProps) {
 	return (
 		<Transition as={Fragment} leave="transition ease-in duration-100" leaveFrom="opacity-100" leaveTo="opacity-0">
 			<Listbox.Options
-				className={clsx(
+				className={twMerge(
 					'z-10 absolute mt-1 max-h-60 w-full overflow-auto rounded-md bg-white dark:bg-gray-900 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm',
 					className
 				)}
@@ -116,12 +116,8 @@ function ListBoxOption({ className, value }: ListboxOptionProps) {
 					{selected ? (
 						<span className="absolute inset-y-0 left-0 flex items-center pl-3">
 							<Check
-								className={twMerge(
-									clsx('h-5 w-5', {
-										'text-white': active,
-										'text-red-500': !active,
-									})
-								)}
+								data-active={active}
+								className={twMerge('h-5 w-5 text-red-500 data-[active=true]:text-white')}
 								aria-hidden="true"
 							/>
 						</span>

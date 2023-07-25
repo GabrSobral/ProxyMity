@@ -1,8 +1,7 @@
-import { Dialog, Transition } from '@headlessui/react';
-import { X } from '@phosphor-icons/react';
-import clsx from 'clsx';
-import { Fragment, ReactNode } from 'react';
 import { twMerge } from 'tailwind-merge';
+import { X } from '@phosphor-icons/react';
+import { Fragment, ReactNode } from 'react';
+import { Dialog, Transition } from '@headlessui/react';
 
 export interface ModalProps {
 	closeModal: () => void;
@@ -40,19 +39,12 @@ function ModalGroup({ closeModal, show, children, className, showCloseButton = t
 					>
 						<Dialog.Panel
 							className={twMerge(
-								clsx(
-									'flex flex-col gap-2 m-8 max-w-[90%] overflow-hidden rounded-[1rem] bg-white dark:bg-gray-900 p-6 pt-10 text-left align-middle shadow-xl transition-all',
-									className
-								)
+								'flex flex-col gap-2 m-8 max-w-[90%] overflow-hidden rounded-[1rem] bg-white dark:bg-gray-900 p-6 pt-10 text-left align-middle shadow-xl transition-all',
+								className
 							)}
 						>
 							{showCloseButton && (
-								<button
-									type="button"
-									onClick={closeModal}
-									title="Fechar"
-									className="absolute top-4 right-4"
-								>
+								<button type="button" onClick={closeModal} title="Fechar" className="absolute top-4 right-4">
 									<X size={24} className="dark:text-whiteAlpha-900 text-white" />
 								</button>
 							)}
@@ -70,9 +62,7 @@ function ModalTitle({ children, className }: { children: ReactNode; className?: 
 	return (
 		<Dialog.Title
 			as="h3"
-			className={twMerge(
-				clsx('text-lg font-bold leading-6 text-white dark:text-whiteAlpha-900', className)
-			)}
+			className={twMerge('text-lg font-bold leading-6 text-white dark:text-whiteAlpha-900', className)}
 		>
 			{children}
 		</Dialog.Title>
@@ -81,7 +71,7 @@ function ModalTitle({ children, className }: { children: ReactNode; className?: 
 
 function ModalDescription({ children, className }: { children: ReactNode; className?: string }) {
 	return (
-		<Dialog.Description className={twMerge(clsx('leading-6 text-gray-200 text-md', className))}>
+		<Dialog.Description className={twMerge('leading-6 text-gray-200 text-md', className)}>
 			{children}
 		</Dialog.Description>
 	);

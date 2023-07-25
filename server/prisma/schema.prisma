@@ -1,0 +1,87 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id         String    @id
+  name       String
+  email      String    @unique
+  createdAt  DateTime
+  lastOnline DateTime?
+  password   String
+  photoUrl   String?
+
+  participants  Participant[]
+  messageStatus MessageStatus[]
+}
+
+model Participant {
+  userId         String
+  conversationId String
+  createdAt      DateTime
+  removedAt      DateTime?
+
+  user         User         @relation(fields: [userId], references: [id])
+  conversation Conversation @relation(fields: [conversationId], references: [id])
+
+  @@id([userId, conversationId])
+  @@index([userId])
+}
+
+model Message {
+  id                 String    @id
+  content            String
+  author_id          String
+  conversation_id    String
+  replied_message_id String?   @unique
+  sent_at            DateTime?
+  received_at        DateTime?
+  read_at            DateTime?
+
+  messageStatus  MessageStatus[]
+  conversation   Conversation    @relation(fields: [conversation_id], references: [id])
+  repliedMessage Message?        @relation("repliedMessage", fields: [replied_message_id], references: [id])
+  parentMessage  Message?        @relation("repliedMessage")
+
+  @@index([conversation_id])
+}
+
+model MessageStatus {
+  user_id         String
+  message_id      String
+  conversation_id String
+  received_at     DateTime?
+  read_at         DateTime?
+
+  user    User    @relation(fields: [user_id], references: [id])
+  message Message @relation(fields: [message_id], references: [id])
+
+  @@id([user_id, message_id])
+}
+
+model Conversation {
+  id          String    @id
+  created_at  DateTime
+  disabled_at DateTime?
+  group_id    String?   @unique
+  is_group    Boolean   @default(false)
+
+  messages     Message[]
+  participants Participant[]
+  group        Group?        @relation(fields: [group_id], references: [id])
+}
+
+model Group {
+  id          String    @id
+  name        String
+  description String?
+  created_at  DateTime
+  updated_at  DateTime?
+
+  conversation Conversation?
+}

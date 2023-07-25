@@ -1,70 +1,47 @@
 'use client';
 
-import clsx from 'clsx';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ReactNode, Suspense, useEffect } from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
-import { usePathname, useRouter } from 'next/navigation';
+import { ReactNode, Suspense } from 'react';
+import { usePathname } from 'next/navigation';
+import { AnimatePresence } from 'framer-motion';
 
 import { LoadingSpinning } from '@/@design-system/LoadingSpinning';
 
-import { getToken } from '@/services/token/handler';
-
 export default function AuthenticationLayout({ children }: { children: ReactNode }) {
 	const pathname = usePathname();
-	const router = useRouter();
-
-	useEffect(() => {
-		const session = getToken();
-
-		if (JSON.stringify(session) !== '{}') {
-			router.replace('/products/chats');
-		}
-	}, [router]);
-
-	const currentPage = pathname.includes('sign-in') ? 'sign-in' : 'sign-up';
+	const isSignInPage = pathname.includes('sign-in');
 
 	return (
-		<div className="flex-1 flex items-center justify-center bg-[url('/sign-background.svg')] bg-no-repeat bg-cover">
-			<motion.div
-				className={clsx(
-					'p-4 duration-300 rounded-[1rem] perspectiv ring-1 ring-gray-700 w-96 flex flex-col gap-4 shadow-lg bg-gray-800/40 backdrop-blur-sm transition-all max-h-full'
-					// {
-					// 	'h-[28.5rem]': currentPage === 'sign-in',
-					// 	'h-[36.75rem]': currentPage === 'sign-up',
-					// }
-				)}
-			>
+		<main className="flex-1 flex items-center justify-center bg-[url('/sign-background.svg')] bg-no-repeat bg-cover">
+			<div className="p-4 duration-300 rounded-[1rem] ring-1 ring-gray-700 w-96 flex flex-col gap-4 shadow-lg bg-gray-800/40 backdrop-blur-sm transition-all max-h-full">
 				<header className="flex items-center justify-center relative h-[80px]">
 					<Image src="/Logo.svg" alt="ProxyMity Logo" width={170} height={170} className="absolute -top-[5rem]" />
 				</header>
 
-				<div className="flex w-full bg-gray-900 relative rounded-[10px] shadow-inner">
+				<div className="flex w-full bg-gray-900 relative rounded-full shadow-inner">
 					<div
-						className={clsx(
-							'absolute h-[80%] -translate-y-2/4 top-2/4 w-[calc(50%-12px)] rounded-[10px]  z-20 gradient transition-all shadow-lg duration-300',
-							{
-								'left-[6px]': currentPage === 'sign-in',
-								'left-[calc(50%+6px)]': currentPage === 'sign-up',
-							}
-						)}
+						data-signin={isSignInPage}
+						data-signup={!isSignInPage}
+						className="absolute h-[80%] -translate-y-2/4 top-2/4 w-[calc(50%-12px)] rounded-full z-20 gradient transition-all shadow-lg duration-300 data-[signin=true]:left-[6px] data-[signup=true]:left-[calc(50%+6px)]"
 					/>
 
 					<Link
 						href="/auth/sign-in"
 						shallow
-						className="flex items-center flex-1 text-white font-medium text-lg whitespace-nowrap p-3 rounded-[10px] justify-center"
+						title="Log In Page"
+						className="flex items-center flex-1 text-white font-medium text-lg whitespace-nowrap p-3 rounded-[10px] justify-center z-30 tracking-widest"
 					>
-						<span className="z-30 tracking-widest">Log In</span>
+						Log In
 					</Link>
 
 					<Link
 						href="/auth/sign-up"
 						shallow
-						className="flex items-center flex-1 text-white font-medium text-lg whitespace-nowrap p-3 rounded-[10px] justify-center"
+						title="Register page"
+						className="flex items-center flex-1 text-white font-medium text-lg whitespace-nowrap p-3 rounded-[10px] justify-center z-30 tracking-widest"
 					>
-						<span className="z-30 tracking-widest">Register</span>
+						Register
 					</Link>
 				</div>
 
@@ -73,7 +50,7 @@ export default function AuthenticationLayout({ children }: { children: ReactNode
 						<Suspense fallback={<LoadingSpinning size={32} color="white" lineSize={3} />}>{children}</Suspense>
 					</AnimatePresence>
 				</div>
-			</motion.div>
-		</div>
+			</div>
+		</main>
 	);
 }

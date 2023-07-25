@@ -1,0 +1,12 @@
+{
+	"testing.automaticallyOpenPeekView": "never",
+	"editor.codeActionsOnSave": {
+		"source.fixAll.eslint": true
+	},
+	"vitest.enable": true,
+	"editor.formatOnSave": true,
+	"editor.defaultFormatter": "esbenp.prettier-vscode",
+	"[prisma]": {
+		"editor.defaultFormatter": "Prisma.prisma"
+	},
+}

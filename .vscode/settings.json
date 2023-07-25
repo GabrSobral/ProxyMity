@@ -1,14 +1,10 @@
 {
-	"testing.automaticallyOpenPeekView": "never",
-	"editor.codeActionsOnSave": {
-		"source.fixAll.eslint": true
-	},
-	"editor.formatOnSave": true,
-	"editor.defaultFormatter": "esbenp.prettier-vscode",
-	"cSpell.words": [
-		"Dexie"
-	],
-	"[dotenv]": {
-		"editor.defaultFormatter": "foxundermoon.shell-format"
-	}
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "typescript.enablePromptUseWorkspaceTsdk": true,
+  "testing.automaticallyOpenPeekView": "never",
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": true
+  },
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode"
 }
