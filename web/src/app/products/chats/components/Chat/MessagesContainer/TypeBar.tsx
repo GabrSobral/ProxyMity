@@ -8,10 +8,6 @@ import { PaperPlaneTilt, X } from '@phosphor-icons/react';
 import { Input } from '@/@design-system/Input';
 import { Button } from '@/@design-system/Button';
 
-import { useUserStore } from '@/stores/user';
-import { useContactStore } from '@/stores/contacts';
-import { useMessageStore } from '@/stores/messages';
-
 import { useWebSocket } from '@/app/products/chats/contexts/websocket-context/hook';
 
 import { Message } from '@/types/message';
@@ -23,103 +19,99 @@ import { useChat } from '../../../contexts/chat-context/hook';
 import { sendTypingWebSocketEvent } from '../../../contexts/websocket-context/emmiters/sendTyping';
 import { sendMessageWebSocketEvent } from '../../../contexts/websocket-context/emmiters/sendMessage';
 
+import { useAuth } from '@/contexts/auth-context/hook';
+import { useChatsStore } from '../../../contexts/chat-context/stores/chat';
+
 export function TypeBar() {
-	const { socket } = useWebSocket();
+	const { user } = useAuth();
 	const { typebarRef } = useChat();
-	const userData = useUserStore(store => store.state);
+	const { socket } = useWebSocket();
 
-	const { addMessage, saveTypeMessageFromContact, removeReplyMessageFromContact } = useMessageStore(
-		store => store.actions
-	);
-	const { contacts } = useMessageStore(store => store.state);
-
-	const selectedContact = useContactStore(store => store.state.selectedContact);
-	const { bringToTop } = useContactStore(store => store.actions);
+	const {
+		addMessage,
+		saveTypeMessageFromConversation,
+		removeReplyMessageFromConversation,
+		bringToTop,
+		selectedConversation,
+	} = useChatsStore();
 
 	const [type, setType] = useState('');
-	const [selectedContactMessage, setSelectedContactMessage] = useState<(typeof contacts)[0] | null>(null);
 
 	useEffect(() => {
-		setSelectedContactMessage(contacts.find(item => item.id === selectedContact?.id) || null);
-	}, [contacts, selectedContact?.id]);
-
-	useEffect(() => {
-		if (selectedContactMessage) {
-			setType(selectedContactMessage?.typeMessage || '');
+		if (selectedConversation) {
+			setType(selectedConversation?.typeMessage || '');
 		}
-	}, [selectedContactMessage]);
+	}, [selectedConversation]);
 
 	const sendMessage = useCallback(async () => {
-		if (!userData.data || !selectedContact || !type.trim()) return;
+		if (!user || !selectedConversation || !type.trim()) return;
 
 		const repliedMessage = (() => {
 			if (
-				selectedContactMessage?.replyMessage &&
-				selectedContactMessage.replyMessage.repliedMessage &&
-				typeof selectedContactMessage.replyMessage.repliedMessage === 'object'
+				selectedConversation?.replyMessage &&
+				selectedConversation.replyMessage.repliedMessage &&
+				typeof selectedConversation.replyMessage.repliedMessage === 'object'
 			) {
 				return {
-					...selectedContactMessage?.replyMessage,
-					repliedMessage: selectedContactMessage?.replyMessage.repliedMessage.id,
+					...selectedConversation?.replyMessage,
+					repliedMessage: selectedConversation?.replyMessage.repliedMessage.id,
 				};
 			} else {
-				return selectedContactMessage?.replyMessage;
+				return selectedConversation?.replyMessage;
 			}
 		})();
-
-		console.log({ repliedMessage });
 
 		const message: Message = {
 			id: uuidv4(),
 			content: type.trim(),
-			contactRef: '',
-			readAt: 'none',
+
 			writtenAt: new Date(),
-			receivedAt: 'none',
-			sentAt: 'none',
-			authorId: userData.data.id,
-			recipientId: selectedContact?.id,
+			sentAt: null,
+			receivedByAllAt: null,
+			readByAllAt: null,
+
+			conversationId: selectedConversation?.id,
+			authorId: user.id,
 			repliedMessage: repliedMessage || null,
 		};
 
-		addMessageAsyncDB({ ...message, contactRef: message.authorId + message.recipientId });
+		addMessageAsyncDB(message);
 
-		bringToTop(message.recipientId);
+		bringToTop(message.conversationId);
 
 		addMessage({
-			contactId: selectedContact?.id,
-			message: { ...message, contactRef: message.authorId + message.recipientId },
+			conversationId: selectedConversation?.id,
+			message,
 		});
 
 		sendMessageWebSocketEvent(socket, {
-			message: { ...message, readAt: 'none', receivedAt: 'none', sentAt: new Date() },
-			sender: userData.data.id,
-			receiver: selectedContact.id,
+			message: { ...message, readByAllAt: null, receivedByAllAt: null, sentAt: new Date() },
+			sender: user.id,
+			receiver: selectedConversation.id,
 		});
 
 		changeMessageStatusAsyncDB({ messageId: message.id, status: 'sent' });
 
-		saveTypeMessageFromContact({ contactId: selectedContact.id, typeMessage: '' });
+		saveTypeMessageFromConversation({ conversationId: selectedConversation.id, typeMessage: '' });
 		setType('');
-		removeReplyMessageFromContact({ contactId: selectedContact.id });
+		removeReplyMessageFromConversation({ conversationId: selectedConversation.id });
 	}, [
-		userData.data,
-		selectedContact,
+		user,
+		selectedConversation,
 		type,
-		selectedContactMessage?.replyMessage,
 		bringToTop,
 		addMessage,
 		socket,
-		saveTypeMessageFromContact,
-		removeReplyMessageFromContact,
+		saveTypeMessageFromConversation,
+		removeReplyMessageFromConversation,
 	]);
 
 	function typing(value: string) {
 		function handle(typing: boolean) {
 			sendTypingWebSocketEvent(socket, {
 				typing,
-				recipientId: selectedContact?.id || '',
-				authorId: userData.data?.id || '',
+				conversationId: selectedConversation?.id || '',
+				authorId: user?.id || '',
 			});
 		}
 
@@ -149,15 +141,15 @@ export function TypeBar() {
 	}, [sendMessage, typebarRef]);
 
 	useEffect(() => {
-		if (selectedContactMessage?.replyMessage) {
+		if (selectedConversation?.replyMessage) {
 			typebarRef.current?.focus();
 		}
-	}, [selectedContactMessage?.replyMessage, typebarRef]);
+	}, [selectedConversation?.replyMessage, typebarRef]);
 
 	return (
 		<div className="flex flex-col gap-2 m-1 mt-auto">
 			<AnimatePresence mode="popLayout">
-				{selectedContactMessage?.replyMessage && (
+				{selectedConversation?.replyMessage && (
 					<motion.div
 						className="w-full p-2 flex gap-2 bg-black rounded-lg"
 						initial={{ opacity: 0, y: 40 }}
@@ -165,14 +157,14 @@ export function TypeBar() {
 						exit={{ opacity: 0, y: 40 }}
 					>
 						<div className="bg-gray-950 w-full p-2 rounded-md flex flex-col gap-1">
-							<span className="text-purple-300 text-xs">{selectedContact?.name}</span>
-							<span className="text-white text-sm">{selectedContactMessage?.replyMessage.content}</span>
+							<span className="text-purple-300 text-xs">{'Name'}</span>
+							<span className="text-white text-sm">{selectedConversation?.replyMessage.content}</span>
 						</div>
 
 						<button
 							type="button"
 							title="Cancel reply message"
-							onClick={() => removeReplyMessageFromContact({ contactId: selectedContact?.id || '' })}
+							onClick={() => removeReplyMessageFromConversation({ conversationId: selectedConversation?.id || '' })}
 							className="ml-auto bg-gray-900 hover:brightness-125 flex items-center justify-center rounded-full max-w-[2.5rem] min-w-[2.5rem] max-h-[2.5rem] min-h-[2.5rem]"
 						>
 							<X size={24} color="white" />

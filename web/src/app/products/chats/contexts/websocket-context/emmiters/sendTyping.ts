@@ -2,7 +2,7 @@ import { toBinary } from '@/utils/binary-parser';
 
 interface ISendTypingWebSocketPayload {
 	typing: boolean;
-	recipientId: string;
+	conversationId: string;
 	authorId: string;
 }
 

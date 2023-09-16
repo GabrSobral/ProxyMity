@@ -1,11 +1,12 @@
 'use client';
 
-import { createContext, ReactNode, useEffect, useMemo } from 'react';
+import { createContext, ReactNode, useEffect, useMemo, useRef } from 'react';
 
-import { useUserStore } from '@/stores/user';
+import { useAuth } from '@/contexts/auth-context/hook';
 
 import { eventsHandler } from './handler';
 import { sendConnectionWebSocketEvent } from './emmiters/sendConnection';
+import { sendDisconnectionWebSocketEvent } from './emmiters/sendDisconnection';
 
 interface WebSocketContextProps {
 	socket: WebSocket;
@@ -14,26 +15,48 @@ interface WebSocketContextProps {
 export const WebSocketContext = createContext({} as WebSocketContextProps);
 
 export function WebSocketProvider({ children }: { children: ReactNode }) {
-	const userData = useUserStore(store => store.state);
+	const { user } = useAuth();
+	const isFirstTime = useRef(true);
 
 	const socket = useMemo(() => {
-		const webSocketUrlConnection = process.env.NEXT_PUBLIC_WS_API_DOMAIN || '';
-		const instance = new WebSocket(webSocketUrlConnection);
-		instance.binaryType = 'arraybuffer';
+		const connection = new WebSocket(process.env.NEXT_PUBLIC_WS_API_DOMAIN || '');
+		connection.binaryType = 'arraybuffer';
 
-		return instance;
+		return connection;
 	}, []);
 
 	useEffect(() => {
-		if (!userData.data?.id) return;
+		if (user?.id && isFirstTime.current && socket) {
+			sendConnectionWebSocketEvent(socket, { id: user?.id || '' });
+			isFirstTime.current = false;
+		}
 
-		socket.onopen = () => sendConnectionWebSocketEvent(socket, { id: userData.data?.id || '' });
-	}, [socket, userData.data?.id]);
+		const handler = () => {
+			if (user?.id && isFirstTime.current && socket) {
+				sendConnectionWebSocketEvent(socket, { id: user?.id || '' });
+				isFirstTime.current = false;
+			}
+		};
+
+		socket.addEventListener('open', handler);
+		return () => socket.removeEventListener('open', handler);
+	}, [user?.id, socket]);
 
 	useEffect(() => {
 		socket.addEventListener('message', eventsHandler);
 		return () => socket.removeEventListener('message', eventsHandler);
 	}, [socket]);
 
-	return <WebSocketContext.Provider value={{ socket }}>{children}</WebSocketContext.Provider>;
+	useEffect(() => {
+		const handler = () => {
+			if (socket && user?.id) {
+				sendDisconnectionWebSocketEvent(socket, { id: user?.id || '' });
+			}
+		};
+
+		socket.addEventListener('close', handler);
+		return () => socket.removeEventListener('close', handler);
+	}, [socket, user?.id]);
+
+	return socket ? <WebSocketContext.Provider value={{ socket }}>{children}</WebSocketContext.Provider> : null;
 }

@@ -2,6 +2,7 @@ import '../style/globals.css';
 import { Inter } from 'next/font/google';
 
 import { AuthWrapperProvider } from '@/contexts/auth-context/context';
+import { ThemeProvider } from '@/contexts/theme-context/context';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -16,8 +17,10 @@ export const metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
 	return (
 		<html lang="pt-br">
-			<body className="w-screen h-screen flex flex-col bg-gray-800" style={inter.style}>
-				<AuthWrapperProvider>{children}</AuthWrapperProvider>
+			<body className="w-screen h-screen flex flex-col dark:bg-gray-800 transition-all bg-gray-200" style={inter.style}>
+				<ThemeProvider>
+					<AuthWrapperProvider>{children}</AuthWrapperProvider>
+				</ThemeProvider>
 			</body>
 		</html>
 	);

@@ -59,6 +59,7 @@ export function SignInPageComponents() {
 							value={email}
 							required
 							onChange={e => setEmailValue(e.target.value)}
+							className="bg-gray-900 ring-gray-700 text-gray-200"
 						/>
 					</Input.Wrapper>
 				</Input.Group>
@@ -74,6 +75,7 @@ export function SignInPageComponents() {
 							title="Type your password"
 							value={password}
 							required
+							className="bg-gray-900 ring-gray-700 text-gray-200"
 							onChange={e => setPasswordValue(e.target.value)}
 						/>
 

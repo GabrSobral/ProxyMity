@@ -2,8 +2,9 @@ import { toBinary } from '@/utils/binary-parser';
 
 interface ISendTypingWebSocketPayload {
 	messageId: string;
-	recipientId: string;
-	contactId: string;
+	conversationId: string;
+	userId: string;
+	isConversationGroup: boolean;
 }
 
 export function sendReceiveMessageWebSocketEvent(socket: WebSocket, payload: ISendTypingWebSocketPayload) {

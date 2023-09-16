@@ -6,12 +6,11 @@ import { Fragment, useEffect, useState } from 'react';
 
 import { Message } from '@/types/message';
 
-import { useUserStore } from '@/stores/user';
-
+import { useAuth } from '@/contexts/auth-context/hook';
 import { Events, ExtractPayloadType } from '../../../contexts/websocket-context/handler';
+import { useChatsStore } from '../../../contexts/chat-context/stores/chat';
 
 import { changeMessageStatusAsyncDB } from '@/services/database/use-cases/change-message-status';
-import { useMessageStore } from '@/stores/messages';
 
 interface Props {
 	previousMessage?: Message;
@@ -20,28 +19,26 @@ interface Props {
 
 const formatter = Intl.DateTimeFormat('pt-br', { hour: 'numeric', minute: 'numeric' });
 
-const selectTimeToShow = (isMine: boolean, message: Message) =>
-	isMine
-		? formatter.format(message.writtenAt)
-		: message.receivedAt && message.receivedAt !== 'none'
-		? formatter.format(message.receivedAt)
-		: null;
-
 export function Message({ message, previousMessage }: Props) {
-	const userData = useUserStore(store => store.state.data);
-	const { updateContactMessageStatus, setReplyMessageFromContact } = useMessageStore(store => store.actions);
-
+	const { user } = useAuth();
+	const { updateConversationMessageStatus, setReplyMessageFromConversation } = useChatsStore();
 	const [isMessageConfigVisible, setIsMessageConfigVisible] = useState(false);
-
 	const [status, setStatus] = useState<'sent' | 'received' | 'read' | 'wrote'>(() => {
-		if (message.readAt !== 'none') return 'read';
-		if (message.receivedAt !== 'none') return 'received';
-		if (message.sentAt !== 'none') return 'sent';
+		if (message.readByAllAt !== null) return 'read';
+		if (message.receivedByAllAt !== null) return 'received';
+		if (message.sentAt !== null) return 'sent';
 
 		return 'wrote';
 	});
 
-	const isMine = message.authorId === userData?.id;
+	const selectTimeToShow = (isMine: boolean, message: Message) =>
+		isMine
+			? formatter.format(new Date(message.writtenAt))
+			: message.receivedByAllAt && new Date(message.receivedByAllAt) !== null
+			? formatter.format(new Date(message.receivedByAllAt))
+			: null;
+
+	const isMine = message.authorId === user?.id;
 	const previousIsFromUser = previousMessage?.authorId === message.authorId;
 
 	const timeToShow = selectTimeToShow(isMine, message);
@@ -53,35 +50,33 @@ export function Message({ message, previousMessage }: Props) {
 				return;
 			}
 
-			console.log('Mensagem', message.id, 'acionou aqui');
+			const { messageId, status: newStatus, conversationId } = event.detail;
 
-			const { messageId, status: newStatus, contactId } = event.detail;
-
-			if (newStatus && messageId && contactId) {
+			if (newStatus && messageId && conversationId) {
 				setStatus(newStatus);
-				updateContactMessageStatus({ contactId, messageId: message.id, status: newStatus });
+				updateConversationMessageStatus({ conversationId, messageId: message.id, status: newStatus });
 				changeMessageStatusAsyncDB({ messageId: messageId, status: newStatus });
 			}
 		}
 
 		addEventListener(message.id, handler);
 		return () => removeEventListener(message.id, handler);
-	}, [message.id, updateContactMessageStatus]);
+	}, [message.id, updateConversationMessageStatus]);
 
 	//🟡 Receive the "read" message status from another user, and update it at state
 	useEffect(() => {
 		function handler(event: CustomEventInit<ExtractPayloadType<'receive_read_message', Events>>) {
-			const contactId = event.detail?.contactId || '';
+			const conversationId = event.detail?.conversationId || '';
 
-			if (contactId === message.recipientId && message.readAt === 'none') {
-				console.log('@ws.receive_message_status', contactId);
+			if (conversationId === message.conversationId && message.readByAllAt === null) {
+				console.log('@ws.receive_message_status', conversationId);
 				setStatus('read');
 			}
 		}
 
 		addEventListener('@ws.receive_read_message', handler);
 		return () => removeEventListener('@ws.receive_read_message', handler);
-	}, [message.recipientId, message.readAt]);
+	}, [message.conversationId, message.readByAllAt]);
 
 	return (
 		<motion.li
@@ -93,9 +88,12 @@ export function Message({ message, previousMessage }: Props) {
 			className="flex flex-col gap-1  rounded-[1rem] w-full"
 		>
 			<div
-				className={clsx('flex items-center gap-3 sticky bg-gray-900 p-1 px-2 rounded-full w-fit -top-3', {
-					'ml-auto': isMine,
-				})}
+				className={clsx(
+					'flex items-center gap-3 sticky dark:bg-gray-900 bg-white transition-colors p-1 px-2 rounded-full w-fit -top-3',
+					{
+						'ml-auto': isMine,
+					}
+				)}
 			>
 				{!isMine && !previousIsFromUser && (
 					<Fragment>
@@ -106,20 +104,20 @@ export function Message({ message, previousMessage }: Props) {
 							height={30}
 							className="min-w-[30px] min-h-[30px] rounded-full z-0 shadow-xl"
 						/>
-						<span className="text-gray-200 text-xs">Diego</span>
+						<span className="dark:text-gray-200 text-gray-700 transition-colors text-xs">Diego</span>
 					</Fragment>
 				)}
 
-				<span className="text-gray-300 text-xs ml-2 flex items-center gap-2">
+				<span className="dark:text-gray-300 text-gray-700 transition-colors text-xs ml-2 flex items-center gap-2">
 					{isMine &&
 						(status === 'wrote' ? (
-							<Clock size={13} className="text-gray-100" />
+							<Clock size={13} className="dark:text-gray-100 text-gray-600 transition-colors" />
 						) : (
 							<div
 								title={status}
 								className={clsx('w-6 h-3 rounded-full flex items-center p-[2px] transition-all', {
 									'justify-end bg-transparent': status === 'sent',
-									'justify-end bg-gray-600': status === 'received',
+									'justify-end dark:bg-gray-600 bg-gray-300': status === 'received',
 									'justify-start bg-purple-500': status === 'read',
 								})}
 							>
@@ -139,7 +137,11 @@ export function Message({ message, previousMessage }: Props) {
 					})}
 				>
 					{message.repliedMessage && (
-						<div className={clsx('bg-black p-2 rounded-[8px] w-full flex flex-col', { 'ml-auto': isMine })}>
+						<div
+							className={clsx('dark:bg-black bg-white transition-colors p-2 rounded-[8px] w-full flex flex-col', {
+								'ml-auto': isMine,
+							})}
+						>
 							<span className="text-purple-300 text-xs">{'Typescript'}</span>
 							<span className="text-gray-200 text-sm">
 								{typeof message.repliedMessage === 'object' ? message.repliedMessage?.content : null}
@@ -156,9 +158,7 @@ export function Message({ message, previousMessage }: Props) {
 							initial={{ opacity: 0, x: isMine ? 10 : -10 }}
 							animate={{ opacity: 1, x: 0 }}
 							exit={{ opacity: 0, x: isMine ? 10 : -10 }}
-							onClick={() =>
-								setReplyMessageFromContact({ contactId: isMine ? message.recipientId : message.authorId, message })
-							}
+							onClick={() => setReplyMessageFromConversation({ conversationId: message.conversationId, message })}
 						>
 							<ShareFat size={16} color="white" weight="fill" />
 						</motion.button>

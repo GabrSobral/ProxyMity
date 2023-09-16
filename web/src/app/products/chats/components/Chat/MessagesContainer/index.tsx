@@ -1,27 +1,24 @@
+/* eslint-disable @next/next/no-img-element */
 import { useEffect, useRef } from 'react';
 
 import { Message } from './Message';
 import { TypeBar } from './TypeBar';
 
-import { useMessageStore } from '@/stores/messages';
-import { useContactStore } from '@/stores/contacts';
-
 import { Heading } from '@/@design-system/Heading';
 
 import { ScrollToBottomButton } from './ScrollToBottomButton';
+import { useChatsStore } from '../../../contexts/chat-context/stores/chat';
 
 export function MessagesContainer() {
 	const isFirstAccess = useRef(true);
 	const messageContainerRef = useRef<HTMLUListElement>(null);
 
-	const contactsMessages = useMessageStore(store => store.state.contacts);
-	const selectedContact = useContactStore(store => store.state.selectedContact);
-
-	const contactMessages = contactsMessages.find(item => item.id === selectedContact?.id);
+	const { selectedConversation } = useChatsStore();
+	const conversationMessages = selectedConversation?.messages;
 
 	useEffect(() => {
 		isFirstAccess.current = true;
-	}, [selectedContact]);
+	}, [selectedConversation]);
 
 	useEffect(() => {
 		const container = messageContainerRef.current;
@@ -34,12 +31,12 @@ export function MessagesContainer() {
 
 			isFirstAccess.current = false;
 		}
-	}, [contactMessages]);
+	}, [conversationMessages]);
 
 	return (
 		<div className="overflow-hidden w-full flex-1 h-full flex flex-col p-1 relative">
 			<ul className="flex flex-col gap-2 overflow-auto p-4" ref={messageContainerRef}>
-				{contactMessages?.messages.length === 0 ? (
+				{conversationMessages?.length === 0 ? (
 					<div className="flex-1 flex items-center justify-center flex-col gap-3 pointer-events-none">
 						<img src="/no-messages.svg" alt="No message" className="w-[25rem]" />
 						<Heading size="sm" className="opacity-80">
@@ -47,8 +44,8 @@ export function MessagesContainer() {
 						</Heading>
 					</div>
 				) : (
-					contactMessages?.messages.map((message, i) => (
-						<Message key={message.id} message={message} previousMessage={contactMessages?.messages[i - 1]} />
+					conversationMessages?.map((message, i) => (
+						<Message key={message.id} message={message} previousMessage={conversationMessages?.[i - 1]} />
 					))
 				)}
 			</ul>

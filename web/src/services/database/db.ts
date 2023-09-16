@@ -1,50 +1,58 @@
 import Dexie, { Table } from 'dexie';
 
-import { Contact } from '../../types/contact';
+import { Conversation } from '../../types/conversation';
 import { Message } from '../../types/message';
 import { User } from '../../types/user';
 
 export class DexieDatabase extends Dexie {
-	contacts!: Table<Contact>;
+	conversations!: Table<Conversation>;
+	me!: Table<User>;
 	user!: Table<User>;
 	messages!: Table<Message>;
 
 	constructor() {
-		super('proxymity-chat');
+		super('proxymity-chats');
 		this.version(1).stores({
-			user: `
-				++id, 
+			me: `
+				id,
 				name, 
 				email, 
 				
 				createdAt,
 				photoUrl
 			`,
-			contacts: `
-        ++id, 
-        name, 
-        email, 
+			users: `
+				id,
+				name, 
+				email, 
 				
-        lastOnline, 
-        registeredAt, 
-        createdAt,
+				createdAt,
+				photoUrl
+			`,
+			conversations: `
+				id,
+				isGroup,
+				order,
 
-				avatarConfig
+        createdAt,
+				disabledAt,
+				groupName,
+				groupDescription,
+				participants
       `,
 			messages: `
 				++dbId,
 				id,
 				content,
-
-				contactRef,
-				
-				authorId,
-				recipientId,
-
-				sentAt,
-				receivedAt,
+		
 				writtenAt,
-				readAt,
+				sentAt,
+				receivedByAllAt,
+				readByAllAt,
+			
+				conversationId,
+				repliedMessage,
+				authorId,
 
 				[contactRef+readAt+authorId]
 			`,

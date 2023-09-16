@@ -1,20 +1,17 @@
-import { Contact } from './contact';
+import { Conversation } from './conversation';
+import { User } from './user';
 
 export interface Message {
 	dbId?: number;
-
 	id: string;
 	content: string;
 
-	contactRef?: string;
-
-	recipientId: Contact['id'];
-	authorId: Contact['id'];
-
 	writtenAt: Date;
-	sentAt: Date | 'none';
-	receivedAt: Date | 'none';
-	readAt: Date | 'none';
+	sentAt: Date | null;
+	receivedByAllAt: Date | null;
+	readByAllAt: Date | null;
 
+	conversationId: Conversation['id'];
 	repliedMessage: Message | Message['id'] | null;
+	authorId: User['id'];
 }

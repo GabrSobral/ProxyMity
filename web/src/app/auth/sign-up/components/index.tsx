@@ -11,7 +11,6 @@ import { LoadingSpinning } from '@/@design-system/LoadingSpinning';
 import { StrongPasswordModal } from './StrongPasswordModal';
 
 import { useAuthStore } from '../../authStore';
-import { useUserStore } from '@/stores/user';
 
 import { APISignUp } from '@/services/api/sign-up';
 
@@ -26,8 +25,6 @@ export function SignUpPageComponents() {
 
 	const [error, setError] = useState<string | null>(null);
 
-	const setUser = useUserStore(store => store.actions.setUser);
-
 	const { name, email, password } = useAuthStore(store => store.signUp.states);
 	const { setNameValue, setEmailValue, setPasswordValue } = useAuthStore(store => store.signUp.actions);
 
@@ -38,8 +35,10 @@ export function SignUpPageComponents() {
 		try {
 			const response = await APISignUp({ name, email, password });
 
+			console.log({ response });
+
 			// setToken(response.access_token);
-			setUser(response.data);
+			// setUser(response.data);
 			setIsLoading(false);
 
 			router.replace('/products/chats');
@@ -65,6 +64,7 @@ export function SignUpPageComponents() {
 							autoComplete="name"
 							required
 							value={name}
+							className="bg-gray-900 ring-gray-700 text-gray-200"
 							onChange={e => setNameValue(e.target.value)}
 						/>
 					</Input.Wrapper>
@@ -80,6 +80,7 @@ export function SignUpPageComponents() {
 							title="Type your e-mail"
 							required
 							value={email}
+							className="bg-gray-900 ring-gray-700 text-gray-200"
 							onChange={e => setEmailValue(e.target.value)}
 						/>
 					</Input.Wrapper>
@@ -95,6 +96,7 @@ export function SignUpPageComponents() {
 							autoComplete="new-password"
 							title="Type or paste a strong password"
 							required
+							className="bg-gray-900 ring-gray-700 text-gray-200"
 							onChange={e => setPasswordValue(e.target.value)}
 						/>
 

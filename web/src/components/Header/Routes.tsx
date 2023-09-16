@@ -1,3 +1,5 @@
+'use client';
+
 import clsx from 'clsx';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -22,8 +24,8 @@ export function Routes() {
 					className={clsx(
 						'text-md font-medium tracking-wider hover:underline min-h-[59px] max-h-[59px] flex items-center relative pr-2',
 						{
-							'text-purple-300': page.path === pathname,
-							'text-gray-200': page.path !== pathname,
+							'dark:text-purple-300 text-purple-500': page.path === pathname,
+							'darK:text-gray-200 text-gray-700': page.path !== pathname,
 						}
 					)}
 					key={page.path}
@@ -34,7 +36,7 @@ export function Routes() {
 					</span>
 
 					<div
-						className={clsx('absolute h-1 rounded bg bg-purple-300 bottom-0 m-auto transition-all', {
+						className={clsx('absolute h-1 rounded bg dark:bg-purple-300 bg-purple-500 bottom-0 m-auto transition-all', {
 							'w-0': page.path !== pathname,
 							'w-full': page.path === pathname,
 						})}

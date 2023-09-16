@@ -1,11 +1,20 @@
+'use client';
+
 import { Bell, BellRinging } from '@phosphor-icons/react';
 import { Popover, Transition } from '@headlessui/react';
 
 export function NotificationButton() {
 	return (
 		<Popover className="relative z-20">
-			<Popover.Button title="Notifications" className="rounded-full p-2 hover:bg-purple-500 transition-colors">
-				<Bell className="text-white" size={28} weight="light" />
+			<Popover.Button
+				title="Notifications"
+				className="rounded-full p-2 hover:bg-purple-500 hover:text-white group transition-colors"
+			>
+				<Bell
+					className="dark:text-white text-gray-700 transition-colors group-hover:text-white"
+					size={28}
+					weight="light"
+				/>
 			</Popover.Button>
 
 			<Transition

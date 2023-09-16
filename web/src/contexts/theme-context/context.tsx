@@ -1,44 +1,48 @@
 'use client';
 
-import { SessionProvider, useSession } from 'next-auth/react';
-import { createContext, ReactNode, useEffect, useRef } from 'react';
+import { createContext, ReactNode, useEffect, useState } from 'react';
 
-import { User } from '@/types/user';
-
-interface AuthContextProps {
-	user: User | null;
-	accessToken: string | null;
+interface ThemeContextProps {
+	changeTheme: (theme: 'dark' | 'light' | 'system') => void;
+	isDark: boolean;
+	theme: 'light' | 'dark' | 'system';
 }
 
-export const AuthContext = createContext({} as AuthContextProps);
+export const ThemeContext = createContext({} as ThemeContextProps);
 
-function AuthProvider({ children }: { children: ReactNode }) {
-	const { data } = useSession();
-	const accessToken = useRef(null);
+export function ThemeProvider({ children }: { children: ReactNode }) {
+	const [theme, setTheme] = useState<'light' | 'dark' | 'system'>('system');
 
 	useEffect(() => {
-		if (data) {
-			const session = data as any as { user: User; accessToken: string };
-			accessToken.current = session.accessToken as any;
+		const currentTheme = localStorage.getItem(`@proxymity_theme`) as 'light' | 'dark' | 'system' | null;
+
+		if (currentTheme && currentTheme !== 'system') {
+			setTheme(currentTheme);
+		} else {
+			setTheme('system');
 		}
-	}, [data]);
+	}, []);
+
+	useEffect(() => {
+		if (theme === 'system') {
+			const darkThemeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+
+			if (darkThemeMediaQuery.matches) {
+				return document.documentElement.setAttribute('class', 'dark');
+			} else {
+				return document.documentElement.setAttribute('class', 'light');
+			}
+		}
+
+		return document.documentElement.setAttribute('class', theme);
+	}, [theme]);
+
+	const changeTheme = (theme: 'dark' | 'light' | 'system') => {
+		localStorage.setItem(`@proxymity_theme`, theme);
+		setTheme(theme);
+	};
 
 	return (
-		<AuthContext.Provider
-			value={{
-				accessToken: accessToken.current,
-				user: data ? (data?.user as User) : null,
-			}}
-		>
-			{children}
-		</AuthContext.Provider>
-	);
-}
-
-export function AuthWrapperProvider({ children }: { children: ReactNode }) {
-	return (
-		<SessionProvider>
-			<AuthProvider>{children}</AuthProvider>
-		</SessionProvider>
+		<ThemeContext.Provider value={{ changeTheme, isDark: theme === 'dark', theme }}>{children}</ThemeContext.Provider>
 	);
 }

@@ -17,7 +17,7 @@ export default function ChatPage() {
 	return (
 		<EncryptionProvider>
 			<ChatProvider>
-				<main className="flex flex-1 p-4 h-full gap-4 overflow-hidden m-auto max-w-[1366px] w-full">
+				<main className="flex flex-1 p-4 h-full gap-4 overflow-hidden m-auto max-w-[1980px] w-full">
 					<ContactSidebar />
 					<Chat />
 					<ConversationDetail />

@@ -60,13 +60,13 @@ export function StrongPasswordModal({ isVisible, closeModal }: Props) {
 
 			<Modal.Description>Protect yourself by choosing a strong password.</Modal.Description>
 
-			<Modal.Description className="text-orange-300 flex items-center gap-2">
-				<Warning size={24} className="text-orange-300" />
+			<Modal.Description className="dark:text-orange-300 text-orange-400 flex items-center gap-2">
+				<Warning size={24} className="dark:text-orange-300 text-orange-400" />
 				Don&lsquo;t forget to save this password before create your account!
 			</Modal.Description>
 
-			<div className="bg-gray-950 p-2 px-4 rounded-[10px] flex items-center justify-between mt-4 shadow-inner">
-				<strong className="text-[1.5rem] font-bold tracking-widest text-white">
+			<div className="dark:bg-gray-950 bg-gray-100 p-2 px-4 rounded-[10px] flex items-center justify-between mt-4 shadow-inner">
+				<strong className="text-[1.5rem] font-bold tracking-widest dark:text-white text-gray-700">
 					{isPasswordVisible
 						? strongPassword
 						: strongPassword
@@ -83,9 +83,9 @@ export function StrongPasswordModal({ isVisible, closeModal }: Props) {
 						className="flex items-center justify-center w-fit"
 					>
 						{isPasswordVisible ? (
-							<EyeClosed size={28} className="text-purple-300" />
+							<EyeClosed size={28} className="dark:text-purple-300 text-purple-500" />
 						) : (
-							<Eye size={28} className="text-purple-300" />
+							<Eye size={28} className="dark:text-purple-300 text-purple-500" />
 						)}
 					</button>
 
@@ -95,7 +95,7 @@ export function StrongPasswordModal({ isVisible, closeModal }: Props) {
 						title="Regenerate the password"
 						className="flex items-center justify-center w-fit active:scale-90 transition-all"
 					>
-						<ArrowClockwise size={28} className="text-purple-300" />
+						<ArrowClockwise size={28} className="dark:text-purple-300 text-purple-500" />
 					</button>
 				</div>
 			</div>
@@ -104,9 +104,13 @@ export function StrongPasswordModal({ isVisible, closeModal }: Props) {
 				<button
 					type="button"
 					onClick={copyToClipboard}
-					className="p-2 px-3 transition-all flex items-center gap-2 text-purple-300 tracking-wider text-md rounded-[10px] border border-solid border-purple-500 w-fit"
+					className="p-2 px-3 transition-all flex items-center gap-2 dark:text-purple-300 text-purple-500 tracking-wider text-md rounded-[10px] border-2 border-solid border-purple-500 w-fit"
 				>
-					{isCopied ? <Check size={28} className="text-purple-300" /> : <Copy size={28} className="text-purple-300" />}
+					{isCopied ? (
+						<Check size={28} className="dark:text-purple-300 text-purple-500" />
+					) : (
+						<Copy size={28} className="dark:text-purple-300 text-purple-500" />
+					)}
 					{isCopied ? 'Copied' : 'Copy'}
 				</button>
 
@@ -116,9 +120,9 @@ export function StrongPasswordModal({ isVisible, closeModal }: Props) {
 						setPasswordValue(strongPassword);
 						closeModal();
 					}}
-					className="p-2 px-3 flex items-center gap-2 text-green-400 tracking-wider text-md rounded-[10px] border border-solid border-green-400 w-fit"
+					className="p-2 px-3 flex items-center gap-2 dark:text-green-400 text-green-700 tracking-wider text-md rounded-[10px] border-2 border-solid dark:border-green-400 border-green-700 w-fit"
 				>
-					<Key size={28} className="text-green-400" />
+					<Key size={28} className="dark:text-green-400 text-green-700" />
 					Use this password
 				</button>
 			</div>

@@ -2,59 +2,47 @@ import clsx from 'clsx';
 import { motion } from 'framer-motion';
 import { PulseLoader } from 'react-spinners';
 import tailwindColors from 'tailwindcss/colors';
-import { ForwardedRef, forwardRef, useEffect, useMemo, useState } from 'react';
+import { ForwardedRef, forwardRef, useEffect, useState } from 'react';
 
 import { UserImage } from '@/@design-system/UserImage';
-import { Contact } from '@/types/contact';
 
-import { useUserStore } from '@/stores/user';
-import { useContactStore } from '@/stores/contacts';
-import { useMessageStore } from '@/stores/messages';
-
+import { useAuth } from '@/contexts/auth-context/hook';
 import { useChat } from '../../../contexts/chat-context/hook';
+import { ConversationState, useChatsStore } from '../../../contexts/chat-context/stores/chat';
+import { twMerge } from 'tailwind-merge';
 
 interface Props {
-	contact: Contact;
+	conversation: ConversationState;
 	index: number;
 }
 
-export const ContactItem = forwardRef(({ contact, index }: Props, ref: ForwardedRef<HTMLLIElement>) => {
-	const formatLastMessageDate = Intl.DateTimeFormat('pt-br', { hour: 'numeric', minute: 'numeric' });
+const formatLastMessageDate = Intl.DateTimeFormat('pt-br', { hour: 'numeric', minute: 'numeric' });
 
+export const ContactItem = forwardRef(({ conversation, index }: Props, ref: ForwardedRef<HTMLLIElement>) => {
 	const [typing, setTyping] = useState(false);
-	const { selectContactAsync } = useChat();
+	const { user } = useAuth();
+	const { selectConversationAsync } = useChat();
+	const { selectedConversation } = useChatsStore();
+	const isSelectedContact = selectedConversation?.id === conversation.id;
 
-	const userData = useUserStore(store => store.state);
-	const { selectedContact } = useContactStore(store => store.state);
-	const { contacts: contactsMessages } = useMessageStore(store => store.state);
+	const conversationName =
+		conversation?.groupName || conversation?.participants.find(item => item.id !== user?.id)?.name || '';
 
-	const isSelectedContact = selectedContact === contact;
-
-	const { lastMessage, notificationsCount } = useMemo(() => {
-		const contactMessages = contactsMessages.find(contactMessages => contactMessages.id === contact.id);
-
-		return {
-			lastMessage: contactMessages ? contactsMessages[index]?.messages.at(-1) : null,
-			notificationsCount: contactMessages?.notifications || 0,
-		};
-	}, [contactsMessages, index, contact.id]);
+	const contact = conversation?.participants.find(item => item.id !== user?.id);
+	const lastMessage = conversation.messages?.at(-1);
 
 	useEffect(() => {
-		if (!contact.id) {
-			return;
-		}
+		const eventHandler = (event: CustomEventInit<{ typing: boolean; authorId: string; conversationId: string }>) => {
+			const data = event.detail;
 
-		const eventHandler = (event: CustomEventInit<{ typing: boolean; authorId: string }>) => {
-			const data = event.detail!;
-
-			if (data.authorId === contact.id) {
+			if (data?.conversationId === conversation.id) {
 				setTyping(data.typing);
 			}
 		};
 
 		addEventListener('@ws.receive_typing', eventHandler);
 		return () => removeEventListener('@ws.receive_typing', eventHandler);
-	}, [contact.id]);
+	}, [conversation.id]);
 
 	return (
 		<motion.li
@@ -64,54 +52,54 @@ export const ContactItem = forwardRef(({ contact, index }: Props, ref: Forwarded
 			animate={{ x: 0, opacity: 1 }}
 			exit={{ x: -30, opacity: 0 }}
 			transition={{ duration: 0.3, delay: index / 10 + 0.2 }}
-			onClick={() => selectContactAsync({ contact })}
-			className="w-full  relative py-2 px-3 rounded-xl flex gap-4 cursor-pointer hover:opacity-90 transition-colors group bg-gray-900 shadow"
+			onClick={() => selectConversationAsync({ conversation: conversation })}
+			className="w-full  relative py-2 px-3 rounded-xl flex gap-4 cursor-pointer hover:opacity-90 group dark:bg-gray-900 bg-white transition-all shadow-md"
 		>
 			<div
-				className={clsx(
-					'absolute h-full bg-gradient-to-r from-[#1C64CE] border-0 to-[#B809A6] transition-all rounded-xl top-0 z-0 duration-[0.3s] mx-auto',
-					{
-						'w-full left-0 opacity-100': isSelectedContact,
-						'w-0 left-2/4 opacity-10': !isSelectedContact,
-					}
-				)}
+				className={`${
+					isSelectedContact ? 'w-full left-0 opacity-100' : 'w-0 left-2/4 opacity-10'
+				} absolute h-full bg-gradient-to-r from-[#1C64CE] border-0 to-[#B809A6] transition-all rounded-xl top-0 z-0 duration-[0.3s] mx-auto`}
 			/>
-			<UserImage src={contact.photoUrl || ''} alt="Alt Text" status={contact.status} />
+			<UserImage src={contact?.photoUrl || 'https://github.com/GabrSobral.png'} alt="Alt Text" status={'offline'} />
 
-			<div className={clsx('flex flex-col gap-1 overflow-hidden w-full z-10')}>
+			<div className={'flex flex-col gap-1 overflow-hidden w-full z-10'}>
 				<span
-					className={clsx('truncate font-medium flex items-center justify-between gap-3', {
-						'text-white': true,
-						'text-gray-700': false,
-					})}
+					className={`${
+						isSelectedContact ? 'text-white' : 'text-gray-700 dark:text-gray-200'
+					} truncate font-medium flex items-center justify-between gap-3 `}
 				>
-					{contact.name} {contact.id === userData.data?.id && '(You)'}
-					<span className="text-[12px] text-gray-200 ml-auto ">{formatLastMessageDate.format(new Date())}</span>
+					{conversationName} {conversation.id === user?.id && '(You)'}
+					<span
+						className="text-[12px] dark:text-gray-200 transition-colors text-gray-700 ml-auto data-[is-selected=true]:text-gray-100"
+						data-is-selected={isSelectedContact}
+					>
+						{formatLastMessageDate.format(new Date())}
+					</span>
 				</span>
 
 				<div
-					className={clsx('truncate flex justify-between gap-4 text-gray-200 text-sm', {
-						'text-purple-500': typing && !isSelectedContact,
-						'text-white': isSelectedContact,
-					})}
+					className={twMerge(
+						clsx('truncate flex justify-between gap-4 dark:text-gray-200 text-gray-600 text-sm', {
+							'text-purple-500': typing && !isSelectedContact,
+							'text-white': isSelectedContact,
+						})
+					)}
 				>
 					{typing ? (
-						<div className="">
-							<PulseLoader
-								color={isSelectedContact ? '#FFFFFF' : tailwindColors.purple['500']}
-								size={8}
-								title="Typing..."
-							/>
-						</div>
+						<PulseLoader
+							color={isSelectedContact ? '#FFFFFF' : tailwindColors.purple['500']}
+							size={8}
+							title="Typing..."
+						/>
 					) : lastMessage ? (
 						lastMessage.content
 					) : (
-						<span>Start a conversation...</span>
+						<span>Start the conversation...</span>
 					)}
 
-					{notificationsCount > 0 && (
+					{conversation.notifications > 0 && (
 						<span className="rounded-full bg-purple-500 w-5 h-5 ml-auto flex items-center justify-center text-[12px] text-white font-medium animate-pulse z-10">
-							{notificationsCount}
+							{conversation.notifications}
 						</span>
 					)}
 				</div>
@@ -119,4 +107,5 @@ export const ContactItem = forwardRef(({ contact, index }: Props, ref: Forwarded
 		</motion.li>
 	);
 });
+
 ContactItem.displayName = 'ContactItem';

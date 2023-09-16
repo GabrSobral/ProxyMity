@@ -17,7 +17,7 @@ export function Heading({ asChild, children, className, size, ...rest }: Heading
 		<Component
 			className={twMerge(
 				clsx(
-					'text-gray-700 dark:text-whiteAlpha-900 transition-colors',
+					'text-gray-700 dark:text-white transition-colors tracking-wide',
 					{
 						'text-md': size === 'sm',
 						'text-xl': size === 'md',

@@ -11,7 +11,9 @@ interface Props {
 export function LogoutModal({ show, closeModal }: Props) {
 	return (
 		<Modal show={show} closeModal={closeModal} className="max-w-[420px]">
-			<Modal.Title className="text-purple-300">Are you leaving already?..</Modal.Title>
+			<Modal.Title className="dark:text-purple-300 transition-colors text-purple-500">
+				Are you leaving already?..
+			</Modal.Title>
 			<Modal.Description>
 				If you logout, all your data saved data will be deleted, and you will must to Login again.
 			</Modal.Description>

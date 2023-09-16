@@ -16,7 +16,7 @@ export function Text({
 	children,
 	className,
 	size,
-	defaultTextColor = 'text-gray-700 dark:text-whiteAlpha-900',
+	defaultTextColor = 'text-gray-700 dark:text-white',
 	...rest
 }: TextProps) {
 	const Component = asChild ? Slot : 'span';
@@ -25,7 +25,7 @@ export function Text({
 		<Component
 			className={twMerge(
 				clsx(
-					'transition-colors',
+					'transition-colors ',
 					{
 						'text-xs': size === 'sm',
 						'text-sm': size === 'md',

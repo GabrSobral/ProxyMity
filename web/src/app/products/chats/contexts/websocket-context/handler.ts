@@ -3,15 +3,15 @@ import { toText } from '@/utils/binary-parser';
 
 export type Events =
 	| { event: 'sent_message'; payload: { message: Message } }
-	| { event: 'receive_typing'; payload: { typing: boolean; authorId: string } }
+	| { event: 'receive_typing'; payload: { typing: boolean; conversationId: string } }
 	| { event: 'receive_message'; payload: { message: Message } }
-	| { event: 'receive_read_message'; payload: { contactId: string } }
+	| { event: 'receive_read_message'; payload: { conversationId: string } }
 	| {
 			event: 'receive_message_status';
 			payload: {
 				messageId: Message['id'];
 				status: 'sent' | 'received';
-				contactId: string;
+				conversationId: string;
 			};
 	  };
 

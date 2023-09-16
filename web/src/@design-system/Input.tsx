@@ -1,3 +1,5 @@
+'use client';
+
 import { Slot } from '@radix-ui/react-slot';
 import {
 	createContext,
@@ -64,7 +66,7 @@ function InputInput({ asChild, className, inputRef, ...rest }: InputInputProps) 
 			id={inputId}
 			ref={inputRef || null}
 			className={twMerge(
-				'outline-none flex hover:ring-1 transition-all ring-gray-700 rounded-[10px] bg-gray-900 text-gray-200 focus:outline-purple-500 focus:ring-0 placeholder:text-gray-400 w-full p-4',
+				'outline-none flex hover:ring-1 transition-all dark:ring-gray-700 ring-gray-300/30 rounded-[10px] dark:bg-gray-900 bg-white dark:text-gray-200 text-gray-700 focus:outline-purple-500 focus:ring-0 placeholder:text-gray-400 w-full p-4',
 				className
 			)}
 			{...rest}

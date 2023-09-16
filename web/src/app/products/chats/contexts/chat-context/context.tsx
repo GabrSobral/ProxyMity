@@ -2,15 +2,16 @@
 
 import { createContext, ReactNode, RefObject, useCallback, useEffect, useRef } from 'react';
 
-import { APISearchContactById } from '@/services/api/search-contact-by-id';
+import { APIGetUserConversations } from '@/services/api/get-user-conversations';
+import { APIGetConversationMessages } from '@/services/api/get-conversation-messages';
 
 import { addMessageAsyncDB } from '@/services/database/use-cases/add-message';
-import { getContactsAsyncDB } from '@/services/database/use-cases/get-contacts';
-import { getLastMessageAsyncDB } from '@/services/database/use-cases/get-last-messages';
-import { registerContactAsyncDB } from '@/services/database/use-cases/register-contact';
-import { getContactMessagesAsyncDB } from '@/services/database/use-cases/get-contact-messages';
-import { readContactMessagesAsyncDB } from '@/services/database/use-cases/read-contact-messages';
-import { getContactNotificationCountAsyncDB } from '@/services/database/use-cases/get-contact-notification-count';
+import { saveConversationsAsyncDB } from '@/services/database/use-cases/save-conversations';
+import { getConversationCacheAsyncDB } from '@/services/database/use-cases/get-conversations-state';
+import { readConversationMessagesAsyncDB } from '@/services/database/use-cases/read-conversation-messages';
+import { getConversationsMessagesAsyncDB } from '@/services/database/use-cases/get-conversations-messages';
+
+import { useAuth } from '@/contexts/auth-context/hook';
 
 import { useWebSocket } from '../websocket-context/hook';
 import { Events, ExtractPayloadType } from '../websocket-context/handler';
@@ -18,16 +19,11 @@ import { sendReadMessageWebSocketEvent } from '../websocket-context/emmiters/sen
 import { sendReceiveMessageWebSocketEvent } from '../websocket-context/emmiters/sendReceiveMessage';
 
 import { Message } from '@/types/message';
-import { Contact } from '@/types/contact';
 
-import { useUserStore } from '@/stores/user';
-import { useContactStore } from '@/stores/contacts';
-import { useMessageStore } from '@/stores/messages';
-
-import { contactsMock } from './mock';
+import { ConversationState, useChatsStore } from './stores/chat';
 
 interface ChatContextProps {
-	selectContactAsync: (params: { contact: Contact }) => Promise<void>;
+	selectConversationAsync: (params: { conversation: ConversationState }) => Promise<void>;
 	typebarRef: RefObject<HTMLInputElement>;
 }
 
@@ -35,171 +31,174 @@ export const ChatContext = createContext({} as ChatContextProps);
 
 export function ChatProvider({ children }: { children: ReactNode }) {
 	const typebarRef = useRef<HTMLInputElement>(null);
-	const userData = useUserStore(store => store.state.data);
+	const { user } = useAuth();
 	const { socket } = useWebSocket();
 
-	const { contacts, selectedContact } = useContactStore(store => store.state);
-	const { setContacts, bringToTop, addContact, selectContact } = useContactStore(store => store.actions);
 	const {
-		setContactMessages,
+		selectedConversation,
+		conversations,
+		setConversationMessages,
 		addMessage,
-		setContactInitialState,
-		updateContactMessageStatus,
-		saveTypeMessageFromContact,
-	} = useMessageStore(store => store.actions);
+		setConversationInitialState,
+		updateConversationMessageStatus,
+		saveTypeMessageFromConversation,
+		bringToTop,
+		selectConversation,
+	} = useChatsStore();
 
-	const { contacts: messageContacts } = useMessageStore(store => store.state);
-
-	//🟡 Fetch contacts from IndexedDb, and set to React State
-	//🟡 Fetch last messages from each contact, from IndexedDb, and set to React State
 	useEffect(() => {
-		if (!userData?.id) return;
+		if (!user?.id) return;
 
-		console.log('Downloading last message and notification count...');
+		APIGetUserConversations({ id: user.id })
+			.then(conversationsData => {
+				console.log('Fetching conversations data was successfully.');
 
-		getContactsAsyncDB().then(() => {
-			setContacts(contactsMock); // update it after
+				setConversationInitialState({ conversationsData, userId: user.id });
 
-			contactsMock.forEach(async contact => {
-				const contactRef = userData?.id + contact.id;
+				const filteredData = conversationsData.map(data => ({
+					...data,
+					participants: data.participants.filter(item => item.id !== user.id),
+				}));
 
-				const [lastMessage, notificationCount] = await Promise.all([
-					getLastMessageAsyncDB({ contactRef }),
-					getContactNotificationCountAsyncDB({ contactRef, userId: userData?.id || '' }),
-				]);
+				saveConversationsAsyncDB(filteredData);
+			})
+			.catch(error => {
+				console.error('Error on trying to fetch conversations, data will be taken from the cache', error);
 
-				if (lastMessage) {
-					setContactInitialState({ contactId: contact.id, lastMessage, notificationCount });
-				}
+				getConversationCacheAsyncDB({ userId: user.id }).then(conversationsData =>
+					setConversationInitialState({ conversationsData, userId: user.id })
+				);
 			});
-		});
-	}, [userData?.id, setContactInitialState, setContacts]);
+	}, [user?.id, setConversationInitialState]);
 
 	//🟡 Receive a message from another user, and store it at state and IndexedDB
 	useEffect(() => {
 		function handler(e: CustomEventInit<ExtractPayloadType<'receive_message', Events>>) {
 			const message = e.detail?.message;
 
-			if (!message || !userData) return;
+			if (!message || !user) {
+				return;
+			}
 
-			sendReceiveMessageWebSocketEvent(socket, {
-				contactId: userData.id,
-				recipientId: message.authorId,
-				messageId: message.id,
-			});
-
-			if (selectedContact?.id === message.authorId) {
-				sendReadMessageWebSocketEvent(socket, {
-					contactId: userData.id,
-					recipientId: selectedContact.id,
+			if (selectedConversation?.id === message.conversationId) {
+				sendReceiveMessageWebSocketEvent(socket, {
+					userId: user.id,
+					conversationId: message.conversationId,
+					messageId: message.id,
+					isConversationGroup: selectedConversation.isGroup,
 				});
+				sendReadMessageWebSocketEvent(socket, {
+					userId: user.id,
+					conversationId: selectedConversation.id,
+					isConversationGroup: selectedConversation.isGroup,
+				});
+			} else {
+				const messageConversation = conversations.find(item => item.id === message.conversationId);
+
+				if (messageConversation)
+					sendReceiveMessageWebSocketEvent(socket, {
+						userId: user.id,
+						conversationId: message.conversationId,
+						messageId: message.id,
+						isConversationGroup: messageConversation?.isGroup,
+					});
 			}
 
 			const payload: Message = {
 				...message,
-				receivedAt: new Date(),
-				readAt: selectedContact?.id === message.authorId ? new Date() : 'none',
-				contactRef: message.recipientId + message.authorId,
+				receivedByAllAt: new Date(),
+				readByAllAt: selectedConversation?.id === message.authorId ? new Date() : null,
 			};
 
-			const shouldNotification = selectedContact?.id !== message.authorId;
+			const shouldNotification = selectedConversation?.id !== message.authorId;
 
 			addMessageAsyncDB(payload);
-			addMessage({ contactId: message.authorId, message: payload, shouldNotification });
+			addMessage({ conversationId: message.conversationId, message: payload, shouldNotification });
 			bringToTop(message.authorId);
 		}
 
 		addEventListener('@ws.receive_message', handler);
 		return () => removeEventListener('@ws.receive_message', handler);
-	}, [selectedContact?.id, socket, userData, addMessage, bringToTop]);
+	}, [selectedConversation?.id, selectedConversation?.isGroup, socket, user, addMessage, bringToTop, conversations]);
 
 	//🟡 Receive the "read" message status from another user, and update it at state and IndexedDB
 	useEffect(() => {
 		function handler(event: CustomEventInit<ExtractPayloadType<'receive_read_message', Events>>) {
-			if (!userData?.id) return;
+			if (!user?.id) return;
 
-			const contactId = event.detail?.contactId || '';
+			const conversationId = event.detail?.conversationId || '';
 
-			updateContactMessageStatus({ contactId, status: 'read' });
-			readContactMessagesAsyncDB({ contactId: contactId, userId: userData.id, itsMe: false });
+			updateConversationMessageStatus({ conversationId, status: 'read' });
+			// readConversationMessagesAsyncDB({ contactId: conversationId, userId: user.id, itsMe: false });
 		}
 
 		addEventListener('@ws.receive_read_message', handler);
 		return () => removeEventListener('@ws.receive_read_message', handler);
-	}, [userData?.id, updateContactMessageStatus]);
-
-	//🟡 Verify if exist some contact in Messages Status that don't exist inside Contact State, and create if not exist
-	useEffect(() => {
-		for (const mContact of messageContacts) {
-			if (contacts.some(contact => contact.id === mContact.id)) return;
-
-			APISearchContactById({ id: mContact.id }).then(({ data }) => {
-				registerContactAsyncDB(data);
-				addContact(data);
-			});
-		}
-	}, [messageContacts, contacts, addContact]);
+	}, [user?.id, updateConversationMessageStatus]);
 
 	//🟡 Receive a message that has the status changed, and update it on react state and IndexedDB
 	useEffect(() => {
 		function handler(event: CustomEventInit<ExtractPayloadType<'receive_message_status', Events>>) {
-			if (!event.detail) {
-				return;
+			if (event.detail) {
+				const { messageId } = event.detail;
+				const messageStatusEvent = new CustomEvent(messageId, { detail: event.detail });
+
+				dispatchEvent(messageStatusEvent);
 			}
-
-			const { messageId } = event.detail;
-			const messageStatusEvent = new CustomEvent(messageId, { detail: event.detail });
-
-			dispatchEvent(messageStatusEvent);
 		}
 
 		addEventListener('@ws.receive_message_status', handler);
 		return () => removeEventListener('@ws.receive_message_status', handler);
-	}, [updateContactMessageStatus]);
+	}, [updateConversationMessageStatus]);
 
-	const selectContactAsync = useCallback(
-		async ({ contact }: { contact: Contact }) => {
-			if (contact === selectedContact || !userData) return;
+	const selectConversationAsync = useCallback(
+		async ({ conversation }: { conversation: ConversationState }) => {
+			if (conversation === selectedConversation || !user) return;
 
-			saveTypeMessageFromContact({
-				contactId: selectedContact?.id || '',
+			saveTypeMessageFromConversation({
+				conversationId: selectedConversation?.id || '',
 				typeMessage: typebarRef.current?.value || '',
 			});
 
-			selectContact(contact);
-			getContactMessagesAsyncDB(userData?.id + contact.id).then(({ messages, notifications }) => {
-				setContactMessages({ contactId: contact.id, messages, notifications });
-			});
+			selectConversation(conversation);
 
-			updateContactMessageStatus({ contactId: contact.id, status: 'read' });
-			readContactMessagesAsyncDB({
-				contactId: contact.id,
-				userId: userData.id,
-				itsMe: true,
-			});
+			if (!conversation.hasMessagesFetched) {
+				try {
+					const { messages } = await APIGetConversationMessages({ conversationId: conversation.id });
+					setConversationMessages({ conversationId: conversation.id, messages });
+				} catch (error) {
+					console.error('Error fetching conversations, data will be taken from the cache', error);
 
-			if (messageContacts.reduce((sum, item) => sum + item.notifications, 0) > 0)
+					const messages = await getConversationsMessagesAsyncDB(conversation.id);
+					setConversationMessages({ conversationId: conversation.id, messages });
+				}
+			}
+
+			updateConversationMessageStatus({ conversationId: conversation.id, status: 'read' });
+			readConversationMessagesAsyncDB({ conversationId: conversation.id, userId: user.id });
+
+			if (conversation.notifications > 0)
 				sendReadMessageWebSocketEvent(socket, {
-					contactId: userData.id,
-					recipientId: contact.id,
+					userId: user.id,
+					conversationId: conversation.id,
+					isConversationGroup: conversation.isGroup,
 				});
 		},
 		[
-			selectedContact,
-			userData,
-			saveTypeMessageFromContact,
-			selectContact,
-			updateContactMessageStatus,
-			messageContacts,
+			selectedConversation,
+			user,
+			saveTypeMessageFromConversation,
+			selectConversation,
+			updateConversationMessageStatus,
 			socket,
-			setContactMessages,
+			setConversationMessages,
 		]
 	);
 
 	return (
 		<ChatContext.Provider
 			value={{
-				selectContactAsync,
+				selectConversationAsync,
 				typebarRef,
 			}}
 		>

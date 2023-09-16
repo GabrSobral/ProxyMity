@@ -6,18 +6,22 @@ import { useState } from 'react';
 import { Popover, Transition } from '@headlessui/react';
 import { Eye, Gear, SignOut } from '@phosphor-icons/react';
 
+import { Text } from '@/@design-system/Text';
+
 import { useAuth } from '@/contexts/auth-context/hook';
-import { ChangeStatusModal } from './ChangeStatusModal';
+
 import { LogoutModal } from './LogoutModal';
+import { SettingsModal } from '../SettingsModal';
+import { ChangeStatusModal } from './ChangeStatusModal';
 
 export type Status = 'online' | 'busy' | 'invisible';
 
 export function Profile() {
 	const { user } = useAuth();
-
 	const [status, setStatus] = useState<Status>('online');
 
 	const [showStatusModal, setShowStatusModal] = useState(false);
+	const [showSettingsModal, setShowSettingsModal] = useState(false);
 	const [showLogoutModal, setShowLogoutModal] = useState(false);
 
 	function selectStatus(selectedStatus: Status) {
@@ -28,12 +32,14 @@ export function Profile() {
 	return (
 		<div className="flex items-center gap-3">
 			<div className="flex flex-col gap-1">
-				<span className="text-gray-100 ">Good Morning, {user?.name}</span>
-				<span className="text-xs text-gray-300">{user?.email}</span>
+				<Text size="md">Good Morning, {user?.name}</Text>
+				<Text size="sm" className="text-xs text-gray-300">
+					{user?.email}
+				</Text>
 			</div>
 
 			<div className="relative">
-				<Popover className="relative">
+				<Popover className="relative z-20">
 					<Popover.Button>
 						<Image
 							src="https://github.com/GabrSobral.png"
@@ -52,30 +58,31 @@ export function Profile() {
 						leaveFrom="transform scale-100 opacity-100 translate-y-[16px]"
 						leaveTo="transform scale-95 opacity-0 translate-y-[0px]"
 					>
-						<Popover.Panel className="min-w-[200px] flex-col flex gap-1 absolute z-10 -top-3 right-0 bg-gray-900/70 p-2 rounded-[1rem] w-fit overflow-hidden shadow-lg backdrop-blur-sm">
+						<Popover.Panel className="min-w-[200px] flex-col flex gap-1 absolute -top-3 right-0 bg-gray-100/70 dark:bg-gray-900/70 p-2 rounded-[1rem] w-fit overflow-hidden shadow-lg backdrop-blur-sm">
 							<button
-								className="text-white text-sm rounded-[calc(1rem-0.5rem)] cursor-pointer tracking-wider transition-all flex items-center gap-2 hover:bg-purple-500 hover:text-white p-2"
+								className="dark:text-white text-gray-700 text-sm rounded-[calc(1rem-0.5rem)] cursor-pointer tracking-wider transition-all flex items-center gap-2 hover:bg-purple-500 hover:text-white p-2 group"
 								type="button"
 								onClick={() => setShowStatusModal(state => !state)}
 							>
-								<Eye className="text-white" size={24} weight="light" />
+								<Eye className="dark:text-white text-gray-700 group-hover:text-white" size={24} weight="light" />
 								Change Status
 							</button>
 
 							<button
-								className="text-white text-sm rounded-[calc(1rem-0.5rem)] cursor-pointer tracking-wider transition-all flex items-center gap-2 hover:bg-purple-500 hover:text-white p-2"
+								className="dark:text-white text-gray-700 text-sm rounded-[calc(1rem-0.5rem)] cursor-pointer tracking-wider transition-all flex items-center gap-2 hover:bg-purple-500 hover:text-white p-2 group"
 								type="button"
+								onClick={() => setShowSettingsModal(true)}
 							>
-								<Gear className="text-white" size={24} weight="light" />
+								<Gear className="dark:text-white text-gray-700 group-hover:text-white" size={24} weight="light" />
 								Settings
 							</button>
 
 							<button
-								className="text-red-400 group text-sm rounded-[calc(1rem-0.5rem)] font-medium tracking-wider cursor-pointer transition-all flex items-center gap-2 hover:bg-purple-500 hover:text-white p-2"
+								className="dark:text-red-400 text-red-500 group text-sm rounded-[calc(1rem-0.5rem)] font-medium tracking-wider cursor-pointer transition-all flex items-center gap-2 hover:bg-purple-500 hover:text-white p-2"
 								type="button"
 								onClick={() => setShowLogoutModal(true)}
 							>
-								<SignOut className="text-red-400 group-hover:text-white" size={24} />
+								<SignOut className="dark:text-red-400 text-red-500 group-hover:text-white" size={24} />
 								Logout
 							</button>
 						</Popover.Panel>
@@ -100,6 +107,7 @@ export function Profile() {
 					selectStatus={selectStatus}
 				/>
 
+				<SettingsModal show={showSettingsModal} closeModal={() => setShowSettingsModal(false)} />
 				<LogoutModal closeModal={() => setShowLogoutModal(false)} show={showLogoutModal} />
 			</div>
 		</div>
