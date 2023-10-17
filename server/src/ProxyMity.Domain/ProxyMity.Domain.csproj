@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Folder Include="Interfaces\Repositories\ConversationRepository\CustomQueries\" />
+    <Folder Include="Interfaces\Repositories\GroupRepository\CustomQueries\" />
+    <Folder Include="Interfaces\Repositories\MessageRepository\CustomQueries\" />
+    <Folder Include="Interfaces\Repositories\MessageStatusRepository\CustomQueries\" />
+    <Folder Include="Interfaces\Repositories\UserRepository\CustomQueries\" />
+  </ItemGroup>
+
+</Project>
