@@ -1,6 +1,7 @@
 ﻿namespace ProxyMity.Domain.Exceptions;
 
-public class InvalidParticipantsCounterOfConversationException : Exception {
+public class InvalidParticipantsCounterOfConversationException : Exception
+{
     public InvalidParticipantsCounterOfConversationException(int participantsCount)
         : base($"Private conversation cannot be created with a number of participants different than {participantsCount}") { }
 

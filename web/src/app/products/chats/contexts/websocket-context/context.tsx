@@ -1,62 +1,79 @@
 'use client';
 
-import { createContext, ReactNode, useEffect, useMemo, useRef } from 'react';
+import { createContext, ReactNode, useEffect, useMemo } from 'react';
+import {
+	HttpClient,
+	HttpTransportType,
+	HubConnection,
+	HubConnectionBuilder,
+	HubConnectionState,
+	LogLevel,
+} from '@microsoft/signalr';
 
 import { useAuth } from '@/contexts/auth-context/hook';
 
-import { eventsHandler } from './handler';
-import { sendConnectionWebSocketEvent } from './emmiters/sendConnection';
-import { sendDisconnectionWebSocketEvent } from './emmiters/sendDisconnection';
+// import { eventsHandler } from './handler';
 
 interface WebSocketContextProps {
-	socket: WebSocket;
+	connection: HubConnection | null;
 }
 
 export const WebSocketContext = createContext({} as WebSocketContextProps);
 
 export function WebSocketProvider({ children }: { children: ReactNode }) {
-	const { user } = useAuth();
-	const isFirstTime = useRef(true);
+	const { accessToken } = useAuth();
 
-	const socket = useMemo(() => {
-		const connection = new WebSocket(process.env.NEXT_PUBLIC_WS_API_DOMAIN || '');
-		connection.binaryType = 'arraybuffer';
-
-		return connection;
-	}, []);
-
-	useEffect(() => {
-		if (user?.id && isFirstTime.current && socket) {
-			sendConnectionWebSocketEvent(socket, { id: user?.id || '' });
-			isFirstTime.current = false;
+	const connection = useMemo(() => {
+		if (accessToken) {
+			return new HubConnectionBuilder()
+				.withUrl('http://localhost:5000/chat', {
+					accessTokenFactory: () => accessToken || '',
+					logMessageContent: true,
+					withCredentials: true,
+				})
+				.configureLogging(LogLevel.Information)
+				.withAutomaticReconnect()
+				.build();
+		} else {
+			return null;
 		}
-
-		const handler = () => {
-			if (user?.id && isFirstTime.current && socket) {
-				sendConnectionWebSocketEvent(socket, { id: user?.id || '' });
-				isFirstTime.current = false;
-			}
-		};
-
-		socket.addEventListener('open', handler);
-		return () => socket.removeEventListener('open', handler);
-	}, [user?.id, socket]);
+	}, [accessToken]);
 
 	useEffect(() => {
-		socket.addEventListener('message', eventsHandler);
-		return () => socket.removeEventListener('message', eventsHandler);
-	}, [socket]);
+		console.log({ connection });
 
-	useEffect(() => {
-		const handler = () => {
-			if (socket && user?.id) {
-				sendDisconnectionWebSocketEvent(socket, { id: user?.id || '' });
-			}
-		};
+		if (
+			connection &&
+			connection?.state !== HubConnectionState.Connected &&
+			connection?.state !== HubConnectionState.Connecting
+		) {
+			connection.start().then(() => console.log('Client connected to hub.'));
+		}
+	}, [connection]);
 
-		socket.addEventListener('close', handler);
-		return () => socket.removeEventListener('close', handler);
-	}, [socket, user?.id]);
+	// useEffect(() => {
+	// 	socket.addEventListener('message', eventsHandler);
+	// 	return () => socket.removeEventListener('message', eventsHandler);
+	// }, [socket]);
 
-	return socket ? <WebSocketContext.Provider value={{ socket }}>{children}</WebSocketContext.Provider> : null;
+	// useEffect(() => {
+	// 	const handler = () => {
+	// 		if (socket && user?.id) {
+	// 			sendDisconnectionWebSocketEvent(socket, { id: user?.id || '' });
+	// 		}
+	// 	};
+
+	// 	socket.addEventListener('close', handler);
+	// 	return () => socket.removeEventListener('close', handler);
+	// }, [socket, user?.id]);
+
+	return (
+		<WebSocketContext.Provider
+			value={{
+				connection,
+			}}
+		>
+			{children}
+		</WebSocketContext.Provider>
+	);
 }

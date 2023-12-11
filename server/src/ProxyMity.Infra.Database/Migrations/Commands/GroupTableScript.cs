@@ -1,6 +1,7 @@
 ﻿namespace ProxyMity.Infra.Database.Migrations.Commands;
 
-internal static class GroupTableScript {
+internal static class GroupTableScript
+{
     public static string Create() => $"{Table()} {Indexes()}";
 
     private static string Table() => """

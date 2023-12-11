@@ -1,7 +1,9 @@
 ﻿namespace ProxyMity.Application.Handlers.Authentication.SignIn;
 
-internal sealed class SignInCommandValidator : AbstractValidator<SignInCommand> {
-    public SignInCommandValidator() {
+internal sealed class SignInCommandValidator : AbstractValidator<SignInCommand>
+{
+    public SignInCommandValidator()
+    {
         RuleFor(x => x.Email)
             .NotNull().WithMessage("Email address can't be nullable")
             .NotEmpty().WithMessage("Email address must be passed")

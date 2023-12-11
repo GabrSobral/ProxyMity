@@ -1,18 +1,24 @@
 ﻿namespace ProxyMity.Server.Middlewares;
 
-public sealed class ExceptionHandlerMiddleware {
+public sealed class ExceptionHandlerMiddleware
+{
     private readonly RequestDelegate _next;
     private readonly ILogger<ExceptionHandlerMiddleware> _logger;
 
-    public ExceptionHandlerMiddleware(RequestDelegate next, ILogger<ExceptionHandlerMiddleware> logger) {
+    public ExceptionHandlerMiddleware(RequestDelegate next, ILogger<ExceptionHandlerMiddleware> logger)
+    {
         _next = next;
         _logger = logger;
     }
 
-    public async Task Invoke(HttpContext context) {
-        try {
+    public async Task Invoke(HttpContext context)
+    {
+        try
+        {
             await _next(context);
-        } catch (Exception error) {
+        }
+        catch (Exception error)
+        {
             _logger.LogError(error, error.Message);
 
             var response = context.Response;
@@ -20,7 +26,8 @@ public sealed class ExceptionHandlerMiddleware {
 
             SwitchException(error, response);
 
-            var result = JsonSerializer.Serialize(new {
+            var result = JsonSerializer.Serialize(new
+            {
                 title = error.GetType().Name,
                 status = response.StatusCode,
                 occuredAt = DateTime.UtcNow,
@@ -31,8 +38,10 @@ public sealed class ExceptionHandlerMiddleware {
         }
     }
 
-    private void SwitchException(Exception error, HttpResponse response) {
-        switch (error) {
+    private void SwitchException(Exception error, HttpResponse response)
+    {
+        switch (error)
+        {
             case NoJwtSecretWasProvidedException:
                 response.StatusCode = (int)HttpStatusCode.InternalServerError;
                 _logger.LogError($"[No Jwt Secret as provided] {error.Message}");

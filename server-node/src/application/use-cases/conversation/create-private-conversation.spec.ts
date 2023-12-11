@@ -10,10 +10,7 @@ describe('Create Conversation Use Case', () => {
     const inMemoryParticipantRepository = new InMemoryParticipantRepository();
     const inMemoryConversationRepository = new InMemoryConversationRepository();
 
-    const createConversationUseCase = new CreatePrivateConversationUseCase(
-      inMemoryParticipantRepository,
-      inMemoryConversationRepository,
-    );
+    const createConversationUseCase = new CreatePrivateConversationUseCase(inMemoryParticipantRepository, inMemoryConversationRepository);
 
     await createConversationUseCase.execute({
       participants: ['user-one-id', 'user-two-id'],
@@ -23,14 +20,11 @@ describe('Create Conversation Use Case', () => {
     expect(inMemoryParticipantRepository.items, 'Participant Repository items').toHaveLength(2);
   });
 
-  it('should be able to create a conversation with more than two users', async () => {
+  it('should not be able to create a conversation with more than two users', async () => {
     const inMemoryParticipantRepository = new InMemoryParticipantRepository();
     const inMemoryConversationRepository = new InMemoryConversationRepository();
 
-    const createConversationUseCase = new CreatePrivateConversationUseCase(
-      inMemoryParticipantRepository,
-      inMemoryConversationRepository,
-    );
+    const createConversationUseCase = new CreatePrivateConversationUseCase(inMemoryParticipantRepository, inMemoryConversationRepository);
 
     const result = await createConversationUseCase.execute({
       participants: ['user-one-id', 'user-two-id', 'user-two-id'],
@@ -43,14 +37,11 @@ describe('Create Conversation Use Case', () => {
     expect(inMemoryParticipantRepository.items, 'Participant Repository items').toHaveLength(0);
   });
 
-  it('should be able to create a conversation with less than two users', async () => {
+  it('should not be able to create a conversation with less than two users', async () => {
     const inMemoryParticipantRepository = new InMemoryParticipantRepository();
     const inMemoryConversationRepository = new InMemoryConversationRepository();
 
-    const createConversationUseCase = new CreatePrivateConversationUseCase(
-      inMemoryParticipantRepository,
-      inMemoryConversationRepository,
-    );
+    const createConversationUseCase = new CreatePrivateConversationUseCase(inMemoryParticipantRepository, inMemoryConversationRepository);
 
     const result = await createConversationUseCase.execute({
       participants: ['user-one-id'],

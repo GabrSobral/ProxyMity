@@ -47,7 +47,6 @@ internal class InMemoryParticipantRepository : InMemoryRepository<Participant>, 
 
             conversationsWithParticipants.Add(new GetConversationsByUserIdQuery(
                 conversation.Id,
-                conversation.DisabledAt,
                 conversation.CreatedAt,
                 group.Description,
                 group.Name,

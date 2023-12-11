@@ -28,8 +28,6 @@ export function SignInPageComponents() {
 
 		const result = await signIn('credentials', { email, password, redirect: false });
 
-		console.log({ error: result?.error });
-
 		if (result?.error) {
 			console.error(result?.error);
 
@@ -81,6 +79,7 @@ export function SignInPageComponents() {
 
 						<button
 							type="button"
+							aria-label={showPassword ? 'Hide password' : 'Show Password'}
 							onClick={() => setShowPassword(s => !s)}
 							className="absolute right-4 -translate-y-2/4 top-2/4"
 							title={showPassword ? 'Hide password' : 'Show Password'}
@@ -94,7 +93,12 @@ export function SignInPageComponents() {
 					</Input.Wrapper>
 				</Input.Group>
 
-				<Button type="submit" className="w-full" disabled={!(email && password) || isLoading}>
+				<Button
+					type="submit"
+					className="w-full"
+					disabled={!(email && password) || isLoading}
+					title={isLoading ? 'Loading...' : 'Sign In'}
+				>
 					{isLoading ? (
 						<LoadingSpinning size={32} lineSize={2} color="white" />
 					) : (

@@ -31,8 +31,8 @@ export const ChatContext = createContext({} as ChatContextProps);
 
 export function ChatProvider({ children }: { children: ReactNode }) {
 	const typebarRef = useRef<HTMLInputElement>(null);
-	const { user } = useAuth();
-	const { socket } = useWebSocket();
+	const { user, accessToken } = useAuth();
+	const { connection } = useWebSocket();
 
 	const {
 		selectedConversation,
@@ -47,9 +47,9 @@ export function ChatProvider({ children }: { children: ReactNode }) {
 	} = useChatsStore();
 
 	useEffect(() => {
-		if (!user?.id) return;
+		if (!user?.id || !accessToken) return;
 
-		APIGetUserConversations({ id: user.id })
+		APIGetUserConversations({ id: user.id }, { accessToken })
 			.then(conversationsData => {
 				console.log('Fetching conversations data was successfully.');
 
@@ -69,7 +69,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
 					setConversationInitialState({ conversationsData, userId: user.id })
 				);
 			});
-	}, [user?.id, setConversationInitialState]);
+	}, [user?.id, setConversationInitialState, accessToken]);
 
 	//🟡 Receive a message from another user, and store it at state and IndexedDB
 	useEffect(() => {
@@ -81,13 +81,13 @@ export function ChatProvider({ children }: { children: ReactNode }) {
 			}
 
 			if (selectedConversation?.id === message.conversationId) {
-				sendReceiveMessageWebSocketEvent(socket, {
+				sendReceiveMessageWebSocketEvent(connection, {
 					userId: user.id,
 					conversationId: message.conversationId,
 					messageId: message.id,
 					isConversationGroup: selectedConversation.isGroup,
 				});
-				sendReadMessageWebSocketEvent(socket, {
+				sendReadMessageWebSocketEvent(connection, {
 					userId: user.id,
 					conversationId: selectedConversation.id,
 					isConversationGroup: selectedConversation.isGroup,
@@ -96,7 +96,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
 				const messageConversation = conversations.find(item => item.id === message.conversationId);
 
 				if (messageConversation)
-					sendReceiveMessageWebSocketEvent(socket, {
+					sendReceiveMessageWebSocketEvent(connection, {
 						userId: user.id,
 						conversationId: message.conversationId,
 						messageId: message.id,
@@ -119,7 +119,15 @@ export function ChatProvider({ children }: { children: ReactNode }) {
 
 		addEventListener('@ws.receive_message', handler);
 		return () => removeEventListener('@ws.receive_message', handler);
-	}, [selectedConversation?.id, selectedConversation?.isGroup, socket, user, addMessage, bringToTop, conversations]);
+	}, [
+		selectedConversation?.id,
+		selectedConversation?.isGroup,
+		connection,
+		user,
+		addMessage,
+		bringToTop,
+		conversations,
+	]);
 
 	//🟡 Receive the "read" message status from another user, and update it at state and IndexedDB
 	useEffect(() => {
@@ -178,7 +186,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
 			readConversationMessagesAsyncDB({ conversationId: conversation.id, userId: user.id });
 
 			if (conversation.notifications > 0)
-				sendReadMessageWebSocketEvent(socket, {
+				sendReadMessageWebSocketEvent(connection, {
 					userId: user.id,
 					conversationId: conversation.id,
 					isConversationGroup: conversation.isGroup,
@@ -190,7 +198,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
 			saveTypeMessageFromConversation,
 			selectConversation,
 			updateConversationMessageStatus,
-			socket,
+			connection,
 			setConversationMessages,
 		]
 	);

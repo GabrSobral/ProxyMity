@@ -1,6 +1,7 @@
 ﻿namespace ProxyMity.Domain.Interfaces.Repositories.MessageStatusRepository;
 
-public interface IMessageStatusRepository {
+public interface IMessageStatusRepository
+{
     public Task CreateAsync(MessageStatus messageStatus);
     public Task ReceiveAsync(Guid userId, Guid messageId);
     public Task ReadAsync(Guid userId, Guid messageId);

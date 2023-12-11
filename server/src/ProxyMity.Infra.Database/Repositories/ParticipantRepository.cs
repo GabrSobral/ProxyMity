@@ -1,15 +1,18 @@
 ﻿namespace ProxyMity.Infra.Database.Repositories;
 
-public class ParticipantRepository : TRepository<ParticipantRepository>, IParticipantRepository {
+public class ParticipantRepository : TRepository<ParticipantRepository>, IParticipantRepository
+{
     public ParticipantRepository(DbSession session) : base(session) { }
 
-    public async Task AddAsync(Participant participant) {
+    public async Task AddAsync(Participant participant)
+    {
         const string sql = """
             INSERT INTO "participant" (user_id, conversation_id, created_at)
             VALUES (@user_id, @conversation_id, @created_at);
         """;
 
-        object parameters = new {
+        object parameters = new
+        {
             user_id = participant.UserId,
             conversation_id = participant.ConversationId,
             created_at = participant.CreatedAt,
@@ -18,7 +21,8 @@ public class ParticipantRepository : TRepository<ParticipantRepository>, IPartic
         await _session.Connection.ExecuteAsync(sql, parameters, _session.Transaction);
     }
 
-    public async Task<IEnumerable<Participant>> GetByConversationIdAsync(Guid conversationId) {
+    public async Task<IEnumerable<Participant>> GetByConversationIdAsync(Guid conversationId)
+    {
         const string sql = """
             SELECT 
                 user_id as "UserId", 
@@ -32,11 +36,11 @@ public class ParticipantRepository : TRepository<ParticipantRepository>, IPartic
         return await _session.Connection.QueryAsync<Participant>(sql, parameters);
     }
 
-    public async Task<IEnumerable<GetConversationsByUserIdQuery>> GetConversationsByUserIdAsync(Guid userId) {
+    public async Task<IEnumerable<GetConversationsByUserIdQuery>> GetConversationsByUserIdAsync(Guid userId)
+    {
         const string sql = """
             SELECT 
               "conversation"."id" AS "Id", 
-              "conversation"."disabled_at" AS "DisabledAt",
               "conversation"."created_at" AS "CreatedAt",
               "group"."name" AS "GroupName",
               "group"."description" AS "GroupDescription",
@@ -51,7 +55,8 @@ public class ParticipantRepository : TRepository<ParticipantRepository>, IPartic
         return await _session.Connection.QueryAsync<GetConversationsByUserIdQuery>(sql, parameters);
     }
 
-    public async Task<IEnumerable<Participant>> GetByUserIdAsync(Guid userId) {
+    public async Task<IEnumerable<Participant>> GetByUserIdAsync(Guid userId)
+    {
         const string sql = """
             SELECT 
                 user_id as "UserId", 
@@ -65,7 +70,8 @@ public class ParticipantRepository : TRepository<ParticipantRepository>, IPartic
         return await _session.Connection.QueryAsync<Participant>(sql, parameters);
     }
 
-    public async Task<IEnumerable<GetParticipantsByConversationIdQuery>> GetParticipantsByConversationIdAsync(Guid conversationId) {
+    public async Task<IEnumerable<GetParticipantsByConversationIdQuery>> GetParticipantsByConversationIdAsync(Guid conversationId)
+    {
         const string sql = """
             SELECT 
               "user"."id" AS "Id",
@@ -85,7 +91,8 @@ public class ParticipantRepository : TRepository<ParticipantRepository>, IPartic
         return await _session.Connection.QueryAsync<GetParticipantsByConversationIdQuery>(sql, parameters);
     }
 
-    public async Task RemoveAsync(Participant participant) {
+    public async Task RemoveAsync(Participant participant)
+    {
         const string sql = """
             DELETE FROM participant 
             WHERE 
@@ -97,7 +104,8 @@ public class ParticipantRepository : TRepository<ParticipantRepository>, IPartic
         await _session.Connection.ExecuteAsync(sql, parameters, _session.Transaction);
     }
 
-    public async Task<Participant?> GetByIdAsync(Guid userId, Guid conversationId) {
+    public async Task<Participant?> GetByIdAsync(Guid userId, Guid conversationId)
+    {
         const string sql = """
             SELECT
                 "user_id",

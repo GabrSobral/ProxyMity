@@ -1,26 +1,32 @@
 ﻿namespace ProxyMity.Infra.Database.Wrappers;
 
-public class UnitOfWork : IUnitOfWork {
+public class UnitOfWork : IUnitOfWork
+{
     private readonly DbSession _session;
 
-    public UnitOfWork(DbSession session) {
+    public UnitOfWork(DbSession session)
+    {
         _session = session;
     }
 
-    public void BeginTransaction() {
+    public void BeginTransaction()
+    {
         _session.Transaction = _session.Connection.BeginTransaction();
     }
 
-    public void Commit() {
+    public void Commit()
+    {
         _session.Transaction?.Commit();
         Dispose();
     }
-    public void Rollback() {
+    public void Rollback()
+    {
         _session.Transaction?.Rollback();
         Dispose();
     }
 
-    public void Dispose() {
+    public void Dispose()
+    {
         _session.Transaction?.Dispose();
     }
 }

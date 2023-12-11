@@ -10,13 +10,13 @@ interface Request {
 	password: string;
 }
 
-interface Response {
-	data: User;
-	access_token: string;
+export interface SignInResponse {
+	user: User;
+	accessToken: string;
 }
 
 export async function APISignIn({ email, password }: Request) {
-	const { data } = await api.post<Response>('/user/sign-in', {
+	const { data } = await api.post<SignInResponse>('/auth/sign-in', {
 		email,
 		password,
 	});

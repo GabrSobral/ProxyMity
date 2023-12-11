@@ -2,8 +2,9 @@
 #region Packages
 global using Microsoft.OpenApi.Models;
 global using Microsoft.Extensions.Options;
-global using Microsoft.AspNetCore.Mvc;
 global using Microsoft.IdentityModel.Tokens;
+global using Microsoft.AspNetCore.Mvc;
+global using Microsoft.AspNetCore.Mvc.Versioning;
 global using Microsoft.AspNetCore.Authentication.JwtBearer;
 #endregion
 

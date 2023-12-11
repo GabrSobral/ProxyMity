@@ -27,7 +27,7 @@ function AuthProvider({ children }: { children: ReactNode }) {
 		<AuthContext.Provider
 			value={{
 				accessToken: accessToken.current,
-				user: data ? (data?.user as User) : null,
+				user: data ? (data.user as User) : null,
 			}}
 		>
 			{children}

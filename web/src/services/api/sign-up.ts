@@ -17,7 +17,7 @@ interface Response {
 }
 
 export async function APISignUp({ name, email, password }: Request) {
-	const { data } = await api.post<Response>('/user/sign-up', {
+	const { data } = await api.post<Response>('/auth/sign-up', {
 		name,
 		email,
 		password,

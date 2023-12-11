@@ -1,7 +1,9 @@
 ﻿namespace ProxyMity.Application.Handlers.Conversations.Commands.CreatePrivateConversation;
 
-internal sealed class CreatePrivateConversationCommandValidator : AbstractValidator<CreatePrivateConversationCommand> {
-    public CreatePrivateConversationCommandValidator() {
+internal sealed class CreatePrivateConversationCommandValidator : AbstractValidator<CreatePrivateConversationCommand>
+{
+    public CreatePrivateConversationCommandValidator()
+    {
         RuleFor(x => x.RequesterId)
             .NotEqual(x => x.ParticipantId)
             .WithMessage("The requester Id cannot be equal to target Id");

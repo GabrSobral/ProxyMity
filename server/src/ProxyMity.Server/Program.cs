@@ -1,11 +1,14 @@
-internal class Program {
-    private static void Main(string[] args) {
+internal class Program
+{
+    private static void Main(string[] args)
+    {
         var builder = WebApplication.CreateBuilder(args);
 
         builder.Services
             .AddApplication()
-            .AddPresentation()
             .AddInfraDatabase()
+            .AddPresentation()
+            .ConfigureCors()
             .ConfigureAuthentication()
             .ConfigureApiDocumentation();
 

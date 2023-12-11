@@ -1,14 +1,18 @@
 ﻿namespace ProxyMity.Server.OptionsSetup;
 
-public class JwtBearerOptionsSetup : IConfigureNamedOptions<JwtBearerOptions> {
+public class JwtBearerOptionsSetup : IConfigureNamedOptions<JwtBearerOptions>
+{
     private readonly JwtOptions _jwtOptions;
 
-    public JwtBearerOptionsSetup(IOptions<JwtOptions> options) {
+    public JwtBearerOptionsSetup(IOptions<JwtOptions> options)
+    {
         _jwtOptions = options.Value;
     }
 
-    public void Configure(string? name, JwtBearerOptions options) {
-        options.TokenValidationParameters = new() {
+    public void Configure(string? name, JwtBearerOptions options)
+    {
+        options.TokenValidationParameters = new()
+        {
             ValidateIssuer = true,
             ValidateAudience = true,
             ValidateLifetime = true,
@@ -21,8 +25,10 @@ public class JwtBearerOptionsSetup : IConfigureNamedOptions<JwtBearerOptions> {
         };
     }
 
-    public void Configure(JwtBearerOptions options) {
-        options.TokenValidationParameters = new() {
+    public void Configure(JwtBearerOptions options)
+    {
+        options.TokenValidationParameters = new()
+        {
             ValidateIssuer = true,
             ValidateAudience = true,
             ValidateLifetime = true,

@@ -1,6 +1,7 @@
 ﻿namespace ProxyMity.Infra.Database.Migrations.Commands;
 
-internal static class UserTableScript {
+internal static class UserTableScript
+{
     public static string Create() => $"{Table()} {Indexes()}";
 
     private static string Table() => """

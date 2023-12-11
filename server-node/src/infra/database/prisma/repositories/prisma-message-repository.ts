@@ -37,10 +37,7 @@ export class PrismaMessageRepository implements MessageRepository {
     }
   }
 
-  async getUnreadConversationMessagesCount(
-    userId: User['_id'],
-    conversationId: Conversation['_id'],
-  ): Promise<Either<Error, number>> {
+  async getUnreadConversationMessagesCount(userId: User['_id'], conversationId: Conversation['_id']): Promise<Either<Error, number>> {
     const unreadMessagesCount = await this.prisma.message.count({
       where: { conversation_id: conversationId, NOT: { author_id: userId } },
     });
@@ -48,7 +45,7 @@ export class PrismaMessageRepository implements MessageRepository {
     return right(unreadMessagesCount);
   }
 
-  async readUnreadMessagedByConversationId(conversationId: string): Promise<Either<Error, void>> {
+  async readUnreadMessageByConversationId(userId: string, conversationId: string): Promise<Either<Error, void>> {
     await this.prisma.message.updateMany({
       data: { read_at: new Date() },
       where: { conversation_id: conversationId },
@@ -76,10 +73,7 @@ export class PrismaMessageRepository implements MessageRepository {
     }
   }
 
-  async getMessagesFromConversation(
-    conversationId: string,
-    quantity: number,
-  ): Promise<Either<Error, IMessageViewModel[]>> {
+  async getMessagesFromConversation(conversationId: string, quantity: number): Promise<Either<Error, IMessageViewModel[]>> {
     const messages = await this.prisma.message.findMany({
       where: { conversation_id: conversationId },
       orderBy: { written_at: 'desc' },

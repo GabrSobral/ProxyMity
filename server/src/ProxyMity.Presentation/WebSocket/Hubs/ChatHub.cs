@@ -4,27 +4,21 @@
 /// Chat SignalR hub, that handle with all events of real time chat.
 /// </summary>
 [Authorize]
-public sealed class ChatHub : Hub<IChatHubServer>, IChatHubClient
+public sealed class ChatHub(
+    ILogger<ChatHub> logger,
+    ISender sender
+) : Hub<IChatHubServer>, IChatHubClient
 {
-    private readonly ILogger<ChatHub> _logger;
-    private readonly ISender _sender;
-
-    public ChatHub(ILogger<ChatHub> logger, ISender sender)
-    {
-        _logger = logger;
-        _sender = sender;
-    }
-
     /// <summary>
     /// When user connect, will be assigned to all conversations that belong, at SignalR groups.
     /// </summary>
     public override async Task OnConnectedAsync()
     {
-        _logger.LogInformation($"The user {Context.UserIdentifier} is connected.");
+        logger.LogInformation($"The user {Context.UserIdentifier} is connected.");
 
         var userId = Guid.Parse(Context.UserIdentifier ?? "");
         var getUserConversationsQuery = new GetUserConversationsQuery(userId);
-        var userConversations = await _sender.Send(getUserConversationsQuery);
+        var userConversations = await sender.Send(getUserConversationsQuery);
 
         foreach (var item in userConversations)
             await Groups.AddToGroupAsync(Context.UserIdentifier!, item.Conversation.Id.ToString());
@@ -36,11 +30,11 @@ public sealed class ChatHub : Hub<IChatHubServer>, IChatHubClient
     /// <param name="exception"></param>
     public override async Task OnDisconnectedAsync(Exception? exception)
     {
-        _logger.LogInformation($"The user {Context.UserIdentifier} is disconnected.");
+        logger.LogInformation($"The user {Context.UserIdentifier} is disconnected.");
 
         var userId = Guid.Parse(Context.UserIdentifier ?? "");
         var getUserConversationsQuery = new GetUserConversationsQuery(userId);
-        var userConversations = await _sender.Send(getUserConversationsQuery);
+        var userConversations = await sender.Send(getUserConversationsQuery);
 
         foreach (var item in userConversations)
             await Groups.RemoveFromGroupAsync(Context.UserIdentifier!, item.Conversation.Id.ToString());
@@ -56,7 +50,7 @@ public sealed class ChatHub : Hub<IChatHubServer>, IChatHubClient
         var hubGroupId = message.ConversationId.ToString();
 
         var saveMessageCommand = new SaveMessageCommand(message);
-        await _sender.Send(saveMessageCommand);
+        await sender.Send(saveMessageCommand);
 
         await Clients.OthersInGroup(hubGroupId).ReceiveMessage(message);
         await Clients.OthersInGroup(hubGroupId).ReceiveTyping(false, message.AuthorId, message.ConversationId);
@@ -64,7 +58,7 @@ public sealed class ChatHub : Hub<IChatHubServer>, IChatHubClient
         var updateMessageStatusCommand = new UpdateMessageStatusCommand(
             message.Id, payload.IsConversationGroup, message.ConversationId, EMessageStatuses.SENT, message.AuthorId);
 
-        await _sender.Send(updateMessageStatusCommand);
+        await sender.Send(updateMessageStatusCommand);
 
         await Clients.Clients(Context.ConnectionId).ReceiveMessageStatus(EMessageStatuses.SENT, message.Id, message.ConversationId);
     }
@@ -74,9 +68,13 @@ public sealed class ChatHub : Hub<IChatHubServer>, IChatHubClient
     /// </summary>
     /// <param name="payload"></param>
     /// <exception cref="NotImplementedException"></exception>
-    public Task OnSendReadMessage(ChatSendReadMessagePayload payload)
+    public async Task OnSendReadMessage(ChatSendReadMessagePayload payload)
     {
-        throw new NotImplementedException();
+        var readConversationMessagesCommand = new ReadConversationMessagesCommand(payload.UserId, payload.ConversationId, payload.IsConversationGroup);
+        await sender.Send(readConversationMessagesCommand);
+
+        var hubGroupId = payload.ConversationId.ToString();
+        await Clients.OthersInGroup(hubGroupId).ReceiveReadMessage(payload.UserId, payload.ConversationId);
     }
 
     /// <summary>
@@ -89,7 +87,7 @@ public sealed class ChatHub : Hub<IChatHubServer>, IChatHubClient
         var updateMessageStatusCommand = new UpdateMessageStatusCommand(
             payload.MessageId, payload.IsConversationGroup, payload.ConversationId, EMessageStatuses.SENT, payload.UserId);
 
-        await _sender.Send(updateMessageStatusCommand);
+        await sender.Send(updateMessageStatusCommand);
 
         await Clients.OthersInGroup(hubGroupId).ReceiveMessageStatus(EMessageStatuses.RECEIVED, payload.MessageId, payload.ConversationId);
     }
@@ -101,6 +99,7 @@ public sealed class ChatHub : Hub<IChatHubServer>, IChatHubClient
     public async Task OnSendTyping(ChatSendTypingPayload payload)
     {
         var hubGroupId = payload.ConversationId.ToString();
+
         await Clients.OthersInGroup(hubGroupId)
             .ReceiveTyping(payload.Typing, payload.AuthorId, payload.ConversationId);
     }

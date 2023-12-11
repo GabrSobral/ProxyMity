@@ -1,9 +1,12 @@
 ﻿namespace ProxyMity.Server.Configuration;
 
-public static class Authentication {
-    public static IServiceCollection ConfigureAuthentication(this IServiceCollection services) {
+public static class Authentication
+{
+    public static IServiceCollection ConfigureAuthentication(this IServiceCollection services)
+    {
         services
-            .AddAuthentication(options => {
+            .AddAuthentication(options =>
+            {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
             }).AddJwtBearer();
 

@@ -1,5 +1,6 @@
 ﻿namespace ProxyMity.Domain.Enums;
 
-public enum EMessageStatuses {
+public enum EMessageStatuses
+{
     READ, RECEIVED, SENT
 }

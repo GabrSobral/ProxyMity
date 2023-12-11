@@ -1,7 +1,9 @@
 ﻿namespace ProxyMity.Infra.Database;
 
-public static class DependenyInjection {
-    public static IServiceCollection AddInfraDatabase(this IServiceCollection services) {
+public static class DependenyInjection
+{
+    public static IServiceCollection AddInfraDatabase(this IServiceCollection services)
+    {
         services.AddScoped<DbSession>();
         services.AddScoped<MigrationManager>();
 

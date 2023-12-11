@@ -4,7 +4,8 @@ public record GetByIdQuery(
     Guid Id
 ) : IQuery<GetByIdResponse>;
 
-public record GetByIdResponse {
+public record GetByIdResponse
+{
     public Guid Id { get; set; }
     public string Name { get; set; }
     public string Email { get; set; }
@@ -12,7 +13,8 @@ public record GetByIdResponse {
     public DateTime CreatedAt { get; set; }
     public DateTime? LastOnline { get; set; }
 
-    public GetByIdResponse(User user) {
+    public GetByIdResponse(User user)
+    {
         Id = user.Id;
         Name = user.Name;
         Email = user.Email;

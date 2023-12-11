@@ -1,9 +1,11 @@
 ﻿namespace ProxyMity.Infra.Database.Repositories;
 
-public class UserRepository : TRepository<UserRepository>, IUserRepository {
+public class UserRepository : TRepository<UserRepository>, IUserRepository
+{
     public UserRepository(DbSession session) : base(session) { }
 
-    public async Task CreateAsync(User newUser) {
+    public async Task CreateAsync(User newUser)
+    {
         const string sql = """
             INSERT INTO "user" (
                 "id", 
@@ -20,7 +22,8 @@ public class UserRepository : TRepository<UserRepository>, IUserRepository {
             );
         """;
 
-        object parameters = new {
+        object parameters = new
+        {
             id = newUser.Id,
             name = newUser.Name,
             email = newUser.Email,
@@ -31,7 +34,8 @@ public class UserRepository : TRepository<UserRepository>, IUserRepository {
         await _session.Connection.ExecuteAsync(sql, parameters, _session.Transaction);
     }
 
-    public async Task<User?> FindByEmailAsync(string email) {
+    public async Task<User?> FindByEmailAsync(string email)
+    {
         const string sql = """
             SELECT 
                 id AS "Id", 
@@ -49,7 +53,8 @@ public class UserRepository : TRepository<UserRepository>, IUserRepository {
         return await _session.Connection.QueryFirstOrDefaultAsync<User>(sql, parameters);
     }
 
-    public async Task<User?> FindByIdAsync(Guid userId) {
+    public async Task<User?> FindByIdAsync(Guid userId)
+    {
         const string sql = """
             SELECT 
                 id AS "Id", 

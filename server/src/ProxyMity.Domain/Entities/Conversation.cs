@@ -1,6 +1,7 @@
 ﻿namespace ProxyMity.Domain.Entities;
 
-public class Conversation {
+public class Conversation
+{
     public Guid Id { get; set; }
 
     public Guid? GroupId { get; set; }
@@ -11,8 +12,10 @@ public class Conversation {
 
     public DateTime? DisabledAt { get; set; }
 
-    public static Conversation Create(Guid? groupId = null) {
-        return new Conversation {
+    public static Conversation Create(Guid? groupId = null)
+    {
+        return new Conversation
+        {
             Id = Guid.NewGuid(),
             GroupId = groupId,
             CreatedAt = DateTime.UtcNow,

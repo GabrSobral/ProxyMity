@@ -2,7 +2,6 @@
 
 public record GetConversationsByUserIdQuery(
     Guid Id,
-    DateTime? DisabledAt,
     DateTime CreatedAt,
     string? GroupName,
     string? GroupDescription,

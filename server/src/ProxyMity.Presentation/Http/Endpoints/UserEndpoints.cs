@@ -14,7 +14,6 @@ public static class UserEndpoints
         var group = app.MapGroup("user").RequireAuthorization();
 
         group.MapGet("get-by-id/{userId}", GetUserById).WithName(nameof(GetUserById));
-
         group.MapGet("get-by-email/{email}", GetUserByEmail).WithName(nameof(GetUserByEmail));
     }
 

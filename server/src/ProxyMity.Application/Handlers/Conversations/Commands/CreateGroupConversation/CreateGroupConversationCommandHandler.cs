@@ -1,66 +1,49 @@
 ﻿namespace ProxyMity.Application.Handlers.Conversations.Commands.CreateGroupConversation;
 
-public class CreateGroupConversationCommandHandler
-    : ICommandHandler<CreateGroupConversationCommand, CreateGroupConversationResponse> {
-    private readonly ILogger<CreateGroupConversationCommandHandler> _logger;
+public class CreateGroupConversationCommandHandler(
+    ILogger<CreateGroupConversationCommandHandler> logger,
 
-    private readonly IGroupRepository _groupRepository;
-    private readonly IParticipantRepository _participantRepository;
-    private readonly IConversationRepository _conversationRepository;
-    private readonly IUserRepository _userRepository;
+    IGroupRepository groupRepository,
+    IParticipantRepository participantRepository,
+    IConversationRepository conversationRepository,
+    IUserRepository userRepository,
 
-    private readonly IUnitOfWork _unitOfWork;
-
-    public CreateGroupConversationCommandHandler(
-        ILogger<CreateGroupConversationCommandHandler> logger,
-
-        IGroupRepository groupRepository,
-        IParticipantRepository participantRepository,
-        IConversationRepository conversationRepository,
-        IUserRepository userRepository,
-
-        IUnitOfWork unitOfWork
-    ) {
-        _logger = logger;
-
-        _groupRepository = groupRepository;
-        _participantRepository = participantRepository;
-        _conversationRepository = conversationRepository;
-        _userRepository = userRepository;
-
-        _unitOfWork = unitOfWork;
-    }
-
-    public async Task<CreateGroupConversationResponse> Handle(CreateGroupConversationCommand request, CancellationToken cancellationToken) {
-        _logger.LogInformation($"🟢 Creating a group conversation...");
+    IUnitOfWork unitOfWork
+) : ICommandHandler<CreateGroupConversationCommand, CreateGroupConversationResponse>
+{
+    public async Task<CreateGroupConversationResponse> Handle(CreateGroupConversationCommand request, CancellationToken cancellationToken)
+    {
+        logger.LogInformation($"🟢 Creating a group conversation...");
 
         var participantsCount = request.Participants.Count();
 
         var group = Group.Create(request.CreatorId, request.Name, request.Description);
         var conversation = Conversation.Create(group.Id);
 
-        _unitOfWork.BeginTransaction();
+        unitOfWork.BeginTransaction();
 
-        await _groupRepository.CreateAsync(group);
-        await _conversationRepository.CreateAsync(conversation);
+        await groupRepository.CreateAsync(group);
+        await conversationRepository.CreateAsync(conversation);
 
-        for (int i = 0; i < participantsCount; i++) {
+        for (int i = 0; i < participantsCount; i++)
+        {
             var participantId = request.Participants.ElementAt(i);
 
-            _ = await _userRepository.FindByIdAsync(participantId) ?? throw new UserNotFoundException(participantId);
-            var existentParticipation = await _participantRepository.GetByIdAsync(participantId, conversation.Id);
+            _ = await userRepository.FindByIdAsync(participantId) ?? throw new UserNotFoundException(participantId);
+            var existentParticipation = await participantRepository.GetByIdAsync(participantId, conversation.Id);
 
-            if (existentParticipation is null) {
+            if (existentParticipation is null)
+            {
                 var participant = Participant.Create(participantId, conversation.Id);
-                await _participantRepository.AddAsync(participant);
+                await participantRepository.AddAsync(participant);
 
-                _logger.LogInformation($"🟢 Creating the parcipation of {participantId} at {conversation.Id} conversation...");
+                logger.LogInformation($"🟢 Creating the parcipation of {participantId} at {conversation.Id} conversation...");
             }
         }
 
-        _unitOfWork.Commit();
+        unitOfWork.Commit();
 
-        _logger.LogInformation("🟢 A group conversation was created successfully!");
+        logger.LogInformation("🟢 A group conversation was created successfully!");
 
         return new CreateGroupConversationResponse(conversation, request.Participants);
     }

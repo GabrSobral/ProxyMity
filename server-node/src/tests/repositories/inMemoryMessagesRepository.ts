@@ -42,7 +42,7 @@ export class InMemoryMessagesRepository implements MessageRepository {
     return right(void 0);
   }
 
-  async readUnreadMessagedByConversationId(userId: User['_id'], conversationId: string): Promise<Either<Error, void>> {
+  async readUnreadMessageByConversationId(userId: User['_id'], conversationId: string): Promise<Either<Error, void>> {
     this.items = this.items.map(item => {
       if (item.conversationId === conversationId && item.authorId !== userId) {
         item.read();

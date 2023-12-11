@@ -1,6 +1,7 @@
 ﻿namespace ProxyMity.Domain.Entities;
 
-public class Participant {
+public class Participant
+{
     public required Guid UserId { get; set; }
 
     public required Guid ConversationId { get; set; }
@@ -11,8 +12,10 @@ public class Participant {
 
     public DateTime? UpdatedAt { get; set; }
 
-    public static Participant Create(Guid userId, Guid conversationId) {
-        return new Participant() {
+    public static Participant Create(Guid userId, Guid conversationId)
+    {
+        return new Participant()
+        {
             ConversationId = conversationId,
             UserId = userId,
             CreatedAt = DateTime.UtcNow,

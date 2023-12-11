@@ -1,10 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc.Versioning;
+﻿namespace ProxyMity.Server.Configuration;
 
-namespace ProxyMity.Server.Configuration;
-
-public static class ApiDocumentation {
-    public static IServiceCollection ConfigureApiDocumentation(this IServiceCollection services) {
-        services.AddApiVersioning(config => {
+public static class ApiDocumentation
+{
+    public static IServiceCollection ConfigureApiDocumentation(this IServiceCollection services)
+    {
+        services.AddApiVersioning(config =>
+        {
             config.DefaultApiVersion = new ApiVersion(1, 0);
             config.ReportApiVersions = true;
             config.AssumeDefaultVersionWhenUnspecified = true;
@@ -15,8 +16,11 @@ public static class ApiDocumentation {
             );
         });
 
-        services.AddSwaggerGen(c => {
+        services.AddSwaggerGen(c =>
+        {
             c.SwaggerDoc("v1", new OpenApiInfo { Title = "ProxyMity.Server", Version = "v1" });
+
+            c.AddSignalRSwaggerGen();
         });
 
         services.AddEndpointsApiExplorer();
@@ -24,8 +28,10 @@ public static class ApiDocumentation {
         return services;
     }
 
-    public static IApplicationBuilder ConfigureApiDocumentationUI(this IApplicationBuilder app, bool isDevelopment) {
-        if (isDevelopment) {
+    public static IApplicationBuilder ConfigureApiDocumentationUI(this IApplicationBuilder app, bool isDevelopment)
+    {
+        if (isDevelopment)
+        {
             app.UseDeveloperExceptionPage();
             app.UseSwagger();
             app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "ProxyMity.Server v1"));

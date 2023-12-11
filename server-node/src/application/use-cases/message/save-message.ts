@@ -48,13 +48,13 @@ export class SaveMessageUseCase {
       await Promise.all(
         participants.value.map(async participant => {
           if (participant.userId !== message.authorId) {
-            const messageStatus = MessageStatus.create({
-              messageId: message.id,
-              userId: participant.userId,
-              conversationId,
-            });
-
-            await this.messageStatusRepository.create(messageStatus);
+            await this.messageStatusRepository.create(
+              MessageStatus.create({
+                messageId: message.id,
+                userId: participant.userId,
+                conversationId,
+              }),
+            );
           }
         }),
       );

@@ -57,17 +57,17 @@ export class ReadConversationMessagesUseCase {
     }
 
     const allUnreadMessageStatusFromConversation = result.value;
-    const allParticipantsReadTheMessage = allUnreadMessageStatusFromConversation.every(item => item.readAt);
+    const allParticipantsReadTheMessage = allUnreadMessageStatusFromConversation.length === 0;
 
     if (allParticipantsReadTheMessage) {
-      await this.messageRepository.readUnreadMessagedByConversationId(userId, conversationId);
+      await this.messageRepository.readUnreadMessageByConversationId(userId, conversationId);
     }
 
     return right({});
   }
 
   private async privateConversationHandler({ userId, conversationId }: HandlerProps): Promise<Either<Error, Response>> {
-    await this.messageRepository.readUnreadMessagedByConversationId(userId, conversationId);
+    await this.messageRepository.readUnreadMessageByConversationId(userId, conversationId);
 
     return right({});
   }

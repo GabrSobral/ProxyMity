@@ -1,6 +1,7 @@
 ﻿namespace ProxyMity.Domain.Entities;
 
-public class Message {
+public class Message
+{
     public Guid Id { get; set; }
 
     public required string Content { get; set; }
@@ -19,8 +20,10 @@ public class Message {
 
     public required Guid AuthorId { get; set; }
 
-    public static Message Create(string content, Guid conversationId, Guid authorId, DateTime? writtenAt = null) {
-        return new Message() {
+    public static Message Create(string content, Guid conversationId, Guid authorId, DateTime? writtenAt = null)
+    {
+        return new Message()
+        {
             Id = Guid.NewGuid(),
             Content = content,
             ConversationId = conversationId,

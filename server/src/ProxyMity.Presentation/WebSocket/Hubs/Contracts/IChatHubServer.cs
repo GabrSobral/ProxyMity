@@ -1,5 +1,8 @@
-﻿namespace ProxyMity.Presentation.WebSocket.Hubs.Contracts;
+﻿using SignalRSwaggerGen.Attributes;
 
+namespace ProxyMity.Presentation.WebSocket.Hubs.Contracts;
+
+[SignalRHub]
 public interface IChatHubServer
 {
     Task ReceiveMessage(Message message);

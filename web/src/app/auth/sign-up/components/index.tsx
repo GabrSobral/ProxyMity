@@ -1,5 +1,6 @@
 'use client';
 
+import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { FormEvent, Fragment, useState } from 'react';
 import { Eye, EyeClosed, UserPlus } from '@phosphor-icons/react';
@@ -11,8 +12,6 @@ import { LoadingSpinning } from '@/@design-system/LoadingSpinning';
 import { StrongPasswordModal } from './StrongPasswordModal';
 
 import { useAuthStore } from '../../authStore';
-
-import { APISignUp } from '@/services/api/sign-up';
 
 import { WarningAlert } from '../../sign-in/components/WarningAlert';
 
@@ -33,14 +32,17 @@ export function SignUpPageComponents() {
 		setIsLoading(true);
 
 		try {
-			const response = await APISignUp({ name, email, password });
+			const result = await signIn('register', { name, email, password, redirect: false });
 
-			console.log({ response });
+			if (result?.error) {
+				console.error(result?.error);
 
-			// setToken(response.access_token);
-			// setUser(response.data);
+				setError(result?.error);
+				setIsLoading(false);
+				return;
+			}
+
 			setIsLoading(false);
-
 			router.replace('/products/chats');
 		} catch (error: any) {
 			console.log(error?.response?.data || error?.message);
@@ -59,6 +61,7 @@ export function SignUpPageComponents() {
 					<Input.Wrapper className="w-full">
 						<Input
 							type="text"
+							name="name"
 							placeholder="Type your name"
 							title="Type your name"
 							autoComplete="name"
@@ -75,6 +78,7 @@ export function SignUpPageComponents() {
 					<Input.Wrapper className="w-full">
 						<Input
 							type="email"
+							name="email"
 							placeholder="Type your e-mail"
 							autoComplete="email"
 							title="Type your e-mail"
@@ -91,6 +95,7 @@ export function SignUpPageComponents() {
 					<Input.Wrapper className="w-full">
 						<Input
 							type={showPassword ? 'text' : 'password'}
+							name="password"
 							placeholder="**********"
 							value={password}
 							autoComplete="new-password"
@@ -102,6 +107,7 @@ export function SignUpPageComponents() {
 
 						<button
 							type="button"
+							aria-label={showPassword ? 'Hide password' : 'Show Password'}
 							onClick={() => setShowPassword(s => !s)}
 							className="absolute right-4 -translate-y-2/4 top-2/4"
 							title={showPassword ? 'Hide password' : 'Show Password'}
@@ -123,7 +129,7 @@ export function SignUpPageComponents() {
 					</button>
 				</Input.Group>
 
-				<Button type="submit" className="w-full">
+				<Button type="submit" className="w-full" title={isLoading ? 'Loading...' : 'Create Account'}>
 					{isLoading ? (
 						<LoadingSpinning size={32} lineSize={2} color="white" />
 					) : (

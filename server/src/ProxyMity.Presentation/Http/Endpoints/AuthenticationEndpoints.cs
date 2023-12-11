@@ -1,7 +1,3 @@
-using FluentValidation;
-using ProxyMity.Application.Handlers.Authentication.SignIn;
-using ProxyMity.Application.Handlers.Authentication.SignUp;
-
 namespace ProxyMity.Presentation.Http.Endpoints;
 
 /// <summary>
@@ -18,7 +14,6 @@ public static class AuthenticationEndpoints
         var group = app.MapGroup("auth");
 
         group.MapPost("sign-in", SignIn).WithName(nameof(SignIn));
-
         group.MapPost("sign-up", SignUp).WithName(nameof(SignUp));
     }
 
@@ -41,6 +36,6 @@ public static class AuthenticationEndpoints
     public static async Task<IResult> SignUp(SignUpCommand model, ISender sender)
     {
         var response = await sender.Send(model);
-        return TypedResults.Ok(response);
+        return TypedResults.Created("", response);
     }
 }

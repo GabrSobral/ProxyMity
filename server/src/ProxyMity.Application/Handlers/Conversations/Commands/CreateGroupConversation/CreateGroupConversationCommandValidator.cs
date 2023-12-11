@@ -1,7 +1,9 @@
 ﻿namespace ProxyMity.Application.Handlers.Conversations.Commands.CreateGroupConversation;
 
-internal sealed class CreateGroupConversationCommandValidator : AbstractValidator<CreateGroupConversationCommand> {
-    public CreateGroupConversationCommandValidator() {
+internal sealed class CreateGroupConversationCommandValidator : AbstractValidator<CreateGroupConversationCommand>
+{
+    public CreateGroupConversationCommandValidator()
+    {
         RuleFor(x => x.Name)
             .NotNull()
             .WithMessage("The group conversation must have a name.");

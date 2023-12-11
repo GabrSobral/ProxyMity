@@ -7,13 +7,15 @@ public record CreateGroupConversationCommand(
     IEnumerable<Guid> Participants
 ) : ICommand<CreateGroupConversationResponse>;
 
-public record CreateGroupConversationResponse {
+public record CreateGroupConversationResponse
+{
     public Guid Id { get; set; }
     public Guid? GroupId { get; set; }
     public DateTime CreatedAt { get; set; }
     public IEnumerable<Guid> Participants { get; set; }
 
-    public CreateGroupConversationResponse(Conversation conversation, IEnumerable<Guid> participants) {
+    public CreateGroupConversationResponse(Conversation conversation, IEnumerable<Guid> participants)
+    {
         Id = conversation.Id;
         GroupId = conversation.GroupId;
         CreatedAt = conversation.CreatedAt;

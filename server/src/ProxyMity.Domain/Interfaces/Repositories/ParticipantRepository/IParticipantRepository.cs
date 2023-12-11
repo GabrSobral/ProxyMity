@@ -1,6 +1,7 @@
 ﻿namespace ProxyMity.Domain.Interfaces.Repositories.ParticipantRepository;
 
-public interface IParticipantRepository {
+public interface IParticipantRepository
+{
     public Task AddAsync(Participant participant);
     public Task RemoveAsync(Participant participant);
     public Task<Participant?> GetByIdAsync(Guid userId, Guid conversationId);

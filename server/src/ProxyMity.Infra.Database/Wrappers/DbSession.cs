@@ -1,10 +1,15 @@
 ﻿namespace ProxyMity.Infra.Database.Wrappers;
 
-public sealed class DbSession : IDisposable {
+/// <summary>
+/// 
+/// </summary>
+public sealed class DbSession : IDisposable
+{
     public IDbConnection Connection { get; set; }
     public IDbTransaction? Transaction { get; set; }
 
-    public DbSession(IConfiguration configuration) {
+    public DbSession(IConfiguration configuration)
+    {
         Connection = new NpgsqlConnection(configuration.GetConnectionString("PostgreSQL"));
         Connection.Open();
     }

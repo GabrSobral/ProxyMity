@@ -35,7 +35,7 @@ public class SignInServiceTests {
         var result = await signInService.Handle(inputModel, cancellationTokenSource);
 
         Assert.NotNull(result);
-        Assert.NotNull(result.Token);
+        Assert.NotNull(result.AccessToken);
     }
 
     [Fact]

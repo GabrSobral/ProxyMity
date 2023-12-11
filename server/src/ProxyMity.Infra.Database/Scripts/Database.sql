@@ -19,7 +19,6 @@ CREATE TABLE IF NOT EXISTS "conversation" (
     "group_id" UUID,
     "created_at" TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMPTZ,
-    "disabled_at" TIMESTAMPTZ,
 
     PRIMARY KEY ("id"),  -- Add primary key constraint here
     FOREIGN KEY ("group_id") REFERENCES "group" ("id")  -- Add foreign key constraint here

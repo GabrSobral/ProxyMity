@@ -14,9 +14,7 @@ public static class ConversationEndpoints
         var group = app.MapGroup("conversation").RequireAuthorization();
 
         group.MapGet("get-by-user/{userId}", GetUserConversations).WithName(nameof(GetUserConversations));
-
         group.MapPost("private", CreatePrivateConversation).WithName(nameof(CreatePrivateConversation));
-
         group.MapPost("group", CreateGroupConversation).WithName(nameof(CreateGroupConversation));
     }
 
@@ -28,7 +26,6 @@ public static class ConversationEndpoints
     public static async Task<IResult> GetUserConversations(Guid userId, ISender sender)
     {
         var query = new GetUserConversationsQuery(userId);
-
         var response = await sender.Send(query);
 
         return TypedResults.Ok(response);
@@ -43,14 +40,14 @@ public static class ConversationEndpoints
     public static async Task<IResult> CreatePrivateConversation(
         CreatePrivateConversationRequest model,
         HttpContext httpContext,
-        ISender sender
-    )
+        ISender sender)
     {
         var userId = HttpUserClaims.GetId(httpContext);
         var command = new CreatePrivateConversationCommand(userId, model.ParticipantId);
+
         var response = await sender.Send(command);
 
-        return TypedResults.Ok(response);
+        return TypedResults.Created("", response);
     }
 
     /// <summary>
@@ -62,6 +59,6 @@ public static class ConversationEndpoints
     {
         var response = await sender.Send(model);
 
-        return TypedResults.Ok(response);
+        return TypedResults.Created("", response);
     }
 }

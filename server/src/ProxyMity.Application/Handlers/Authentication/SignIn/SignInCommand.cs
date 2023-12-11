@@ -5,20 +5,30 @@ public record SignInCommand(
     string Password
 ) : ICommand<SignInResponse>;
 
-public record SignInResponse {
-    public string Name { get; set; }
-    public string Email { get; set; }
-    public DateTime CreatedAt { get; set; }
-    public DateTime? LastOnline { get; set; }
-    public string? PhotoUrl { get; set; }
-    public string Token { get; set; }
+public record SignInResponse
+{
+    public UserResponse User { get; set; }
+    public string AccessToken { get; set; }
 
-    public SignInResponse(User user, string token) {
-        Name = user.Name;
-        Email = user.Email;
-        CreatedAt = user.CreatedAt;
-        LastOnline = user.LastOnline;
-        PhotoUrl = user?.PhotoUrl;
-        Token = token;
+    public SignInResponse(User user, string token)
+    {
+        User = new UserResponse(
+            user.Id,
+            user.Name,
+            user.Email,
+            user.CreatedAt,
+            user.LastOnline,
+            user.PhotoUrl
+        );
+        AccessToken = token;
     }
 };
+
+public record UserResponse(
+    Guid Id,
+    string Name,
+    string Email,
+    DateTime CreatedAt,
+    DateTime? LastOnline,
+    string? PhotoUrl
+);

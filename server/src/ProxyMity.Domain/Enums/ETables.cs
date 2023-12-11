@@ -1,6 +1,7 @@
 ﻿namespace ProxyMity.Domain.Enums;
 
-public enum ETables {
+public enum ETables
+{
     user,
     conversation,
     message,
