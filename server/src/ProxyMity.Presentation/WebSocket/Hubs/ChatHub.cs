@@ -98,6 +98,7 @@ public sealed class ChatHub(
     /// <param name="payload">Typing status, and data to identify the conversation.</param>
     public async Task OnSendTyping(ChatSendTypingPayload payload)
     {
+        logger.LogInformation($"OnSendTyping: {payload.Typing}, ");
         var hubGroupId = payload.ConversationId.ToString();
 
         await Clients.OthersInGroup(hubGroupId)

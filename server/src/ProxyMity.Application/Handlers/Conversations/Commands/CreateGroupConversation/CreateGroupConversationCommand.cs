@@ -7,6 +7,12 @@ public record CreateGroupConversationCommand(
     IEnumerable<Guid> Participants
 ) : ICommand<CreateGroupConversationResponse>;
 
+public record CreateGroupConversationRequest(
+    string Name,
+    string? Description,
+    IEnumerable<Guid> Participants
+);
+
 public record CreateGroupConversationResponse
 {
     public Guid Id { get; set; }

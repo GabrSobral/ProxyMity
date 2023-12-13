@@ -40,8 +40,8 @@ public static class UserEndpoints
     {
         var query = new GetByEmailQuery(email);
 
-        await sender.Send(query);
+        var response = await sender.Send(query);
 
-        return TypedResults.Ok();
+        return TypedResults.Ok(response);
     }
 }

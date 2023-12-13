@@ -34,7 +34,7 @@ public class CreatePrivateConversationCommandHandler(
 
         logger.LogInformation($"A private conversation between {requesterId} and {participantId} was created successfully!");
 
-        Guid[] participantsId = new Guid[2] { requesterId, participantId };
+        Guid[] participantsId = [requesterId, participantId];
 
         return new CreatePrivateConversationResponse(conversation, participantsId);
     }

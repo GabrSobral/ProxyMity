@@ -55,9 +55,19 @@ public static class ConversationEndpoints
     /// </summary>
     /// <param name="model">Create Group Conversation CQRS command</param>
     /// <param name="sender">MediatR sender</param>
-    public static async Task<IResult> CreateGroupConversation(CreateGroupConversationCommand model, ISender sender)
+    public static async Task<IResult> CreateGroupConversation(
+        CreateGroupConversationRequest model,
+        HttpContext httpContext,
+        ISender sender)
     {
-        var response = await sender.Send(model);
+        var userId = HttpUserClaims.GetId(httpContext);
+        var command = new CreateGroupConversationCommand(
+            Name: model.Name,
+            Description: model.Description,
+            CreatorId: userId,
+            Participants: model.Participants);
+
+        var response = await sender.Send(command);
 
         return TypedResults.Created("", response);
     }
