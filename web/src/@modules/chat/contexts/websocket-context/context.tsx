@@ -2,7 +2,6 @@
 
 import { createContext, ReactNode, useEffect, useMemo } from 'react';
 import {
-	HttpClient,
 	HttpTransportType,
 	HubConnection,
 	HubConnectionBuilder,
@@ -29,6 +28,7 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
 				.withUrl('http://localhost:5000/chat', {
 					accessTokenFactory: () => accessToken || '',
 					logMessageContent: true,
+					transport: HttpTransportType.WebSockets,
 					withCredentials: true,
 				})
 				.configureLogging(LogLevel.Information)
@@ -40,14 +40,21 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
 	}, [accessToken]);
 
 	useEffect(() => {
-		console.log({ connection });
-
 		if (
 			connection &&
 			connection?.state !== HubConnectionState.Connected &&
 			connection?.state !== HubConnectionState.Connecting
 		) {
-			connection.start().then(() => console.log('Client connected to hub.'));
+			connection.start().then(async () => {
+				console.log('Client connected to hub.');
+
+				connection?.invoke('OnSendTyping', { typing: true, conversationId: '', authorId: '' });
+				connection?.invoke('OnSendTyping', { typing: true, conversationId: '', authorId: '' });
+				connection?.invoke('OnSendTyping', { typing: true, conversationId: '', authorId: '' });
+				connection?.invoke('OnSendTyping', { typing: true, conversationId: '', authorId: '' });
+				connection?.invoke('OnSendTyping', { typing: true, conversationId: '', authorId: '' });
+				connection?.invoke('OnSendTyping', { typing: true, conversationId: '', authorId: '' });
+			});
 		}
 	}, [connection]);
 

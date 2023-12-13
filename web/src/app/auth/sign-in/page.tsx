@@ -1,7 +1,5 @@
-import { redirect } from 'next/navigation';
-import { getServerSession } from 'next-auth';
-
-import { SignInPageComponents } from './components';
+import { SignInPage } from '@/@modules/authentication/pages/sign-in/page';
+import { verifyServerSessionAsync } from '@/types/verifyServerSessionAsync';
 
 export const metadata = {
 	title: 'ProxyMity - Sign In',
@@ -9,11 +7,7 @@ export const metadata = {
 };
 
 export default async function SignIn() {
-	const session = await getServerSession();
+	await verifyServerSessionAsync({ callbackUrl: '/products/chat' });
 
-	if (session) {
-		redirect('/products/chats');
-	}
-
-	return <SignInPageComponents />;
+	return <SignInPage />;
 }

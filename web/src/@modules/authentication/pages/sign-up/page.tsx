@@ -9,13 +9,12 @@ import { Input } from '@/@design-system/Input';
 import { Button } from '@/@design-system/Button';
 import { LoadingSpinning } from '@/@design-system/LoadingSpinning';
 
-import { StrongPasswordModal } from './StrongPasswordModal';
+import { WarningAlert } from '../../components/WarningAlert';
+import { StrongPasswordModal } from '../../components/StrongPasswordModal';
 
-import { useAuthStore } from '../../authStore';
+import { useAuthStore } from '@/app/auth/authStore';
 
-import { WarningAlert } from '../../sign-in/components/WarningAlert';
-
-export function SignUpPageComponents() {
+export function SignUpPage() {
 	const router = useRouter();
 
 	const [strongPasswordModalVisible, setStrongPasswordModalVisible] = useState(false);

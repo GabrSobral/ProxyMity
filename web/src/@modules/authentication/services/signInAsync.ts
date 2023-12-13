@@ -1,9 +1,7 @@
-import axios from 'axios';
-import { User } from '../../types/user';
+'use server';
 
-const api = axios.create({
-	baseURL: process.env.NEXT_PUBLIC_HTTP_API_DOMAIN,
-});
+import { User } from '@/types/user';
+import { api } from '@/services/api/config';
 
 interface Request {
 	email: string;
@@ -15,7 +13,7 @@ export interface SignInResponse {
 	accessToken: string;
 }
 
-export async function APISignIn({ email, password }: Request) {
+export async function signInAsync({ email, password }: Request): Promise<SignInResponse> {
 	const { data } = await api.post<SignInResponse>('/auth/sign-in', {
 		email,
 		password,

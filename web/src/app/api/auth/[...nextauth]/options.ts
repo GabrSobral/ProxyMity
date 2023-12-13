@@ -1,10 +1,10 @@
 import type { NextAuthOptions } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
 
-import { APISignIn } from '@/services/api/sign-in';
-import { APISignUp } from '@/services/api/sign-up';
-
 import { User } from '@/types/user';
+
+import { signInAsync } from '@/@modules/authentication/services/signInAsync';
+import { signUpAsync } from '@/@modules/authentication/services/signUpAsync';
 
 export const nextAuthOptions: NextAuthOptions = {
 	pages: {
@@ -27,7 +27,7 @@ export const nextAuthOptions: NextAuthOptions = {
 
 				try {
 					const { email, password } = credentials;
-					const response = await APISignIn({ email, password });
+					const response = await signInAsync({ email, password });
 
 					return response;
 				} catch (error: any) {
@@ -54,7 +54,7 @@ export const nextAuthOptions: NextAuthOptions = {
 
 				try {
 					const { name, email, password } = credentials;
-					const response = await APISignUp({ name, email, password });
+					const response = await signUpAsync({ name, email, password });
 
 					return response;
 				} catch (error: any) {

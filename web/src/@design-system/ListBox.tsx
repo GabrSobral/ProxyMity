@@ -36,7 +36,7 @@ interface ListboxLabelProps {
 }
 function ListBoxLabel({ children, className }: ListboxLabelProps) {
 	return (
-		<Listbox.Label className={twMerge('text-gray-700 dark:text-whiteAlpha-900 font-medium', className)}>
+		<Listbox.Label className={twMerge('text-gray-700 dark:text-gray-200 font-medium', className)}>
 			{children}
 		</Listbox.Label>
 	);
@@ -57,7 +57,7 @@ function ListBoxInput({ className }: ListboxInputProps) {
 				>
 					<span className="block truncate">{getReadableValue(value)}</span>
 					<span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
-						<CaretDown className="h-5 w-5 text-gray-700 dark:text-whiteAlpha-900" aria-hidden="true" />
+						<CaretDown className="h-5 w-5 text-gray-700 dark:text-gray-200" aria-hidden="true" />
 					</span>
 				</Listbox.Button>
 			</Input>
@@ -100,7 +100,7 @@ function ListBoxOption({ className, value }: ListboxOptionProps) {
 						'relative select-none py-2 pl-10 pr-4 cursor-pointer overflow-hidden',
 						{
 							'bg-red-500 text-white': active,
-							'text-gray-900 dark:text-whiteAlpha-900': !active,
+							'text-gray-900 dark:text-gray-200': !active,
 						},
 						className
 					)

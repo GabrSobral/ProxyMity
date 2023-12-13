@@ -10,7 +10,7 @@ export function CheckBox({ label, ref, labelClassName, ...rest }: CheckBoxProps)
 	const id = useId();
 
 	return (
-		<div className="relative flex items-center gap-3 text-sm text-gray-700 dark:text-whiteAlpha-900 w-fit">
+		<div className="relative flex items-center gap-3 text-sm text-gray-700 dark:text-gray-200 w-fit">
 			<input
 				id={id}
 				ref={ref}
@@ -19,10 +19,7 @@ export function CheckBox({ label, ref, labelClassName, ...rest }: CheckBoxProps)
 				{...rest}
 			/>
 
-			<label
-				htmlFor={id}
-				className={labelClassName}
-			>
+			<label htmlFor={id} className={labelClassName}>
 				{label}
 			</label>
 		</div>

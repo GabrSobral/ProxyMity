@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { ArrowClockwise, Check, Copy, Eye, EyeClosed, Key, Warning } from '@phosphor-icons/react';
 
 import { Modal } from '@/@design-system/Modal';
-import { useAuthStore } from '../../authStore';
+import { useAuthStore } from '@/app/auth/authStore';
 
 interface Props {
 	isVisible: boolean;

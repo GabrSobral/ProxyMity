@@ -45,7 +45,7 @@ function ModalGroup({ closeModal, show, children, className, showCloseButton = t
 						>
 							{showCloseButton && (
 								<button type="button" onClick={closeModal} title="Fechar" className="absolute top-4 right-4">
-									<X size={24} className="dark:text-whiteAlpha-900 text-white" />
+									<X size={24} className="dark:text-gray-200 text-white" />
 								</button>
 							)}
 
@@ -60,7 +60,13 @@ function ModalGroup({ closeModal, show, children, className, showCloseButton = t
 
 function ModalTitle({ children, className }: { children: ReactNode; className?: string }) {
 	return (
-		<Dialog.Title as="h3" className={twMerge('text-lg font-bold leading-6  dark:text-white text-gray-700', className)}>
+		<Dialog.Title
+			as="h3"
+			className={twMerge(
+				'text-lg font-bold leading-6  dark:text-purple-300 transition-colors text-purple-500',
+				className
+			)}
+		>
 			{children}
 		</Dialog.Title>
 	);

@@ -1,6 +1,7 @@
 'use client';
 
 import { signIn } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
 import { FormEvent, Fragment, useState } from 'react';
 import { Eye, EyeClosed, SignIn as SignInIcon } from '@phosphor-icons/react';
 
@@ -8,12 +9,11 @@ import { Input } from '@/@design-system/Input';
 import { Button } from '@/@design-system/Button';
 import { LoadingSpinning } from '@/@design-system/LoadingSpinning';
 
-import { useAuthStore } from '../../authStore';
+import { useAuthStore } from '@/app/auth/authStore';
 
-import { WarningAlert } from '../components/WarningAlert';
-import { useRouter } from 'next/navigation';
+import { WarningAlert } from '../../components/WarningAlert';
 
-export function SignInPageComponents() {
+export function SignInPage() {
 	const router = useRouter();
 	const [isLoading, setIsLoading] = useState(false);
 	const [showPassword, setShowPassword] = useState(false);

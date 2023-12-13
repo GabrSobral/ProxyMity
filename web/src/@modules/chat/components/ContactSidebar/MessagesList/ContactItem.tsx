@@ -1,5 +1,6 @@
 import clsx from 'clsx';
 import { motion } from 'framer-motion';
+import { twMerge } from 'tailwind-merge';
 import { PulseLoader } from 'react-spinners';
 import tailwindColors from 'tailwindcss/colors';
 import { ForwardedRef, forwardRef, useEffect, useState } from 'react';
@@ -9,7 +10,6 @@ import { UserImage } from '@/@design-system/UserImage';
 import { useAuth } from '@/contexts/auth-context/hook';
 import { useChat } from '../../../contexts/chat-context/hook';
 import { ConversationState, useChatsStore } from '../../../contexts/chat-context/stores/chat';
-import { twMerge } from 'tailwind-merge';
 
 interface Props {
 	conversation: ConversationState;

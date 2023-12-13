@@ -9,7 +9,7 @@ import { MessagesList } from './MessagesList';
 
 export function ContactSidebar() {
 	return (
-		<aside className="h-full w-[340px] rounded-[1rem] flex flex-col gap-4">
+		<aside className="h-full min-w-[340px] rounded-[1rem] flex flex-col gap-4">
 			<Input.Group>
 				<Input.Label className="sr-only">Search</Input.Label>
 

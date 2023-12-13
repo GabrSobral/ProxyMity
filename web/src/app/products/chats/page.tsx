@@ -1,9 +1,8 @@
-import { Chat } from './components/Chat';
-import { ContactSidebar } from './components/ContactSidebar';
-import { ConversationDetail } from './components/ConversationDetail';
-
-import { ChatProvider } from './contexts/chat-context/context';
-import { EncryptionProvider } from './contexts/encryption-context/context';
+import { Chat } from '@/@modules/chat/components/Chat';
+import { ContactSidebar } from '@/@modules/chat/components/ContactSidebar';
+import { ChatProvider } from '@/@modules/chat/contexts/chat-context/context';
+import { ConversationDetail } from '@/@modules/chat/components/ConversationDetail';
+import { EncryptionProvider } from '@/@modules/chat/contexts/encryption-context/context';
 
 export const metadata = {
 	title: 'ProxyMity - Chats',

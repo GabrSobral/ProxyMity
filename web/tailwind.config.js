@@ -5,7 +5,9 @@ module.exports = {
 		'./src/pages/**/*.{js,ts,jsx,tsx,mdx}',
 		'./src/components/**/*.{js,ts,jsx,tsx,mdx}',
 		'./src/app/**/*.{js,ts,jsx,tsx,mdx}',
+		'./src/@modules/**/*.{js,ts,jsx,tsx,mdx}',
 		'./src/@design-system/**/*.{js,ts,jsx,tsx,mdx}',
+		'./src/@application/**/*.{js,ts,jsx,tsx,mdx}',
 	],
 	theme: {
 		extend: {

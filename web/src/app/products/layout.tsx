@@ -1,7 +1,11 @@
-import { Header } from '../../components/Header';
-import { WebSocketProvider } from './chats/contexts/websocket-context/context';
+import { Header } from '@/@application/Header';
+import { WebSocketProvider } from '@/@modules/chat/contexts/websocket-context/context';
 
-export default function ProductsLayout({ children }: { children: React.ReactNode }) {
+import { verifyServerSessionAsync } from '@/types/verifyServerSessionAsync';
+
+export default async function ProductsLayout({ children }: { children: React.ReactNode }) {
+	await verifyServerSessionAsync({ callbackUrl: '/auth/sign-in', shouldInvertVerification: true });
+
 	return (
 		<WebSocketProvider>
 			<Header />

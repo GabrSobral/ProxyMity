@@ -8,8 +8,6 @@ import { PaperPlaneTilt, X } from '@phosphor-icons/react';
 import { Input } from '@/@design-system/Input';
 import { Button } from '@/@design-system/Button';
 
-import { useWebSocket } from '@/app/products/chats/contexts/websocket-context/hook';
-
 import { Message } from '@/types/message';
 
 import { addMessageAsyncDB } from '@/services/database/use-cases/add-message';
@@ -21,6 +19,8 @@ import { sendMessageWebSocketEvent } from '../../../contexts/websocket-context/e
 
 import { useAuth } from '@/contexts/auth-context/hook';
 import { useChatsStore } from '../../../contexts/chat-context/stores/chat';
+
+import { useWebSocket } from '@/@modules/chat/contexts/websocket-context/hook';
 
 export function TypeBar() {
 	const { user } = useAuth();
