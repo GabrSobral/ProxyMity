@@ -1,0 +1,31 @@
+<script lang="ts">
+	import clsx from "clsx";
+	import { getContext } from "svelte";
+	import { twMerge } from "tailwind-merge";
+	import type { Writable } from "svelte/store";
+    
+	import type { InputContextProps } from "./InputGroup.svelte";
+
+    export let tag: "input" | "textarea" = "input"
+    export let className = ""
+    export let onChange: (e: Event & { currentTarget: EventTarget & HTMLInputElement }) => void;
+
+    const context = getContext<Writable<InputContextProps>>("@design-system:inputContext");
+
+    const inputId = $context.inputId;
+    const hasError = $context.hasError;
+</script>
+
+<svelte:element
+    this={tag}
+    id={inputId}
+    on:input={onChange}
+    class={twMerge(
+        clsx(
+            'outline-none flex hover:ring-1 transition-all dark:ring-gray-700 ring-gray-300/30 rounded-[10px] dark:bg-gray-900 bg-white dark:text-gray-200 text-gray-700 focus:outline-purple-500 focus:ring-0 placeholder:text-gray-400 w-full p-4',
+            { 'border-red-500 dark:border-red-500': hasError }
+        ),
+        className
+    )}
+    {...$$restProps}
+/>

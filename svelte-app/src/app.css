@@ -1,0 +1,39 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+	--foreground-rgb: 0, 0, 0;
+	--background-start-rgb: 214, 219, 220;
+	--background-end-rgb: 255, 255, 255;
+}
+
+@media (prefers-color-scheme: dark) {
+	:root {
+		--foreground-rgb: 255, 255, 255;
+		--background-start-rgb: 0, 0, 0;
+		--background-end-rgb: 0, 0, 0;
+	}
+}
+
+::-webkit-scrollbar {
+	@apply w-[1px] h-[2px] rounded-lg;
+}
+::-webkit-scrollbar-track {
+	@apply bg-gray-900 brightness-75 transition-all w-[1px];
+}
+
+::-webkit-scrollbar-thumb {
+	border-radius: 6px;
+	border: 1px solid #0000020;
+
+	@apply bg-purple-500 shadow transition-all w-[1px];
+}
+
+::-webkit-scrollbar-thumb:hover {
+	filter: brightness(0.6);
+}
+
+.gradient {
+	@apply bg-gradient-to-r from-[#B809A6] border-0 to-[#1C64CE];
+}
