@@ -16,46 +16,45 @@ export const authOptions: SvelteKitAuthConfig = {
 			id: 'credentials',
 			name: 'Credentials',
 			credentials: {
-				email: { label: 'email', type: 'email' },
-				password: { label: 'password', type: 'password' },
-			},
-
-			async authorize(credentials): Promise<any> {
-				return await new Promise((resolve, reject) => {
-					if (!credentials) {
-						return null;
-					}
-
-					const { email, password } = credentials as { email: string; password: string };
-
-					signInAsync({ email, password }).then(resolve).catch(reject);
-				});
-			},
-		}),
-
-		Credentials({
-			id: 'register',
-			name: 'Credentials',
-			credentials: {
 				name: { label: 'name', type: 'text' },
 				email: { label: 'email', type: 'email' },
 				password: { label: 'password', type: 'password' },
+				command: { label: 'command', type: 'text' },
 			},
 
 			async authorize(credentials): Promise<any> {
 				if (!credentials) {
-					return null;
+					return { error: 'Credentials not provided' };
 				}
 
-				try {
+				console.log(credentials);
+
+				const { command } = credentials;
+
+				if (command === 'sign-in') {
+					const { email, password } = credentials as { email: string; password: string };
+
+					try {
+						const response = await signInAsync({ email, password });
+						console.log({ response });
+
+						return response;
+					} catch (error: any) {
+						console.error({ error: error?.response?.data });
+						return { error };
+					}
+				} else {
 					const { name, email, password } = credentials as { email: string; password: string; name: string };
-					const response = await signUpAsync({ name, email, password });
 
-					return response;
-				} catch (error: any) {
-					console.error({ error: error.response.data });
+					try {
+						const response = await signUpAsync({ name, email, password });
+						console.log({ response });
 
-					throw new Error(error.response.data.message);
+						return response;
+					} catch (error: any) {
+						console.error({ error: error?.response?.data });
+						return { error };
+					}
 				}
 			},
 		}),

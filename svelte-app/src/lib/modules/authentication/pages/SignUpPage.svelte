@@ -12,6 +12,7 @@
 	import WarningAlert from "../components/WarningAlert.svelte";
 	import StrongPasswordModal from "../components/StrongPasswordModal.svelte";
 
+    let name = ""
     let email = ""
     let password = ""
 
@@ -25,22 +26,15 @@
         isLoading = true;
 
 		try {
-			const result = await signIn('register', { name, email, password, redirect: false });
-			isLoading = false;
+			await signIn('credentials', { name, email, password, command: "sign-up", redirect: false });
 
-            if(result?.ok) {
-                goto('/chat');
-            } else {
-                console.error(result?.error);
-    
-                errorAlertConfig = result?.error;
-                isLoading = false;
-            }
+            goto('/chat');
 		} catch (error: any) {
 			console.log(error?.response?.data || error?.message);
 			errorAlertConfig = error?.response?.data.message || error?.message;
-			isLoading = false;
 		}
+
+        isLoading = false;
 	}
 </script>
 
@@ -62,9 +56,9 @@
                 placeholder="Type your name"
                 autoComplete="name"
                 title="Type your name"
-                value={email}
+                value={name}
                 required
-                onChange={e => { email = e.target.value }}
+                onInput={e => { name = e.target.value }}
                 className="bg-gray-900 ring-gray-700 text-gray-200"
             />
         </Wrapper>
@@ -82,7 +76,7 @@
                 title="Type your e-mail"
                 value={email}
                 required
-                onChange={e => { email = e.target.value }}
+                onInput={e => { email = e.target.value }}
                 className="bg-gray-900 ring-gray-700 text-gray-200"
             />
         </Wrapper>
@@ -100,7 +94,7 @@
                 title="Type your password"
                 value={password}
                 required
-                onChange={e => { password = e.target.value }}
+                onInput={e => { password = e.target.value }}
                 className="bg-gray-900 ring-gray-700 text-gray-200"
             />
 
@@ -128,7 +122,11 @@
         </button>
     </InputGroup>
 
-    <StrongPasswordModal isVisible={isStrongPasswordModalVisible} closeModal={() => { isStrongPasswordModalVisible = false }}/>
+    <StrongPasswordModal 
+        isVisible={isStrongPasswordModalVisible} 
+        closeModal={() => { isStrongPasswordModalVisible = false }}
+        setPasswordValue={(newPassword) =>{ password = newPassword }}
+    />
 
     <Button
         type="submit"

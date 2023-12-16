@@ -11,6 +11,7 @@
 	import InputGroup from "$lib/design-system/Input/InputGroup.svelte";
 	import LoadingSpinning from "$lib/design-system/LoadingSpinning.svelte";
 
+    //#region States
     let email = ""
     let password = ""
 
@@ -18,24 +19,25 @@
     let isLoading = false;
 
     let errorAlertConfig = ""
+    //#endregion
 
+    //#region Functions
     async function handleSubmit() {
 		isLoading = true;
 
-		const result = await signIn('credentials', { email, password, redirect: false });
-        isLoading = false;
-
-        console.log({ result })
-        
-        if(result?.ok) {
-            goto('/chat');
-        } else {
-            console.error(result?.error);
+        try {
+            await signIn('credentials', { email, password, command: "sign-in", redirect: false });
     
-            errorAlertConfig = result?.error || "";
-            isLoading = false;
-        }		
+            goto('/chat');
+        } catch(error: any) {
+            console.log({ error })
+
+            errorAlertConfig = JSON.stringify(error);
+        }
+
+        isLoading = false;
 	}
+    //#endregion
 </script>
 
 {#if errorAlertConfig}
@@ -58,7 +60,7 @@
                 title="Type your e-mail"
                 value={email}
                 required
-                onChange={event => { email = event.target.value }}
+                onInput={event => { email = event.target.value; }}
                 className="bg-gray-900 ring-gray-700 text-gray-200"
             />
         </Wrapper>
@@ -76,7 +78,7 @@
                 title="Type your password"
                 value={password}
                 required
-                onChange={event => { password = event.target.value }}
+                onInput={event => { password = event.target.value }}
                 className="bg-gray-900 ring-gray-700 text-gray-200"
             />
 

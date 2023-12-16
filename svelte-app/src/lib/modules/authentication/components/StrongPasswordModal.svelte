@@ -11,6 +11,7 @@
 
     export let isVisible = false;
     export let closeModal: () => void;
+    export let setPasswordValue: (newPassword: string) => void;
 
     let strongPassword = generatePassword();
     let isPasswordVisible = false;
@@ -33,9 +34,7 @@
 		navigator.clipboard.writeText(strongPassword);
 		isCopied = true;
 
-		setTimeout(() => {
-			isCopied = false;
-		}, 1000);
+		setTimeout(() => { isCopied = false }, 1000);
 	}
 </script>
 
@@ -114,7 +113,7 @@
         <button
             type="button"
             on:click={() => {
-                // setPasswordValue(strongPassword);
+                setPasswordValue(strongPassword);
                 closeModal();
             }}
             class="p-2 px-3 flex items-center gap-2 dark:text-green-400 text-green-700 tracking-wider text-md rounded-[10px] border-2 border-solid dark:border-green-400 border-green-700 w-fit"

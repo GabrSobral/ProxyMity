@@ -8,7 +8,7 @@ export async function load(event) {
 	const session = await event.locals.getSession();
 
 	if (!session?.user) {
-		throw redirect(303, '/auth/sign-in');
+		redirect(303, '/auth/sign-in');
 	}
 
 	return {};
