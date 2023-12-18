@@ -16,35 +16,11 @@ export const nextAuthOptions: NextAuthOptions = {
 			id: 'credentials',
 			name: 'Credentials',
 			credentials: {
-				email: { label: 'email', type: 'email' },
-				password: { label: 'password', type: 'password' },
-			},
-
-			async authorize(credentials): Promise<any> {
-				if (!credentials) {
-					return null;
-				}
-
-				try {
-					const { email, password } = credentials;
-					const response = await signInAsync({ email, password });
-
-					return response;
-				} catch (error: any) {
-					console.error({ error: error.response.data });
-
-					throw new Error(error.response.data.error || error.response.data.message || error.response.data.title);
-				}
-			},
-		}),
-
-		CredentialsProvider({
-			id: 'register',
-			name: 'Credentials',
-			credentials: {
 				name: { label: 'name', type: 'text' },
 				email: { label: 'email', type: 'email' },
 				password: { label: 'password', type: 'password' },
+
+				cmd: { label: 'name', type: 'text' },
 			},
 
 			async authorize(credentials): Promise<any> {
@@ -52,11 +28,24 @@ export const nextAuthOptions: NextAuthOptions = {
 					return null;
 				}
 
-				try {
-					const { name, email, password } = credentials;
-					const response = await signUpAsync({ name, email, password });
+				const cmd = (credentials.cmd as 'sign-in') || 'sign-up';
 
-					return response;
+				try {
+					if (cmd === 'sign-in') {
+						const { email, password } = credentials;
+						const response = await signInAsync({ email, password });
+
+						return response;
+					}
+
+					if (cmd === 'sign-up') {
+						const { name, email, password } = credentials;
+						const response = await signUpAsync({ name, email, password });
+
+						return response;
+					}
+
+					return new Error('Invalid command passed.');
 				} catch (error: any) {
 					console.error({ error: error.response.data });
 

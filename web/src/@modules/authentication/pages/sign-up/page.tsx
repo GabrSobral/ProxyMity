@@ -31,7 +31,7 @@ export function SignUpPage() {
 		setIsLoading(true);
 
 		try {
-			const result = await signIn('register', { name, email, password, redirect: false });
+			const result = await signIn('credentials', { name, email, password, cmd: 'sign-up', redirect: false });
 
 			if (result?.error) {
 				console.error(result?.error);

@@ -26,7 +26,7 @@ export function SignInPage() {
 		event.preventDefault();
 		setIsLoading(true);
 
-		const result = await signIn('credentials', { email, password, redirect: false });
+		const result = await signIn('credentials', { email, password, redirect: false, cmd: 'sign-up' });
 
 		if (result?.error) {
 			console.error(result?.error);
