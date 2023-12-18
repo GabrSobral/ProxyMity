@@ -33,7 +33,7 @@ export const nextAuthOptions: NextAuthOptions = {
 				} catch (error: any) {
 					console.error({ error: error.response.data });
 
-					throw new Error(error.response.data.message);
+					throw new Error(error.response.data.error || error.response.data.message || error.response.data.title);
 				}
 			},
 		}),
@@ -60,7 +60,7 @@ export const nextAuthOptions: NextAuthOptions = {
 				} catch (error: any) {
 					console.error({ error: error.response.data });
 
-					throw new Error(error.response.data.message);
+					throw new Error(error.response.data.error || error.response.data.message || error.response.data.title);
 				}
 			},
 		}),

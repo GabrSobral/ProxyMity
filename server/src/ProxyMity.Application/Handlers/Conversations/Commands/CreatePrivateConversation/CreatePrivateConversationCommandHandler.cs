@@ -17,8 +17,10 @@ public class CreatePrivateConversationCommandHandler(
         Guid requesterId = request.RequesterId;
         Guid participantId = request.ParticipantId;
 
-        _ = await userRepository.FindByIdAsync(requesterId) ?? throw new UserNotFoundException(requesterId);
-        _ = await userRepository.FindByIdAsync(participantId) ?? throw new UserNotFoundException(participantId);
+        _ = Task.WhenAll([
+            userRepository.FindByIdAsync(requesterId, cancellationToken) ?? throw new UserNotFoundException(requesterId),
+            userRepository.FindByIdAsync(participantId, cancellationToken) ?? throw new UserNotFoundException(participantId)
+        ]);
 
         var conversation = Conversation.Create();
         var requesterParticipation = Participant.Create(requesterId, conversation.Id);
@@ -26,9 +28,9 @@ public class CreatePrivateConversationCommandHandler(
 
         unitOfWork.BeginTransaction();
 
-        await conversationRepository.CreateAsync(conversation);
-        await participantRepository.AddAsync(requesterParticipation);
-        await participantRepository.AddAsync(targetParticipation);
+        await conversationRepository.CreateAsync(conversation, cancellationToken);
+        await participantRepository.AddAsync(requesterParticipation, cancellationToken);
+        await participantRepository.AddAsync(targetParticipation, cancellationToken);
 
         unitOfWork.Commit();
 

@@ -1,14 +1,14 @@
-import 'next-auth';
+import '@auth/sveltekit';
 import { User } from './user';
 
-declare module 'next-auth' {
+declare module '@auth/sveltekit' {
 	interface Session {
 		accessToken: string | undefined;
 		user: User;
 	}
 }
 
-declare module 'next-auth/jwt' {
+declare module '@auth/sveltekit/jwt' {
 	interface JWT extends ISessionPayload {
 		error?: 'RefreshAccessTokenError';
 	}

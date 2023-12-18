@@ -21,6 +21,8 @@
     let errorAlertConfig = ""
     //#endregion
 
+    $: console.log(email)
+
     //#region Functions
     async function handleSubmit() {
 		isLoading = true;
@@ -53,14 +55,14 @@
     
         <Wrapper className="w-full">
             <Input 
+                tabindex={1}
                 type="email"
                 name="email"
                 placeholder="Type your e-mail"
                 autoComplete="email"
                 title="Type your e-mail"
-                value={email}
+                bind:value={email}
                 required
-                onInput={event => { email = event.target.value; }}
                 className="bg-gray-900 ring-gray-700 text-gray-200"
             />
         </Wrapper>
@@ -71,19 +73,20 @@
     
         <Wrapper className="w-full">
             <Input 
+                tabindex={2}
                 type={showPassword ? 'text' : 'password'}
                 name="password"
                 placeholder="**********"
                 autoComplete="password"
                 title="Type your password"
-                value={password}
+                bind:value={password}
                 required
-                onInput={event => { password = event.target.value }}
                 className="bg-gray-900 ring-gray-700 text-gray-200"
             />
 
             <button
                 type="button"
+                tabindex={3}
                 aria-label={showPassword ? 'Hide password' : 'Show Password'}
                 on:click={() => showPassword = !showPassword}
                 class="absolute right-4 -translate-y-2/4 top-2/4"
@@ -99,6 +102,7 @@
     </InputGroup>
 
     <Button
+        tabIndex={4}
         type="submit"
         className="w-full"
         disabled={!(email && password) || isLoading}

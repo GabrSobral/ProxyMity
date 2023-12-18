@@ -51,14 +51,14 @@
 
         <Wrapper className="w-full">
             <Input 
+                tabindex={1}
                 type="text"
                 name="name"
                 placeholder="Type your name"
                 autoComplete="name"
                 title="Type your name"
-                value={name}
+                bind:value={name}
                 required
-                onInput={e => { name = e.target.value }}
                 className="bg-gray-900 ring-gray-700 text-gray-200"
             />
         </Wrapper>
@@ -69,14 +69,14 @@
 
         <Wrapper className="w-full">
             <Input 
+                tabindex={2}
                 type="email"
                 name="email"
                 placeholder="Type your e-mail"
                 autoComplete="email"
                 title="Type your e-mail"
-                value={email}
+                bind:value={email}
                 required
-                onInput={e => { email = e.target.value }}
                 className="bg-gray-900 ring-gray-700 text-gray-200"
             />
         </Wrapper>
@@ -87,18 +87,19 @@
 
         <Wrapper className="w-full">
             <Input 
+                tabindex={3}
                 type={showPassword ? 'text' : 'password'}
                 name="password"
                 placeholder="**********"
                 autoComplete="password"
                 title="Type your password"
-                value={password}
+                bind:value={password}
                 required
-                onInput={e => { password = e.target.value }}
                 className="bg-gray-900 ring-gray-700 text-gray-200"
             />
 
             <button
+                tabindex={4}
                 type="button"
                 aria-label={showPassword ? 'Hide password' : 'Show Password'}
                 on:click={() => showPassword = !showPassword}
@@ -114,6 +115,7 @@
         </Wrapper>
 
         <button
+            tabindex={5}
             type="button"
             class="text-purple-300 text-sm hover:underline underline-offset-2"
             on:click={() => { isStrongPasswordModalVisible = true }}
@@ -129,6 +131,7 @@
     />
 
     <Button
+        tabIndex={6}
         type="submit"
         className="w-full"
         disabled={!(email && password) || isLoading}

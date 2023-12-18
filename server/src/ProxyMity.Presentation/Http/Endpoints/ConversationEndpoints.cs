@@ -1,14 +1,7 @@
 ﻿namespace ProxyMity.Presentation.Http.Endpoints;
 
-/// <summary>
-/// Conversation endpoints handler. (NEED AUTHENTICATION)
-/// </summary>
 public static class ConversationEndpoints
 {
-    /// <summary>
-    /// Static method to map and register the conversation endpoints.
-    /// </summary>
-    /// <param name="app">Endpoint router builder, provided by Minimal APIs</param>
     public static void MapConversationEndpoints(this IEndpointRouteBuilder app)
     {
         var group = app.MapGroup("conversation").RequireAuthorization();
@@ -18,11 +11,6 @@ public static class ConversationEndpoints
         group.MapPost("group", CreateGroupConversation).WithName(nameof(CreateGroupConversation));
     }
 
-    /// <summary>
-    ///  Endpoint which is responsible for listing the user conversations.
-    /// </summary>
-    /// <param name="userId">The current user Id which you want to get all conversations</param>
-    /// <param name="sender">MediatR sender</param>
     public static async Task<IResult> GetUserConversations(Guid userId, ISender sender)
     {
         var query = new GetUserConversationsQuery(userId);
@@ -31,12 +19,6 @@ public static class ConversationEndpoints
         return TypedResults.Ok(response);
     }
 
-    /// <summary>
-    /// Endpoint which handles with a creation of a private conversation.
-    /// </summary>
-    /// <param name="model">Create Private Conversation CQRS command</param>
-    /// <param name="httpContext">The HTTP Context of request, used to get the request user claim</param>
-    /// <param name="sender">MediatR sender</param>
     public static async Task<IResult> CreatePrivateConversation(
         CreatePrivateConversationRequest model,
         HttpContext httpContext,
@@ -50,11 +32,6 @@ public static class ConversationEndpoints
         return TypedResults.Created("", response);
     }
 
-    /// <summary>
-    ///  Endpoint which handles with a creation of a group conversation.
-    /// </summary>
-    /// <param name="model">Create Group Conversation CQRS command</param>
-    /// <param name="sender">MediatR sender</param>
     public static async Task<IResult> CreateGroupConversation(
         CreateGroupConversationRequest model,
         HttpContext httpContext,

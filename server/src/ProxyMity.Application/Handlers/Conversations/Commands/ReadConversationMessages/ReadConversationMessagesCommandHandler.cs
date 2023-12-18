@@ -10,7 +10,7 @@ internal sealed class ReadConversationMessagesCommandHandler(
 {
     public async Task Handle(ReadConversationMessagesCommand request, CancellationToken cancellationToken)
     {
-        var conversation = await conversationRepository.GetByIdAsync(request.ConversationId)
+        var conversation = await conversationRepository.GetByIdAsync(request.ConversationId, cancellationToken)
             ?? throw new ConversationNotFoundException(request.ConversationId);
 
         logger.LogInformation($"The user {request.UserId} is reading the messages of conversation {request.ConversationId}");
@@ -18,14 +18,14 @@ internal sealed class ReadConversationMessagesCommandHandler(
         unitOfWork.BeginTransaction();
 
         if (request.IsConversationGroup)
-            await GroupConversationHandler(request.UserId, conversation);
+            await GroupConversationHandler(request.UserId, conversation, cancellationToken);
         else
-            await PrivateConversationHandler(request.UserId, conversation);
+            await PrivateConversationHandler(request.UserId, conversation, cancellationToken);
 
         unitOfWork.Commit();
     }
 
-    private async Task GroupConversationHandler(Guid userId, Conversation conversation)
+    private async Task GroupConversationHandler(Guid userId, Conversation conversation, CancellationToken cancellationToken)
     {
         await messageStatusRepository.ReadUnreadMessagesByUserIdAsync(userId, conversation.Id);
 
@@ -35,11 +35,11 @@ internal sealed class ReadConversationMessagesCommandHandler(
         var allParticipantsReadTheMessage = allUnreadMessageStatusFromConversation.Any();
 
         if (allParticipantsReadTheMessage)
-            await messageRepository.ReadUnreadMessagesByConversationIdAsync(userId, conversation.Id);
+            await messageRepository.ReadUnreadMessagesByConversationIdAsync(userId, conversation.Id, cancellationToken);
     }
 
-    private async Task PrivateConversationHandler(Guid userId, Conversation conversation)
+    private async Task PrivateConversationHandler(Guid userId, Conversation conversation, CancellationToken cancellationToken)
     {
-        await messageRepository.ReadUnreadMessagesByConversationIdAsync(userId, conversation.Id);
+        await messageRepository.ReadUnreadMessagesByConversationIdAsync(userId, conversation.Id, cancellationToken);
     }
 }

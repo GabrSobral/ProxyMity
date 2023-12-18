@@ -1,11 +1,14 @@
 <script lang="ts">
-	import { getContext } from "svelte";
-	import type { Writable } from "svelte/store";
-	import type { InputContextProps } from "./InputGroup.svelte";
+	import { getContext } from 'svelte';
+	import type { Writable } from 'svelte/store';
+	import type { InputContextProps } from './InputGroup.svelte';
+	import { twMerge } from 'tailwind-merge';
 
-    const context = getContext<Writable<InputContextProps>>("@design-system:inputContext")
+	export let className = '';
+
+	const context = getContext<Writable<InputContextProps>>('@design-system:inputContext');
 </script>
 
-<label class="text-white dark:text-gray-200 font-medium" for={$context.inputId} {...$$restProps}>
-    <slot><!-- optional fallback --></slot>
+<label class={twMerge('text-white dark:text-gray-200 font-medium', className)} for={$context.inputId} {...$$restProps}>
+	<slot />
 </label>

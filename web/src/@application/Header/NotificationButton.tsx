@@ -12,7 +12,7 @@ export function NotificationButton() {
 			>
 				<Bell
 					className="dark:text-white text-gray-700 transition-colors group-hover:text-white"
-					size={28}
+					size={28} 
 					weight="light"
 				/>
 			</Popover.Button>

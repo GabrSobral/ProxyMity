@@ -21,6 +21,7 @@
         <button
             type="button"
             title="Set to Light Theme"
+            tabindex="-2"
             on:click={() => appTheme.set('light')}
             aria-label="Set to Light Theme"
             data-is-active={$appTheme === 'light'}
@@ -32,6 +33,7 @@
         <button
             type="button"
             title="Set to Dark Theme"
+            tabindex="-2"
             on:click={() => appTheme.set('dark')}
             aria-label="Set to Dark Theme"
             data-is-active={$appTheme === 'dark'}
@@ -42,6 +44,7 @@
 
         <button
             type="button"
+            tabindex="-2"
             title="Set to System Theme"
             on:click={() => appTheme.set('system')}
             aria-label="Set to System Theme"
@@ -65,6 +68,7 @@
             />
 
             <a
+                tabindex="-1"
                 href="/auth/sign-in"
                 title="Log In Page"
                 data-sveltekit-preload-data="hover"
@@ -74,6 +78,7 @@
             </a>
 
             <a
+                tabindex="-1"
                 href="/auth/sign-up"
                 title="Register page"
                 data-sveltekit-preload-data="hover"

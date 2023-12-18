@@ -11,5 +11,7 @@ export async function load(event) {
 		redirect(303, '/auth/sign-in');
 	}
 
-	return {};
+	return {
+		session,
+	};
 }

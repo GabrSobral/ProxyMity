@@ -10,4 +10,7 @@
   "[csharp]": {
     "editor.defaultFormatter": "ms-dotnettools.csharp"
   },
+  "[svelte]": {
+    "editor.defaultFormatter": "svelte.svelte-vscode"
+  },
 }

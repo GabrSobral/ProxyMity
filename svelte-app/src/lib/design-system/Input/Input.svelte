@@ -6,8 +6,7 @@
     
 	import type { InputContextProps } from "./InputGroup.svelte";
 
-    export let as: "input" | "textarea" = "input"
-    export let onInput: (e: { target: {value: string} }) => void;
+    export let value = "";
     export let className = ""
 
     const context = getContext<Writable<InputContextProps>>("@design-system:inputContext");
@@ -16,10 +15,9 @@
     const hasError = $context.hasError;
 </script>
 
-<svelte:element
-    this={as}
+<input
     id={inputId}
-    on:input={onInput}
+    bind:value
     class={twMerge(
         clsx(
             'outline-none flex hover:ring-1 transition-all dark:ring-gray-700 ring-gray-300/30 rounded-[10px] dark:bg-gray-900 bg-white dark:text-gray-200 text-gray-700 focus:outline-purple-500 focus:ring-0 placeholder:text-gray-400 w-full p-4',

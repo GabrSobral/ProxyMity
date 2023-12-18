@@ -23,7 +23,7 @@ public sealed class SignUpCommandHandler(
 
         unitOfWork.BeginTransaction();
 
-        await userRepository.CreateAsync(newUser);
+        await userRepository.CreateAsync(newUser, cancellationToken);
         unitOfWork.Commit();
 
         logger.LogInformation($"An user was screated at application: {newUser.Email}");
