@@ -1,9 +1,7 @@
 ﻿namespace ProxyMity.Infra.Database.Repositories;
 
-public class UserRepository : TRepository<UserRepository>, IUserRepository
+public class UserRepository(DbSession session) : TRepository<UserRepository>(session), IUserRepository
 {
-    public UserRepository(DbSession session) : base(session) { }
-
     public async Task CreateAsync(User newUser)
     {
         const string sql = """

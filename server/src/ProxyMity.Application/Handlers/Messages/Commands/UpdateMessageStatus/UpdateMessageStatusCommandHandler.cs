@@ -13,6 +13,8 @@ public sealed class UpdateMessageStatusCommandHandler(
     {
         unitOfWork.BeginTransaction();
 
+        logger.LogInformation($"Updating status from message '{command.MessageId}', to '{command.Status}' status");
+
         if (command.IsConversationGroup)
             await UpdateGroupMessage(command.MessageId, command.Status, command.UserId, command.ConversationId);
         else

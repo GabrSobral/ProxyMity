@@ -1,9 +1,8 @@
 ﻿namespace ProxyMity.Infra.Database.Repositories;
 
-public class ConversationRepository : TRepository<ConversationRepository>, IConversationRepository
+public class ConversationRepository(DbSession session) 
+    : TRepository<ConversationRepository>(session), IConversationRepository
 {
-    public ConversationRepository(DbSession session) : base(session) { }
-
     public async Task CreateAsync(Conversation newConversation)
     {
         const string sql = """

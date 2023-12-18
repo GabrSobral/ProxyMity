@@ -2,7 +2,7 @@
 
 public interface IUserRepository
 {
-    public Task CreateAsync(User newUser, CancellationToken cancellationToken);
-    public Task<User?> FindByIdAsync(Guid userId, CancellationToken cancellationToken);
-    public Task<User?> FindByEmailAsync(string email, CancellationToken cancellationToken);
+    public Task CreateAsync(User newUser);
+    public Task<User?> FindByIdAsync(Guid userId);
+    public Task<User?> FindByEmailAsync(string email);
 }

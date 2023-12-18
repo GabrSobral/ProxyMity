@@ -23,12 +23,13 @@ public sealed class SignUpCommandHandler(
 
         unitOfWork.BeginTransaction();
 
-        await userRepository.CreateAsync(newUser, cancellationToken);
+        await userRepository.CreateAsync(newUser);
         unitOfWork.Commit();
 
         logger.LogInformation($"An user was screated at application: {newUser.Email}");
 
         var token = jsonWebToken.Sign(newUser);
+
         return new SignInResponse(newUser, token);
     }
 }

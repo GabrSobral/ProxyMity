@@ -3,7 +3,7 @@
 /// <summary>
 /// 
 /// </summary>
-internal class SignUpCommandValidator : AbstractValidator<SignUpCommand>
+internal sealed class SignUpCommandValidator : AbstractValidator<SignUpCommand>
 {
     public SignUpCommandValidator(IUserRepository userRepository)
     {
@@ -13,11 +13,13 @@ internal class SignUpCommandValidator : AbstractValidator<SignUpCommand>
             .EmailAddress().WithMessage("Email address must be a valid email");
 
         RuleFor(x => x.Email)
-            .MustAsync(async (email, cancellationToken) => {
-                if (await userRepository.FindByEmailAsync(email, cancellationToken) is not null)
+            .MustAsync(async (email, _) => {
+                var existantUser = await userRepository.FindByEmailAsync(email.ToLower());
+
+                if (existantUser is not null)
                     throw new UserAlreadyExistException();
 
                 return true;
-            });
+            }).WithMessage("User already exists");
     }
 }
