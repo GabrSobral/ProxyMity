@@ -4,8 +4,7 @@ public static class WebSockets
 {
     public static WebApplication ConfigureWebSockets(this WebApplication app)
     {
-        app.MapHub<ChatHub>("chat")
-            .RequireAuthorization();
+        app.MapHub<ChatHub>("chat");
 
         return app;
     }

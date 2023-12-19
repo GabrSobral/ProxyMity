@@ -1,30 +1,7 @@
 import { create } from 'zustand';
-import { Draft, Immutable, produce } from 'immer';
+import { Draft, produce } from 'immer';
 
-export type IAuthStore = Immutable<{
-	signIn: {
-		states: {
-			email: string;
-			password: string;
-		};
-		actions: {
-			setEmailValue: (value: string) => void;
-			setPasswordValue: (value: string) => void;
-		};
-	};
-	signUp: {
-		states: {
-			name: string;
-			email: string;
-			password: string;
-		};
-		actions: {
-			setNameValue: (value: string) => void;
-			setEmailValue: (value: string) => void;
-			setPasswordValue: (value: string) => void;
-		};
-	};
-}>;
+import { IAuthStore } from './type';
 
 export const useAuthStore = create<IAuthStore>(set => ({
 	signIn: {

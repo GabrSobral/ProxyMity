@@ -9,7 +9,7 @@ import { Input } from '@/@design-system/Input';
 import { Button } from '@/@design-system/Button';
 import { LoadingSpinning } from '@/@design-system/LoadingSpinning';
 
-import { useAuthStore } from '@/app/auth/authStore';
+import { useAuthStore } from '../../stores/authStore';
 
 import { WarningAlert } from '../../components/WarningAlert';
 
@@ -26,7 +26,7 @@ export function SignInPage() {
 		event.preventDefault();
 		setIsLoading(true);
 
-		const result = await signIn('credentials', { email, password, redirect: false, cmd: 'sign-up' });
+		const result = await signIn('credentials', { email, password, redirect: false, cmd: 'sign-in' });
 
 		if (result?.error) {
 			console.error(result?.error);

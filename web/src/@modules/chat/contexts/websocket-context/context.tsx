@@ -7,6 +7,7 @@ import {
 	HubConnectionBuilder,
 	HubConnectionState,
 	LogLevel,
+	TransferFormat,
 } from '@microsoft/signalr';
 
 import { useAuth } from '@/contexts/auth-context/hook';
@@ -29,10 +30,10 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
 					accessTokenFactory: () => accessToken || '',
 					logMessageContent: true,
 					transport: HttpTransportType.WebSockets,
+					skipNegotiation: true,
 					withCredentials: true,
 				})
 				.configureLogging(LogLevel.Information)
-				.withAutomaticReconnect()
 				.build();
 		} else {
 			return null;
@@ -48,12 +49,11 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
 			connection.start().then(async () => {
 				console.log('Client connected to hub.');
 
-				connection?.invoke('OnSendTyping', { typing: true, conversationId: '', authorId: '' });
-				connection?.invoke('OnSendTyping', { typing: true, conversationId: '', authorId: '' });
-				connection?.invoke('OnSendTyping', { typing: true, conversationId: '', authorId: '' });
-				connection?.invoke('OnSendTyping', { typing: true, conversationId: '', authorId: '' });
-				connection?.invoke('OnSendTyping', { typing: true, conversationId: '', authorId: '' });
-				connection?.invoke('OnSendTyping', { typing: true, conversationId: '', authorId: '' });
+				connection?.invoke('OnSendTyping', {
+					typing: true,
+					conversationId: '',
+					authorId: '0203d03e-4b4b-4156-9e6a-03ff266e35cf',
+				});
 			});
 		}
 	}, [connection]);

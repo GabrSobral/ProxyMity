@@ -12,7 +12,7 @@ import { LoadingSpinning } from '@/@design-system/LoadingSpinning';
 import { WarningAlert } from '../../components/WarningAlert';
 import { StrongPasswordModal } from '../../components/StrongPasswordModal';
 
-import { useAuthStore } from '@/app/auth/authStore';
+import { useAuthStore } from '../../stores/authStore';
 
 export function SignUpPage() {
 	const router = useRouter();

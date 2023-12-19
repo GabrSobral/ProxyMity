@@ -4,7 +4,8 @@ import { useEffect, useState } from 'react';
 import { ArrowClockwise, Check, Copy, Eye, EyeClosed, Key, Warning } from '@phosphor-icons/react';
 
 import { Modal } from '@/@design-system/Modal';
-import { useAuthStore } from '@/app/auth/authStore';
+
+import { useAuthStore } from '../stores/authStore';
 
 interface Props {
 	isVisible: boolean;
@@ -50,6 +51,7 @@ export function StrongPasswordModal({ isVisible, closeModal }: Props) {
 	return (
 		<Modal show={isVisible} closeModal={closeModal} className="gap-3 max-w-[36rem]">
 			<Modal.Title>Generate a strong password</Modal.Title>
+
 			<Modal.Description className="break-words">
 				A strong and random password helps protect your online accounts and personal information from cyber threats
 			</Modal.Description>

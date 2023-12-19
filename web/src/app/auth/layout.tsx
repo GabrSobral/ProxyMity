@@ -5,10 +5,11 @@ import Image from 'next/image';
 import { ReactNode, Suspense } from 'react';
 import { usePathname } from 'next/navigation';
 import { AnimatePresence } from 'framer-motion';
+import { Laptop, Moon, Sun } from '@phosphor-icons/react';
+
+import { useTheme } from '@/contexts/theme-context/hook';
 
 import { LoadingSpinning } from '@/@design-system/LoadingSpinning';
-import { useTheme } from '@/contexts/theme-context/hook';
-import { Laptop, Moon, Sun } from '@phosphor-icons/react';
 
 export default function AuthenticationLayout({ children }: { children: ReactNode }) {
 	const pathname = usePathname();

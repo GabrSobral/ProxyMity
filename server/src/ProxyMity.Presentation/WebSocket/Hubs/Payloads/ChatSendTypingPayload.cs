@@ -1,7 +1,7 @@
 ﻿namespace ProxyMity.Presentation.WebSocket.Hubs.Payloads;
 
 public record ChatSendTypingPayload(
-    Boolean Typing,
+    bool Typing,
     Guid ConversationId,
     Guid AuthorId
 );

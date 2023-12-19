@@ -1,5 +1,6 @@
 ﻿global using FluentValidation;
 global using MediatR;
+global using MessagePack;
 global using Microsoft.AspNetCore.Authorization;
 global using Microsoft.AspNetCore.Builder;
 global using Microsoft.AspNetCore.Http;

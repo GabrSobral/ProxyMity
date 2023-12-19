@@ -23,7 +23,7 @@ public class PasswordEncrypter : IPasswordEncrypter
 
         using var argon2 = new Argon2i(password);
 
-        argon2.DegreeOfParallelism = Environment.ProcessorCount; // Threads number of server
+        argon2.DegreeOfParallelism = 32; // Threads number of server
         argon2.MemorySize = _memorySize;
         argon2.Iterations = _iterations;
         argon2.Salt = _salt;

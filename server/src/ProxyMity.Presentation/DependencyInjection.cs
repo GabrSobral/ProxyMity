@@ -1,4 +1,6 @@
-﻿namespace ProxyMity.Presentation;
+﻿using MessagePack;
+
+namespace ProxyMity.Presentation;
 
 public static class DependencyInjection
 {
