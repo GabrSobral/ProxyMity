@@ -1,4 +1,5 @@
-import { toBinary } from '@/utils/binary-parser';
+// import { toBinary } from '@/utils/binary-parser';
+import { HubConnection } from '@microsoft/signalr';
 
 interface ISendTypingWebSocketPayload {
 	typing: boolean;
@@ -6,6 +7,7 @@ interface ISendTypingWebSocketPayload {
 	authorId: string;
 }
 
-export function sendTypingWebSocketEvent(socket: WebSocket, payload: ISendTypingWebSocketPayload) {
-	socket.send(toBinary(JSON.stringify({ event: 'send_typing', payload })));
+export function sendTypingWebSocketEvent(connection: HubConnection, payload: ISendTypingWebSocketPayload) {
+	// socket.send(toBinary(JSON.stringify({ event: 'send_typing', payload })));
+	connection.invoke('sendTyping', payload);
 }

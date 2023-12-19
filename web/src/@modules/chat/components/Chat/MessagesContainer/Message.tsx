@@ -1,8 +1,8 @@
 import clsx from 'clsx';
 import Image from 'next/image';
-import { AnimatePresence, motion } from 'framer-motion';
-import { Clock, ShareFat } from '@phosphor-icons/react';
 import { Fragment, useEffect, useState } from 'react';
+import { Clock, ShareFat } from '@phosphor-icons/react';
+import { AnimatePresence, motion } from 'framer-motion';
 
 import { Message } from '@/types/message';
 
@@ -11,6 +11,7 @@ import { Events, ExtractPayloadType } from '../../../contexts/websocket-context/
 import { useChatsStore } from '../../../contexts/chat-context/stores/chat';
 
 import { changeMessageStatusAsyncDB } from '@/services/database/use-cases/change-message-status';
+import { useWebSocket } from '@/@modules/chat/contexts/websocket-context/hook';
 
 interface Props {
 	previousMessage?: Message;
@@ -21,6 +22,7 @@ const formatter = Intl.DateTimeFormat('pt-br', { hour: 'numeric', minute: 'numer
 
 export function Message({ message, previousMessage }: Props) {
 	const { user } = useAuth();
+	const { connection } = useWebSocket();
 	const { updateConversationMessageStatus, setReplyMessageFromConversation } = useChatsStore();
 	const [isMessageConfigVisible, setIsMessageConfigVisible] = useState(false);
 	const [status, setStatus] = useState<'sent' | 'received' | 'read' | 'wrote'>(() => {
@@ -65,18 +67,13 @@ export function Message({ message, previousMessage }: Props) {
 
 	//🟡 Receive the "read" message status from another user, and update it at state
 	useEffect(() => {
-		function handler(event: CustomEventInit<ExtractPayloadType<'receive_read_message', Events>>) {
-			const conversationId = event.detail?.conversationId || '';
-
+		connection.on('receiveReadMessage', ({ conversationId }: { conversationId: string }) => {
 			if (conversationId === message.conversationId && message.readByAllAt === null) {
-				console.log('@ws.receive_message_status', conversationId);
+				console.log('receiveMessageStatus', conversationId);
 				setStatus('read');
 			}
-		}
-
-		addEventListener('@ws.receive_read_message', handler);
-		return () => removeEventListener('@ws.receive_read_message', handler);
-	}, [message.conversationId, message.readByAllAt]);
+		});
+	}, [connection, message.conversationId, message.readByAllAt]);
 
 	return (
 		<motion.li

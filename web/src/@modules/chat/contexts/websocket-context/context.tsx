@@ -7,7 +7,6 @@ import {
 	HubConnectionBuilder,
 	HubConnectionState,
 	LogLevel,
-	TransferFormat,
 } from '@microsoft/signalr';
 
 import { useAuth } from '@/contexts/auth-context/hook';
@@ -15,7 +14,7 @@ import { useAuth } from '@/contexts/auth-context/hook';
 // import { eventsHandler } from './handler';
 
 interface WebSocketContextProps {
-	connection: HubConnection | null;
+	connection: HubConnection;
 }
 
 export const WebSocketContext = createContext({} as WebSocketContextProps);
@@ -41,46 +40,20 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
 	}, [accessToken]);
 
 	useEffect(() => {
-		if (
-			connection &&
-			connection?.state !== HubConnectionState.Connected &&
-			connection?.state !== HubConnectionState.Connecting
-		) {
-			connection.start().then(async () => {
-				console.log('Client connected to hub.');
-
-				connection.invoke('OnSendTyping', {
-					typing: true,
-					conversationId: '',
-					authorId: '0203d03e-4b4b-4156-9e6a-03ff266e35cf',
-				});
-			});
+		if (connection && connection?.state === HubConnectionState.Disconnected) {
+			connection.start().then(async () => console.log('Client connected to hub.'));
 		}
 	}, [connection]);
 
-	// useEffect(() => {
-	// 	socket.addEventListener('message', eventsHandler);
-	// 	return () => socket.removeEventListener('message', eventsHandler);
-	// }, [socket]);
-
-	// useEffect(() => {
-	// 	const handler = () => {
-	// 		if (socket && user?.id) {
-	// 			sendDisconnectionWebSocketEvent(socket, { id: user?.id || '' });
-	// 		}
-	// 	};
-
-	// 	socket.addEventListener('close', handler);
-	// 	return () => socket.removeEventListener('close', handler);
-	// }, [socket, user?.id]);
-
 	return (
-		<WebSocketContext.Provider
-			value={{
-				connection,
-			}}
-		>
-			{children}
-		</WebSocketContext.Provider>
+		connection && (
+			<WebSocketContext.Provider
+				value={{
+					connection,
+				}}
+			>
+				{children}
+			</WebSocketContext.Provider>
+		)
 	);
 }

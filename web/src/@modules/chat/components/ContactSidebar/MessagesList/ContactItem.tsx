@@ -10,6 +10,7 @@ import { UserImage } from '@/@design-system/UserImage';
 import { useAuth } from '@/contexts/auth-context/hook';
 import { useChat } from '../../../contexts/chat-context/hook';
 import { ConversationState, useChatsStore } from '../../../contexts/chat-context/stores/chat';
+import { useWebSocket } from '@/@modules/chat/contexts/websocket-context/hook';
 
 interface Props {
 	conversation: ConversationState;
@@ -21,6 +22,7 @@ const formatLastMessageDate = Intl.DateTimeFormat('pt-br', { hour: 'numeric', mi
 export const ContactItem = forwardRef(({ conversation, index }: Props, ref: ForwardedRef<HTMLLIElement>) => {
 	const [typing, setTyping] = useState(false);
 	const { user } = useAuth();
+	const { connection } = useWebSocket();
 	const { selectConversationAsync } = useChat();
 	const { selectedConversation } = useChatsStore();
 	const isSelectedContact = selectedConversation?.id === conversation.id;
@@ -32,17 +34,21 @@ export const ContactItem = forwardRef(({ conversation, index }: Props, ref: Forw
 	const lastMessage = conversation.messages?.at(-1);
 
 	useEffect(() => {
-		const eventHandler = (event: CustomEventInit<{ typing: boolean; authorId: string; conversationId: string }>) => {
-			const data = event.detail;
-
-			if (data?.conversationId === conversation.id) {
-				setTyping(data.typing);
+		const eventHandler = ({
+			typing,
+			conversationId,
+		}: {
+			typing: boolean;
+			authorId: string;
+			conversationId: string;
+		}) => {
+			if (conversationId === conversation.id) {
+				setTyping(typing);
 			}
 		};
 
-		addEventListener('@ws.receive_typing', eventHandler);
-		return () => removeEventListener('@ws.receive_typing', eventHandler);
-	}, [conversation.id]);
+		connection?.on('receveTyping', eventHandler);
+	}, [connection, conversation.id]);
 
 	return (
 		<motion.li

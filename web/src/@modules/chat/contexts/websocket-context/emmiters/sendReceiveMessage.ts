@@ -1,4 +1,5 @@
-import { toBinary } from '@/utils/binary-parser';
+// import { toBinary } from '@/utils/binary-parser';
+import { HubConnection } from '@microsoft/signalr';
 
 interface ISendTypingWebSocketPayload {
 	messageId: string;
@@ -7,6 +8,7 @@ interface ISendTypingWebSocketPayload {
 	isConversationGroup: boolean;
 }
 
-export function sendReceiveMessageWebSocketEvent(socket: WebSocket, payload: ISendTypingWebSocketPayload) {
-	socket.send(toBinary(JSON.stringify({ event: 'send_receive_message', payload })));
+export function sendReceiveMessageWebSocketEvent(connection: HubConnection, payload: ISendTypingWebSocketPayload) {
+	// socket.send(toBinary(JSON.stringify({ event: 'send_receive_message', payload })));
+	connection.invoke('sendReceiveMessage', payload);
 }

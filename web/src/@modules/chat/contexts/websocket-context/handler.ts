@@ -25,7 +25,7 @@ export async function eventsHandler(message: MessageEvent) {
 	const { event, payload } = JSON.parse(messageParsed) as Events;
 
 	const sentMessageEvent = new CustomEvent('@ws.sent_message', { detail: payload });
-	const receiveTypingEvent = new CustomEvent('@ws.receive_typing', { detail: payload });
+	const receiveTypingEvent = new CustomEvent('@ws.receive_typing', { detail: payload }); // x
 	const receiveMessageEvent = new CustomEvent('@ws.receive_message', { detail: payload });
 	const receiveReadMessageEvent = new CustomEvent('@ws.receive_read_message', { detail: payload });
 	const receiveMessageStatusEvent = new CustomEvent('@ws.receive_message_status', { detail: payload });

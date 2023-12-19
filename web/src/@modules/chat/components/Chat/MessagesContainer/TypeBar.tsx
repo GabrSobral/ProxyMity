@@ -25,7 +25,7 @@ import { useWebSocket } from '@/@modules/chat/contexts/websocket-context/hook';
 export function TypeBar() {
 	const { user } = useAuth();
 	const { typebarRef } = useChat();
-	const { socket } = useWebSocket();
+	const { connection } = useWebSocket();
 
 	const {
 		addMessage,
@@ -84,11 +84,15 @@ export function TypeBar() {
 			message,
 		});
 
-		sendMessageWebSocketEvent(socket, {
-			message: { ...message, readByAllAt: null, receivedByAllAt: null, sentAt: new Date() },
-			sender: user.id,
-			receiver: selectedConversation.id,
-		});
+		if (connection) {
+			sendMessageWebSocketEvent(connection, {
+				message: { ...message, readByAllAt: null, receivedByAllAt: null, sentAt: new Date() },
+				sender: user.id,
+				receiver: selectedConversation.id,
+			});
+		} else {
+			console.error('Connection not established!');
+		}
 
 		changeMessageStatusAsyncDB({ messageId: message.id, status: 'sent' });
 
@@ -101,18 +105,22 @@ export function TypeBar() {
 		type,
 		bringToTop,
 		addMessage,
-		socket,
+		connection,
 		saveTypeMessageFromConversation,
 		removeReplyMessageFromConversation,
 	]);
 
 	function typing(value: string) {
 		function handle(typing: boolean) {
-			sendTypingWebSocketEvent(socket, {
-				typing,
-				conversationId: selectedConversation?.id || '',
-				authorId: user?.id || '',
-			});
+			if (connection) {
+				sendTypingWebSocketEvent(connection, {
+					typing,
+					conversationId: selectedConversation?.id || '',
+					authorId: user?.id || '',
+				});
+			} else {
+				console.error('Connection not established!');
+			}
 		}
 
 		if (value && !type) {
