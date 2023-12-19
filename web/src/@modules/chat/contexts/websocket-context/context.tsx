@@ -49,7 +49,7 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
 			connection.start().then(async () => {
 				console.log('Client connected to hub.');
 
-				connection?.invoke('OnSendTyping', {
+				connection.invoke('OnSendTyping', {
 					typing: true,
 					conversationId: '',
 					authorId: '0203d03e-4b4b-4156-9e6a-03ff266e35cf',
