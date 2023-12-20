@@ -124,8 +124,8 @@ export const useChatsStore = create(
 						message => {
 							if (status === 'read' && message.conversationId !== conversationId) {
 								store.conversations[conversationIndex].notifications = 0;
-
 								message.readByAllAt = new Date();
+
 								return message;
 							}
 

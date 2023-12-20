@@ -39,14 +39,13 @@
 		</Button>
 	</div>
 
-	<ul class="flex flex-col gap-2 mt-4 overflow-auto rounded-[10px] h-full">
-		{#each [] as chat, index (chat.id)}
-			<ChatItem conversation={chat} {index} />
-		{/each}
-	</ul>
+	<div class="flex flex-col gap-2 mt-4 overflow-auto rounded-[10px] h-full" role="list">
+		<ChatItem />
+		<ChatItem />
+	</div>
 
 	<!-- <NewContactModal show={isNewContactModalOpened} closeModal={() => setIsNewContactModalOpened(false)} /> -->
-	m
+
 	<div
 		class="absolute bottom-0 left-0 h-16 w-full z-10 bg-gradient-to-t dark:from-gray-900 transition-all from-gray-200 pointer-events-none"
 	/>

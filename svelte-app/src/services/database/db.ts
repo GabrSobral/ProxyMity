@@ -1,8 +1,9 @@
-import Dexie, { Table } from 'dexie';
+import Dexie from 'dexie';
+import type { Table } from 'dexie';
 
-import { Conversation } from '../../types/conversation';
-import { Message } from '../../types/message';
-import { User } from '../../types/user';
+import type { User } from '../../types/user';
+import type { Message } from '../../types/message';
+import type { Conversation } from '../../types/conversation';
 
 export class DexieDatabase extends Dexie {
 	conversations!: Table<Conversation>;
@@ -34,12 +35,12 @@ export class DexieDatabase extends Dexie {
 				isGroup,
 				order,
 
-        createdAt,
+        		createdAt,
 				disabledAt,
 				groupName,
 				groupDescription,
 				participants
-      `,
+      		`,
 			messages: `
 				++dbId,
 				id,

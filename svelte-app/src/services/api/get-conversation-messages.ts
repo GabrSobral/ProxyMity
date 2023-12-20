@@ -1,10 +1,5 @@
-import axios from 'axios';
-
+import { api } from './config';
 import type { Message } from '../../types/message';
-
-const api = axios.create({
-	baseURL: process.env.NEXT_PUBLIC_HTTP_API_DOMAIN,
-});
 
 interface Request {
 	conversationId: string;

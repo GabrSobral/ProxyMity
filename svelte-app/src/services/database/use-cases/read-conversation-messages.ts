@@ -1,5 +1,4 @@
-import { Conversation } from '@/types/conversation';
-import { database } from '../db';
+import type { Conversation } from '../../../types/conversation';
 
 interface ReadContactMessagesParams {
 	conversationId: Conversation['id'];

@@ -1,12 +1,8 @@
-import axios from 'axios';
+import { api } from './config';
 
 import type { Message } from '../../types/message';
 import type { Conversation } from '../../types/conversation';
 import type { IServiceOptions } from '../../types/utils/IServiceOptions';
-
-const api = axios.create({
-	baseURL: process.env.NEXT_PUBLIC_HTTP_API_DOMAIN,
-});
 
 interface Request {
 	id: string;

@@ -1,10 +1,11 @@
 <script lang="ts">
+	import { chatDispatch } from '$lib/modules/chat/contexts/chat-context/stores/chat';
 	import clsx from 'clsx';
 	import { User } from 'phosphor-svelte';
 	import { twMerge } from 'tailwind-merge';
 
-	export let index: number;
-	export let conversation: any;
+	let index: number;
+	let conversation: any = {};
 
 	let typing = false;
 	$: isTyping = typing;
@@ -15,8 +16,11 @@
 </script>
 
 <!-- svelte-ignore a11y-click-events-have-key-events -->
-<li
+<div
+	role="button"
+	tabindex="0"
 	class="w-full relative py-2 px-3 rounded-xl flex gap-4 cursor-pointer hover:opacity-90 group dark:bg-gray-900 bg-white transition-all shadow-md"
+	on:click={() => chatDispatch.selectConversation(conversation)}
 >
 	<div
 		class={`${
@@ -25,9 +29,9 @@
 	/>
 	<div class="relative min-w-[46px] min-h-[46px] max-w-[46px] max-h-[46px]">
 		<div
-			class="min-w-[46px] min-h-[46px] max-w-[46px] max-h-[46px] rounded-full z-0 shadow-xl flex items-center justify-center bg-gray-700"
+			class="min-w-[46px] min-h-[46px] max-w-[46px] max-h-[46px] rounded-full z-0 shadow-xl flex items-center justify-center dark:bg-gray-700 bg-white transition-colors"
 		>
-			<User size={24} class="text-white" />
+			<User size={24} class="dark:text-white text-gray-700 transition-colors" />
 		</div>
 	</div>
 
@@ -82,4 +86,4 @@
             )} -->
 		</div>
 	</div>
-</li>
+</div>

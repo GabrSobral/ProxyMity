@@ -46,6 +46,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
 		selectConversation,
 	} = useChatsStore();
 
+	console.log({ userId: user?.id, accessToken });
 	useEffect(() => {
 		if (!user?.id || !accessToken) return;
 
@@ -71,144 +72,147 @@ export function ChatProvider({ children }: { children: ReactNode }) {
 			});
 	}, [user?.id, setConversationInitialState, accessToken]);
 
-	//🟡 Receive a message from another user, and store it at state and IndexedDB
-	useEffect(() => {
-		function handler(e: CustomEventInit<ExtractPayloadType<'receive_message', Events>>) {
-			const message = e.detail?.message;
+	// //🟡 Receive a message from another user, and store it at state and IndexedDB
+	// useEffect(() => {
+	// 	function handler(e: CustomEventInit<ExtractPayloadType<'receive_message', Events>>) {
+	// 		const message = e.detail?.message;
 
-			if (!message || !user) {
-				return;
-			}
+	// 		if (!message || !user) {
+	// 			return;
+	// 		}
 
-			if (selectedConversation?.id === message.conversationId) {
-				sendReceiveMessageWebSocketEvent(connection, {
-					userId: user.id,
-					conversationId: message.conversationId,
-					messageId: message.id,
-					isConversationGroup: selectedConversation.isGroup,
-				});
-				sendReadMessageWebSocketEvent(connection, {
-					userId: user.id,
-					conversationId: selectedConversation.id,
-					isConversationGroup: selectedConversation.isGroup,
-				});
-			} else {
-				const messageConversation = conversations.find(item => item.id === message.conversationId);
+	// 		if (selectedConversation?.id === message.conversationId) {
+	// 			sendReceiveMessageWebSocketEvent(connection, {
+	// 				userId: user.id,
+	// 				conversationId: message.conversationId,
+	// 				messageId: message.id,
+	// 				isConversationGroup: selectedConversation.isGroup,
+	// 			});
 
-				if (messageConversation)
-					sendReceiveMessageWebSocketEvent(connection, {
-						userId: user.id,
-						conversationId: message.conversationId,
-						messageId: message.id,
-						isConversationGroup: messageConversation?.isGroup,
-					});
-			}
+	// 			sendReadMessageWebSocketEvent(connection, {
+	// 				userId: user.id,
+	// 				conversationId: selectedConversation.id,
+	// 				isConversationGroup: selectedConversation.isGroup,
+	// 			});
+	// 		} else {
+	// 			const messageConversation = conversations.find(item => item.id === message.conversationId);
 
-			const payload: Message = {
-				...message,
-				receivedByAllAt: new Date(),
-				readByAllAt: selectedConversation?.id === message.authorId ? new Date() : null,
-			};
+	// 			if (messageConversation)
+	// 				sendReceiveMessageWebSocketEvent(connection, {
+	// 					userId: user.id,
+	// 					conversationId: message.conversationId,
+	// 					messageId: message.id,
+	// 					isConversationGroup: messageConversation?.isGroup,
+	// 				});
+	// 		}
 
-			const shouldNotification = selectedConversation?.id !== message.authorId;
+	// 		const payload: Message = {
+	// 			...message,
+	// 			receivedByAllAt: new Date(),
+	// 			readByAllAt: selectedConversation?.id === message.authorId ? new Date() : null,
+	// 		};
 
-			addMessageAsyncDB(payload);
-			addMessage({ conversationId: message.conversationId, message: payload, shouldNotification });
-			bringToTop(message.authorId);
-		}
+	// 		const shouldNotification = selectedConversation?.id !== message.authorId;
 
-		addEventListener('@ws.receive_message', handler);
-		return () => removeEventListener('@ws.receive_message', handler);
-	}, [
-		selectedConversation?.id,
-		selectedConversation?.isGroup,
-		connection,
-		user,
-		addMessage,
-		bringToTop,
-		conversations,
-	]);
+	// 		addMessageAsyncDB(payload);
+	// 		addMessage({ conversationId: message.conversationId, message: payload, shouldNotification });
+	// 		bringToTop(message.authorId);
+	// 	}
 
-	//🟡 Receive the "read" message status from another user, and update it at state and IndexedDB
-	useEffect(() => {
-		function handler(event: CustomEventInit<ExtractPayloadType<'receive_read_message', Events>>) {
-			if (!user?.id) return;
+	// 	addEventListener('@ws.receive_message', handler);
+	// 	return () => removeEventListener('@ws.receive_message', handler);
+	// }, [
+	// 	selectedConversation?.id,
+	// 	selectedConversation?.isGroup,
+	// 	connection,
+	// 	user,
+	// 	addMessage,
+	// 	bringToTop,
+	// 	conversations,
+	// ]);
 
-			const conversationId = event.detail?.conversationId || '';
+	// //🟡 Receive the "read" message status from another user, and update it at state and IndexedDB
+	// useEffect(() => {
+	// 	function handler(event: CustomEventInit<ExtractPayloadType<'receive_read_message', Events>>) {
+	// 		if (!user?.id) return;
 
-			updateConversationMessageStatus({ conversationId, status: 'read' });
-			// readConversationMessagesAsyncDB({ contactId: conversationId, userId: user.id, itsMe: false });
-		}
+	// 		const conversationId = event.detail?.conversationId || '';
 
-		addEventListener('@ws.receive_read_message', handler);
-		return () => removeEventListener('@ws.receive_read_message', handler);
-	}, [user?.id, updateConversationMessageStatus]);
+	// 		updateConversationMessageStatus({ conversationId, status: 'read' });
+	// 		// readConversationMessagesAsyncDB({ contactId: conversationId, userId: user.id, itsMe: false });
+	// 	}
 
-	//🟡 Receive a message that has the status changed, and update it on react state and IndexedDB
-	useEffect(() => {
-		function handler(event: CustomEventInit<ExtractPayloadType<'receive_message_status', Events>>) {
-			if (event.detail) {
-				const { messageId } = event.detail;
-				const messageStatusEvent = new CustomEvent(messageId, { detail: event.detail });
+	// 	addEventListener('@ws.receive_read_message', handler);
+	// 	return () => removeEventListener('@ws.receive_read_message', handler);
+	// }, [user?.id, updateConversationMessageStatus]);
 
-				dispatchEvent(messageStatusEvent);
-			}
-		}
+	// //🟡 Receive a message that has the status changed, and update it on react state and IndexedDB
+	// useEffect(() => {
+	// 	function handler(event: CustomEventInit<ExtractPayloadType<'receive_message_status', Events>>) {
+	// 		if (event.detail) {
+	// 			const { messageId } = event.detail;
+	// 			const messageStatusEvent = new CustomEvent(messageId, { detail: event.detail });
 
-		addEventListener('@ws.receive_message_status', handler);
-		return () => removeEventListener('@ws.receive_message_status', handler);
-	}, [updateConversationMessageStatus]);
+	// 			dispatchEvent(messageStatusEvent);
+	// 		}
+	// 	}
 
-	const selectConversationAsync = useCallback(
-		async ({ conversation }: { conversation: ConversationState }) => {
-			if (conversation === selectedConversation || !user) return;
+	// 	addEventListener('@ws.receive_message_status', handler);
+	// 	return () => removeEventListener('@ws.receive_message_status', handler);
+	// }, [updateConversationMessageStatus]);
 
-			saveTypeMessageFromConversation({
-				conversationId: selectedConversation?.id || '',
-				typeMessage: typebarRef.current?.value || '',
-			});
+	// const selectConversationAsync = useCallback(
+	// 	async ({ conversation }: { conversation: ConversationState }) => {
+	// 		if (conversation === selectedConversation || !user) return;
 
-			selectConversation(conversation);
+	// 		saveTypeMessageFromConversation({
+	// 			conversationId: selectedConversation?.id || '',
+	// 			typeMessage: typebarRef.current?.value || '',
+	// 		});
 
-			if (!conversation.hasMessagesFetched) {
-				try {
-					const { messages } = await APIGetConversationMessages({ conversationId: conversation.id });
-					setConversationMessages({ conversationId: conversation.id, messages });
-				} catch (error) {
-					console.error('Error fetching conversations, data will be taken from the cache', error);
+	// 		selectConversation(conversation);
 
-					const messages = await getConversationsMessagesAsyncDB(conversation.id);
-					setConversationMessages({ conversationId: conversation.id, messages });
-				}
-			}
+	// 		if (!conversation.hasMessagesFetched) {
+	// 			try {
+	// 				const { messages } = await APIGetConversationMessages({ conversationId: conversation.id });
+	// 				setConversationMessages({ conversationId: conversation.id, messages });
+	// 			} catch (error) {
+	// 				console.error('Error fetching conversations, data will be taken from the cache', error);
 
-			updateConversationMessageStatus({ conversationId: conversation.id, status: 'read' });
-			readConversationMessagesAsyncDB({ conversationId: conversation.id, userId: user.id });
+	// 				const messages = await getConversationsMessagesAsyncDB(conversation.id);
+	// 				setConversationMessages({ conversationId: conversation.id, messages });
+	// 			}
+	// 		}
 
-			if (conversation.notifications > 0)
-				sendReadMessageWebSocketEvent(connection, {
-					userId: user.id,
-					conversationId: conversation.id,
-					isConversationGroup: conversation.isGroup,
-				});
-		},
-		[
-			selectedConversation,
-			user,
-			saveTypeMessageFromConversation,
-			selectConversation,
-			updateConversationMessageStatus,
-			connection,
-			setConversationMessages,
-		]
-	);
+	// 		updateConversationMessageStatus({ conversationId: conversation.id, status: 'read' });
+	// 		readConversationMessagesAsyncDB({ conversationId: conversation.id, userId: user.id });
+
+	// 		if (conversation.notifications > 0)
+	// 			sendReadMessageWebSocketEvent(connection, {
+	// 				userId: user.id,
+	// 				conversationId: conversation.id,
+	// 				isConversationGroup: conversation.isGroup,
+	// 			});
+	// 	},
+	// 	[
+	// 		selectedConversation,
+	// 		user,
+	// 		saveTypeMessageFromConversation,
+	// 		selectConversation,
+	// 		updateConversationMessageStatus,
+	// 		connection,
+	// 		setConversationMessages,
+	// 	]
+	// );
 
 	return (
 		<ChatContext.Provider
-			value={{
-				selectConversationAsync,
-				typebarRef,
-			}}
+			value={
+				{
+					// selectConversationAsync,
+					// typebarRef,
+				}
+			}
 		>
 			{children}
 		</ChatContext.Provider>

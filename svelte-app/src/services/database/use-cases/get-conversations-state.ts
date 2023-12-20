@@ -1,5 +1,5 @@
 import { database } from '../db';
-import { GetUserConversationsResponse } from '@/services/api/get-user-conversations';
+import type { GetUserConversationsResponse } from '../../api/get-user-conversations';
 
 export async function getConversationCacheAsyncDB({
 	userId,

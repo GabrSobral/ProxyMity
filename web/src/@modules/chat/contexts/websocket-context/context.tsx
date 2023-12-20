@@ -14,7 +14,7 @@ import { useAuth } from '@/contexts/auth-context/hook';
 // import { eventsHandler } from './handler';
 
 interface WebSocketContextProps {
-	connection: HubConnection;
+	connection: HubConnection | null;
 }
 
 export const WebSocketContext = createContext({} as WebSocketContextProps);
@@ -46,14 +46,12 @@ export function WebSocketProvider({ children }: { children: ReactNode }) {
 	}, [connection]);
 
 	return (
-		connection && (
-			<WebSocketContext.Provider
-				value={{
-					connection,
-				}}
-			>
-				{children}
-			</WebSocketContext.Provider>
-		)
+		<WebSocketContext.Provider
+			value={{
+				connection,
+			}}
+		>
+			{children}
+		</WebSocketContext.Provider>
 	);
 }

@@ -1,18 +1,17 @@
 <script>
-    import "../app.css";
+	import '../app.css';
 
-	import { setAppThemeContext } from "../contexts/theme/context";
+	import { setAppThemeContext } from '../contexts/theme/context';
 
-    import '@fontsource-variable/inter';
+	import '@fontsource-variable/inter';
 
-    setAppThemeContext();
+	setAppThemeContext();
 </script>
 
+<slot />
+
 <style>
-    :global(body) {
-        font-family: 'Inter', sans-serif;
-    }
+	:global(body) {
+		font-family: 'Inter Variable', sans-serif;
+	}
 </style>
-
-<slot /> 
-

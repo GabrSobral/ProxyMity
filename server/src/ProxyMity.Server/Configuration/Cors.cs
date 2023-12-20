@@ -11,7 +11,7 @@ public static class Cors
             options.AddDefaultPolicy(policy =>
             {
                 policy
-                    .WithOrigins("http://localhost:3000")
+                    .WithOrigins("http://localhost:*")
                     .AllowAnyMethod()
                     .AllowAnyHeader()
                     .AllowCredentials();
