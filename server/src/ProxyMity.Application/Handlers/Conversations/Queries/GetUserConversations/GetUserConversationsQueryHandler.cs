@@ -17,7 +17,7 @@ public sealed class GetUserConversationsQueryHandler(
 
         var conversationsThatUserParticipate = await participantRepository.GetConversationsByUserIdAsync(userId);
 
-        HashSet<GetUserConversationsResponse> conversations = [];
+        List<GetUserConversationsResponse> conversations = [];
 
         foreach (var conversation in conversationsThatUserParticipate)
         {
