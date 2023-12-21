@@ -1,29 +1,29 @@
 <script lang="ts">
-	import clsx from "clsx";
-	import { getContext } from "svelte";
-	import { twMerge } from "tailwind-merge";
-	import type { Writable } from "svelte/store";
-    
-	import type { InputContextProps } from "./InputGroup.svelte";
+	import clsx from 'clsx';
+	import { getContext } from 'svelte';
+	import { twMerge } from 'tailwind-merge';
+	import type { Writable } from 'svelte/store';
 
-    export let value = "";
-    export let className = ""
+	import type { InputContextProps } from './InputGroup.svelte';
 
-    const context = getContext<Writable<InputContextProps>>("@design-system:inputContext");
+	export let value = '';
+	export let className = '';
 
-    const inputId = $context.inputId;
-    const hasError = $context.hasError;
+	const context = getContext<Writable<InputContextProps>>('@design-system:inputContext');
+
+	const inputId = $context.inputId;
+	const hasError = $context.hasError;
 </script>
 
 <input
-    id={inputId}
-    bind:value
-    class={twMerge(
-        clsx(
-            'outline-none flex hover:ring-1 transition-all dark:ring-gray-700 ring-gray-300/30 rounded-[10px] dark:bg-gray-900 bg-white dark:text-gray-200 text-gray-700 focus:outline-purple-500 focus:ring-0 placeholder:text-gray-400 w-full p-4',
-            { 'border-red-500 dark:border-red-500': hasError }
-        ),
-        className
-    )}
-    {...$$restProps}
+	id={inputId}
+	bind:value
+	class={twMerge(
+		clsx(
+			'outline-none flex hover:ring-1 transition-all dark:ring-gray-700 ring-gray-300/30 rounded-[10px] dark:bg-gray-900 bg-white dark:text-gray-200 text-gray-700 focus:outline-purple-500 focus:ring-0 placeholder:text-gray-400 w-full p-4',
+			{ 'border-red-500 dark:border-red-500': hasError }
+		),
+		className
+	)}
+	{...$$restProps}
 />
