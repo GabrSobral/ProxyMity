@@ -20,7 +20,7 @@
 	bind:value
 	class={twMerge(
 		clsx(
-			'outline-none flex hover:ring-1 transition-all dark:ring-gray-700 ring-gray-300/30 rounded-[10px] dark:bg-gray-900 bg-white dark:text-gray-200 text-gray-700 focus:outline-purple-500 focus:ring-0 placeholder:text-gray-400 w-full p-4',
+			'outline-none flex hover:ring-1 transition-all dark:ring-gray-700 ring-gray-300/30 rounded-md dark:bg-gray-900 bg-white dark:text-gray-200 text-gray-700 focus:outline-purple-500 focus:ring-0 dark:placeholder:text-gray-400 placeholder:text-gray-600 w-full px-4 py-3',
 			{ 'border-red-500 dark:border-red-500': hasError }
 		),
 		className

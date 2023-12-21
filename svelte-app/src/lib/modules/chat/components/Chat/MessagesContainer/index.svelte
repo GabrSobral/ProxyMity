@@ -13,11 +13,10 @@
 				<Heading size="sm" className="opacity-80">No messages have been sent yet...</Heading>
 			</div>
 		{:else}
-			{#each conversationMessages as message (message.id)}
+			<!-- {#each conversationMessages as message (message.id)}
 				<Message {message} previousMessage={conversationMessages?.[i - 1]} />
-			{/each}
+			{/each} -->
 		{/if}
-		conversationMessages?.map((message, i) => ( ))
 	</ul>
 
 	<Typebar />

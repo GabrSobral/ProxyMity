@@ -5,6 +5,7 @@
 	import Heading from '$lib/design-system/Heading.svelte';
 
 	import ChatItem from './ChatItem.svelte';
+	import { chatState } from '$lib/modules/chat/contexts/chat-context/stores/chat';
 
 	let isNewContactModalOpened = false;
 
@@ -39,14 +40,16 @@
 		</Button>
 	</div>
 
-	<div class="flex flex-col gap-2 mt-4 overflow-auto rounded-[10px] h-full" role="list">
-		<ChatItem />
-		<ChatItem />
+	<div class="flex flex-col gap-[2px] mt-4 overflow-auto rounded-md h-full" role="list">
+		{#each $chatState.conversations as conversation (conversation.id)}
+			<ChatItem {conversation} />
+		{/each}
 	</div>
 
 	<!-- <NewContactModal show={isNewContactModalOpened} closeModal={() => setIsNewContactModalOpened(false)} /> -->
 
 	<div
+		aria-hidden="true"
 		class="absolute bottom-0 left-0 h-16 w-full z-10 bg-gradient-to-t dark:from-gray-900 transition-all from-gray-200 pointer-events-none"
 	/>
 </section>

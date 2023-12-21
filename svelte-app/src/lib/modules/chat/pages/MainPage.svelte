@@ -1,6 +1,7 @@
 <script lang="ts">
 	import Chat from '../components/Chat/index.svelte';
 	import ChatsSidebar from '../components/ChatsSidebar/index.svelte';
+	import ChatDetail from '../components/ChatDetails/index.svelte';
 
 	import { chatState } from '../contexts/chat-context/stores/chat';
 
@@ -14,5 +15,7 @@
 		<Chat />
 	{/if}
 
-	<!-- <ConversationDetail />  -->
+	{#if $chatState.showConversationDetail}
+		<ChatDetail />
+	{/if}
 </main>

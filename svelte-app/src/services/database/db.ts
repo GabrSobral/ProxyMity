@@ -36,7 +36,6 @@ export class DexieDatabase extends Dexie {
 				order,
 
         		createdAt,
-				disabledAt,
 				groupName,
 				groupDescription,
 				participants

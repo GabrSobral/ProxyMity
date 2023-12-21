@@ -62,7 +62,7 @@
 			<img src="/Logo.svg" alt="ProxyMity Logo" width={170} height={170} class="absolute -top-[5rem]" />
 		</header>
 
-		<div class="flex w-full dark:bg-gray-900 bg-gray-300/40 relative rounded-full shadow-inner transition-colors">
+		<div class="flex w-full dark:bg-gray-900 bg-gray-200/20 relative rounded-full shadow-inner transition-colors">
 			<div
 				data-signin={isSignInPage}
 				data-signup={!isSignInPage}

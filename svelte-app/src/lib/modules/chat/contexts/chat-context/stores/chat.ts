@@ -109,7 +109,11 @@ export const chatDispatch: Actions = {
 		chatState.update(store => {
 			conversationsData.forEach(conversation => {
 				store.conversations.push({
-					...conversation,
+					id: conversation.conversation.id,
+					createdAt: conversation.conversation.createdAt,
+					groupDescription: conversation.conversation.groupDescription,
+					groupName: conversation.conversation.groupName,
+					isGroup: !!conversation.conversation.groupId,
 					messages: conversation.lastMessages,
 					notifications: conversation.unreadMessagesCount,
 					participants: conversation.participants.filter(item => item.id !== userId),

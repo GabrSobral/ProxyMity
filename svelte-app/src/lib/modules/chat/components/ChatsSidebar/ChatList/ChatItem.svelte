@@ -1,16 +1,24 @@
 <script lang="ts">
-	import { chatDispatch } from '$lib/modules/chat/contexts/chat-context/stores/chat';
 	import clsx from 'clsx';
 	import { User } from 'phosphor-svelte';
+	import { page } from '$app/stores';
 	import { twMerge } from 'tailwind-merge';
 
-	let index: number;
-	let conversation: any = {};
+	import { chatDispatch, chatState } from '$lib/modules/chat/contexts/chat-context/stores/chat';
+	import type { ConversationState } from '$lib/modules/chat/contexts/chat-context/stores/chat-store-types';
+
+	$: user = $page.data.session?.user;
+	$: lastMessage = conversation.messages?.at(-1);
+	$: isSelectedContact = $chatState.selectedConversation?.id === conversation.id;
+
+	export let conversation: ConversationState;
+
+	$: console.log({ isSelectedContact, selectedConversation: $chatState.selectedConversation, conversation });
+
+	const conversationName =
+		conversation?.groupName || conversation?.participants.find(item => item.id !== user?.id)?.name || '';
 
 	let typing = false;
-	$: isTyping = typing;
-
-	let isSelectedContact = true;
 
 	const formatLastMessageDate = Intl.DateTimeFormat('pt-br', { hour: 'numeric', minute: 'numeric' });
 </script>
@@ -19,30 +27,34 @@
 <div
 	role="button"
 	tabindex="0"
-	class="w-full relative py-2 px-3 rounded-xl flex gap-4 cursor-pointer hover:opacity-90 group dark:bg-gray-900 bg-white transition-all shadow-md"
+	class="w-full hover:dark:border-gray-700 hover:border-gray-100 border-[1px] dark:border-gray-900 border-white relative py-2 px-3 rounded-md flex gap-4 cursor-pointer hover:opacity-90 group dark:bg-gray-900 bg-white transition-all shadow-md"
 	on:click={() => chatDispatch.selectConversation(conversation)}
 >
 	<div
 		class={`${
 			isSelectedContact ? 'w-full left-0 opacity-100' : 'w-0 left-2/4 opacity-10'
-		} absolute h-full gradient transition-all rounded-xl top-0 z-0 duration-[0.3s] mx-auto`}
+		} absolute h-full gradient transition-all rounded-md top-0 z-0 duration-[0.3s] mx-auto`}
 	/>
-	<div class="relative min-w-[46px] min-h-[46px] max-w-[46px] max-h-[46px]">
+
+	<div class="relative min-w-[40px] min-h-[40px] max-w-[40px] max-h-[40px]">
 		<div
-			class="min-w-[46px] min-h-[46px] max-w-[46px] max-h-[46px] rounded-full z-0 shadow-xl flex items-center justify-center dark:bg-gray-700 bg-white transition-colors"
+			class="min-w-[40px] min-h-[40px] max-w-[40px] max-h-[40px] rounded-full z-0 shadow-xl flex items-center justify-center dark:bg-gray-700 bg-white transition-colors"
 		>
-			<User size={24} class="dark:text-white text-gray-700 transition-colors" />
+			<User size={20} class="dark:text-white text-gray-700 transition-colors" />
 		</div>
 	</div>
 
-	<div class={'flex flex-col gap-1 overflow-hidden w-full z-10'}>
+	<div class={'flex flex-col overflow-hidden w-full z-10'}>
 		<span
 			class={`${
 				isSelectedContact ? 'text-white' : 'text-gray-700 dark:text-gray-200'
 			} truncate font-medium flex items-center justify-between gap-3 `}
 		>
-			Conversation Name
-			<!-- {conversationName} {conversation.id === user?.id && '(You)'} -->
+			{conversationName}
+			{#if conversation.id === user?.id}
+				(You)
+			{/if}
+
 			<span
 				class="text-[12px] dark:text-gray-200 transition-colors text-gray-700 ml-auto data-[is-selected=true]:text-gray-100"
 				data-is-selected={isSelectedContact}
@@ -59,31 +71,21 @@
 				})
 			)}
 		>
-			{#if isTyping}
+			{#if typing}
 				<span>Typing...</span>
-			{:else if false}
+			{:else if lastMessage}
 				<span>Last message here.</span>
 			{:else}
 				<span>Start the conversation...</span>
 			{/if}
-			<!-- 
-            {typing ? (
-                <PulseLoader
-                    color={isSelectedContact ? '#FFFFFF' : tailwindColors.purple['500']}
-                    size={8}
-                    title="Typing..."
-                />
-            ) : lastMessage ? (
-                lastMessage.content
-            ) : (
-                <span>Start the conversation...</span>
-            )} -->
 
-			<!-- {conversation.notifications > 0 && (
-                <span class="rounded-full bg-purple-500 w-5 h-5 ml-auto flex items-center justify-center text-[12px] text-white font-medium animate-pulse z-10">
-                    {conversation.notifications}
-                </span>
-            )} -->
+			{#if conversation.notifications > 0}
+				<span
+					class="rounded-full bg-purple-500 w-5 h-5 ml-auto flex items-center justify-center text-[12px] text-white font-medium animate-pulse z-10"
+				>
+					{conversation.notifications}
+				</span>
+			{/if}
 		</div>
 	</div>
 </div>

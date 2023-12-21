@@ -1,5 +1,5 @@
-import { Conversation } from './conversation';
-import { User } from './user';
+import type { User } from './user';
+import type { Conversation } from './conversation';
 
 export interface Message {
 	dbId?: number;
