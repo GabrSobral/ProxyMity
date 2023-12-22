@@ -5,6 +5,8 @@
 	import Heading from '$lib/design-system/Heading.svelte';
 
 	import ChatItem from './ChatItem.svelte';
+	import NewChatModal from '../NewChatModal/index.svelte';
+
 	import { chatState } from '$lib/modules/chat/contexts/chat-context/stores/chat';
 
 	let isNewContactModalOpened = false;
@@ -46,7 +48,12 @@
 		{/each}
 	</div>
 
-	<!-- <NewContactModal show={isNewContactModalOpened} closeModal={() => setIsNewContactModalOpened(false)} /> -->
+	<NewChatModal
+		show={isNewContactModalOpened}
+		closeModal={() => {
+			isNewContactModalOpened = false;
+		}}
+	/>
 
 	<div
 		aria-hidden="true"

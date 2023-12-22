@@ -1,3 +1,4 @@
+import { AUTH_SECRET } from "$env/static/private"
 import Credentials from '@auth/sveltekit/providers/credentials';
 import { SvelteKitAuth, type SvelteKitAuthConfig } from '@auth/sveltekit';
 
@@ -7,6 +8,8 @@ import { signInAsync } from '$lib/modules/authentication/services/signInAsync';
 import type { User } from './types/user';
 
 export const authOptions: SvelteKitAuthConfig = {
+	secret: AUTH_SECRET,
+	trustHost: true,
 	pages: {
 		signIn: '/auth/sign-in',
 		newUser: '/auth/sign-up',
@@ -23,11 +26,8 @@ export const authOptions: SvelteKitAuthConfig = {
 			},
 
 			async authorize(credentials): Promise<any> {
-				if (!credentials) {
+				if (!credentials)
 					return { error: 'Credentials not provided' };
-				}
-
-				console.log(credentials);
 
 				const { command } = credentials;
 
@@ -35,25 +35,19 @@ export const authOptions: SvelteKitAuthConfig = {
 					const { email, password } = credentials as { email: string; password: string };
 
 					try {
-						const response = await signInAsync({ email, password });
-						console.log({ response });
-
-						return response;
+						return await signInAsync({ email, password });;
 					} catch (error: any) {
 						console.error({ error: error?.response?.data });
-						return { error };
+						return { error: error?.response?.data };
 					}
 				} else {
 					const { name, email, password } = credentials as { email: string; password: string; name: string };
 
 					try {
-						const response = await signUpAsync({ name, email, password });
-						console.log({ response });
-
-						return response;
+						return await signUpAsync({ name, email, password });;
 					} catch (error: any) {
 						console.error({ error: error?.response?.data });
-						return { error };
+						return { error: error?.response?.data };
 					}
 				}
 			},
