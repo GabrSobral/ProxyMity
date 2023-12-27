@@ -1,9 +1,7 @@
 ﻿namespace ProxyMity.Infra.Database.Repositories;
 
-public class MessageRepository : TRepository<MessageRepository>, IMessageRepository
+public class MessageRepository(DbSession session) : TRepository<MessageRepository>(session), IMessageRepository
 {
-    public MessageRepository(DbSession session) : base(session) { }
-
     public async Task CreateAsync(Message message)
     {
         const string sql = """
@@ -108,17 +106,17 @@ public class MessageRepository : TRepository<MessageRepository>, IMessageReposit
         string sql = status switch
         {
             EMessageStatuses.READ => """
-                UPDATE FROM "message"
+                UPDATE "message"
                 SET "read_by_all_at" = @currentTime
                 WHERE "id" = @messageId
             """,
             EMessageStatuses.SENT => """
-                UPDATE FROM "message"
+                UPDATE "message"
                 SET "sent_at" = @currentTime
                 WHERE "id" = @messageId
             """,
             EMessageStatuses.RECEIVED => """
-                UPDATE FROM "message"
+                UPDATE "message"
                 SET "received_by_all_at" = @currentTime
                 WHERE "id" = @messageId
             """,
