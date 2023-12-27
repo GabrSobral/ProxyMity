@@ -21,7 +21,7 @@ public sealed class ChatHub(
         var userConversations = await sender.Send(getUserConversationsQuery);
 
         foreach (var item in userConversations)
-            await Groups.AddToGroupAsync(Context.UserIdentifier!, item.Conversation.Id.ToString());
+            await Groups.AddToGroupAsync(Context.ConnectionId!, item.Conversation.Id.ToString());
     }
 
     /// <summary>
@@ -98,8 +98,8 @@ public sealed class ChatHub(
     /// <param name="payload">Typing status, and data to identify the conversation.</param>
     public async Task OnSendTyping(ChatSendTypingPayload payload)
     {
-        logger.LogInformation($"OnSendTyping: {payload.Typing}, ");
         var hubGroupId = payload.ConversationId.ToString();
+        logger.LogInformation($"OnSendTyping: {payload.Typing}, {hubGroupId}, {payload.AuthorId}");
 
         await Clients.OthersInGroup(hubGroupId)
             .ReceiveTyping(payload.Typing, payload.AuthorId, payload.ConversationId);
