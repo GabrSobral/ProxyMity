@@ -7,14 +7,14 @@ public static class DependenyInjection
         services.AddScoped<DbSession>();
         services.AddScoped<MigrationManager>();
 
-        services.AddTransient<IUnitOfWork, UnitOfWork>();
+        services.AddScoped<IUnitOfWork, UnitOfWork>();
 
-        services.AddTransient<IUserRepository, UserRepository>();
-        services.AddTransient<IGroupRepository, GroupRepository>();
-        services.AddTransient<IMessageRepository, MessageRepository>();
-        services.AddTransient<IParticipantRepository, ParticipantRepository>();
-        services.AddTransient<IConversationRepository, ConversationRepository>();
-        services.AddTransient<IMessageStatusRepository, MessageStatusRepository>();
+        services.AddScoped<IUserRepository, UserRepository>();
+        services.AddScoped<IGroupRepository, GroupRepository>();
+        services.AddScoped<IMessageRepository, MessageRepository>();
+        services.AddScoped<IParticipantRepository, ParticipantRepository>();
+        services.AddScoped<IConversationRepository, ConversationRepository>();
+        services.AddScoped<IMessageStatusRepository, MessageStatusRepository>();
 
         return services;
     }
