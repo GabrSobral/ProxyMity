@@ -1,13 +1,48 @@
-<script>
-	import Button from '$lib/design-system/Button.svelte';
-	import InputGroup from '$lib/design-system/Input/InputGroup.svelte';
+<script lang="ts">
+	import { onMount } from 'svelte';
+	import { page } from '$app/stores';
 	import { PaperPlaneTilt, X } from 'phosphor-svelte';
 
-	let selectedConversation = {};
+	import Button from '$lib/design-system/Button.svelte';
+	import InputGroup from '$lib/design-system/Input/InputGroup.svelte';
+
+	import { chatState } from '$lib/modules/chat/contexts/chat-context/stores/chat';
+	import { connection } from '$lib/modules/chat/contexts/websocket-context/stores/connection';
+	import { sendTypingWebSocketEvent } from '$lib/modules/chat/contexts/websocket-context/emmiters/sendTyping';
 
 	let typeValue = '';
+	let typeValueManaged = '';
+	let input: HTMLInputElement;
+
+	$: user = $page.data.session?.user;
 
 	async function sendMessage() {}
+
+	function handleSpreadTypingStatusToConversation(typing: boolean) {
+		if ($connection) {
+			sendTypingWebSocketEvent($connection, {
+				typing,
+				conversationId: $chatState.selectedConversation?.id || '',
+				authorId: user?.id || '',
+			});
+		} else {
+			console.error('Connection not established!');
+		}
+	}
+
+	onMount(() => {
+		input?.addEventListener('input', (e: any) => {
+			const value = e.target.value as string;
+
+			if (value && !typeValueManaged) {
+				handleSpreadTypingStatusToConversation(true);
+			} else if (!value && typeValueManaged) {
+				handleSpreadTypingStatusToConversation(false);
+			}
+
+			typeValueManaged = typeValue;
+		});
+	});
 </script>
 
 <div class="flex flex-col gap-2 m-1 mt-auto">
@@ -27,16 +62,16 @@
 		</button>
 	</div>
 
-	<InputGroup let:Input let:Label let:Wrapper className="flex w-full">
+	<InputGroup let:Label let:Wrapper className="flex w-full">
 		<Label className="sr-only">Type a message</Label>
 
 		<Wrapper className="w-full h-fit">
-			<Input
+			<input
+				bind:this={input}
 				type="text"
-				className="max-h-[20rem] min-h-[3.5rem] resize-none flex flex-1 py-3 focus:outline-none"
+				class="max-h-[20rem] min-h-[3.5rem] resize-none flex flex-1 py-3 focus:outline-none outline-none hover:ring-1 transition-all dark:ring-gray-700 ring-gray-100 rounded-md dark:bg-gray-900 bg-white dark:text-gray-200 text-gray-700 focus:outline-purple-500 focus:ring-0 dark:placeholder:text-gray-400 placeholder:text-gray-600 w-full px-4"
 				placeholder="Type your message"
 				bind:value={typeValue}
-				autoFocus
 				autoComplete="off"
 			/>
 

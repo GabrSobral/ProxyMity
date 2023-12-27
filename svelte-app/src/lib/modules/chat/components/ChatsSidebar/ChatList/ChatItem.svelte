@@ -4,12 +4,19 @@
 	import { page } from '$app/stores';
 	import { twMerge } from 'tailwind-merge';
 
+	import { connection } from '$lib/modules/chat/contexts/websocket-context/stores/connection';
 	import { chatDispatch, chatState } from '$lib/modules/chat/contexts/chat-context/stores/chat';
 	import type { ConversationState } from '$lib/modules/chat/contexts/chat-context/stores/chat-store-types';
 
 	$: user = $page.data.session?.user;
 	$: lastMessage = conversation.messages?.at(-1);
 	$: isSelectedContact = $chatState.selectedConversation?.id === conversation.id;
+
+	$connection?.on('receiveTyping', (typingWs, authorId, conversationId) => {
+		if (conversationId === conversation.id) {
+			typing = typingWs;
+		}
+	});
 
 	export let conversation: ConversationState;
 
