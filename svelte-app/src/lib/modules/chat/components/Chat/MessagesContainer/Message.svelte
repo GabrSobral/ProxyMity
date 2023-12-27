@@ -1,13 +1,60 @@
-<script>
+<script lang="ts">
 	import clsx from 'clsx';
-	import { Clock } from 'phosphor-svelte';
+	import { onMount } from 'svelte';
+	import { page } from '$app/stores';
+	import { Clock, ShareFat } from 'phosphor-svelte';
 
-	let isMine = false;
+	import type { Message } from '../../../../../../types/message';
+	import { connection } from '$lib/modules/chat/contexts/websocket-context/stores/connection';
+
+	export let message: Message;
+	export let previousMessage: Message;
+
+	let isMessageConfigVisible = false;
+	let status: 'sent' | 'received' | 'read' | 'wrote' = (() => {
+		if (message.readByAllAt !== null) return 'read';
+		if (message.receivedByAllAt !== null) return 'received';
+		if (message.sentAt !== null) return 'sent';
+
+		return 'wrote';
+	})();
+
+	$: user = $page.data.session?.user;
+
+	const formatter = Intl.DateTimeFormat('pt-br', { hour: 'numeric', minute: 'numeric' });
+
+	const selectTimeToShow = (isMine: boolean, message: Message) =>
+		isMine
+			? formatter.format(new Date(message.writtenAt))
+			: message.receivedByAllAt && new Date(message.receivedByAllAt) !== null
+				? formatter.format(new Date(message.receivedByAllAt))
+				: null;
+
+	const isMine = message.authorId === user?.id;
+	const previousIsFromUser = previousMessage?.authorId === message.authorId;
+
+	const timeToShow = selectTimeToShow(isMine, message);
+
+	onMount(() => {
+		$connection?.on(
+			'receiveReadMessage',
+			(status: 'received' | 'read' | 'sent', messageId: string, conversationId: string) => {
+				if (conversationId === message.conversationId && message.readByAllAt === null) {
+					console.log('receiveMessageStatus', conversationId);
+					status = 'read';
+				}
+			}
+		);
+	});
 </script>
 
 <li
-	on:mouseover={() => setIsMessageConfigVisible(true)}
-	on:mouseout={() => setIsMessageConfigVisible(false)}
+	on:mouseover={() => {
+		isMessageConfigVisible = true;
+	}}
+	on:mouseout={() => {
+		isMessageConfigVisible = false;
+	}}
 	class="flex flex-col gap-1 rounded-[1rem] w-full"
 >
 	<div
@@ -18,14 +65,16 @@
 			}
 		)}
 	>
-		<img
-			src="https://github.com/diego3g.png"
-			alt="User Photo"
-			width={30}
-			height={30}
-			class="min-w-[30px] min-h-[30px] rounded-full z-0 shadow-xl"
-		/>
-		<span class="dark:text-gray-200 text-gray-700 transition-colors text-xs">Diego</span>
+		{#if isMine && !previousIsFromUser}
+			<img
+				src="https://github.com/diego3g.png"
+				alt="User Photo"
+				width={30}
+				height={30}
+				class="min-w-[30px] min-h-[30px] rounded-full z-0 shadow-xl"
+			/>
+			<span class="dark:text-gray-200 text-gray-700 transition-colors text-xs">Diego</span>
+		{/if}
 
 		<span class="dark:text-gray-300 text-gray-700 transition-colors text-xs ml-2 flex items-center gap-2">
 			{#if isMine && status === 'wrote'}
@@ -68,11 +117,10 @@
 			<p class="p-1">{message.content}</p>
 		</div>
 
-		<button
-			class="p-2 bg-gray-700 shadow-lg z-10 rounded-full"
-			onClick={() => setReplyMessageFromConversation({ conversationId: message.conversationId, message })}
-		>
-			<ShareFat size={16} color="white" weight="fill" />
-		</button>
+		{#if isMessageConfigVisible}
+			<button class="p-2 bg-gray-700 shadow-lg z-10 rounded-full">
+				<ShareFat size={16} color="white" weight="fill" />
+			</button>
+		{/if}
 	</div>
 </li>

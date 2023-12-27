@@ -19,6 +19,8 @@
 
 	$: session = $page.data.session;
 
+	$: console.log({ state: $chatState });
+
 	onMount(() => {
 		if (session?.user && session?.accessToken) {
 			const user = session?.user;

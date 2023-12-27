@@ -6,9 +6,15 @@
 	import Button from '$lib/design-system/Button.svelte';
 	import InputGroup from '$lib/design-system/Input/InputGroup.svelte';
 
-	import { chatState } from '$lib/modules/chat/contexts/chat-context/stores/chat';
 	import { connection } from '$lib/modules/chat/contexts/websocket-context/stores/connection';
+	import { chatDispatch, chatState } from '$lib/modules/chat/contexts/chat-context/stores/chat';
 	import { sendTypingWebSocketEvent } from '$lib/modules/chat/contexts/websocket-context/emmiters/sendTyping';
+	import { sendMessageWebSocketEvent } from '$lib/modules/chat/contexts/websocket-context/emmiters/sendMessage';
+
+	import { addMessageAsyncDB } from '../../../../../../services/database/use-cases/add-message';
+	import { changeMessageStatusAsyncDB } from '../../../../../../services/database/use-cases/change-message-status';
+
+	import type { Message } from '../../../../../../types/message';
 
 	let typeValue = '';
 	let typeValueManaged = '';
@@ -16,7 +22,73 @@
 
 	$: user = $page.data.session?.user;
 
-	async function sendMessage() {}
+	async function sendMessage() {
+		if (!user || !$chatState.selectedConversation || !typeValue.trim()) return;
+
+		const repliedMessage = (() => {
+			if (
+				$chatState.selectedConversation?.replyMessage &&
+				$chatState.selectedConversation.replyMessage.repliedMessage &&
+				typeof $chatState.selectedConversation.replyMessage.repliedMessage === 'object'
+			) {
+				return {
+					...$chatState.selectedConversation?.replyMessage,
+					repliedMessage: $chatState.selectedConversation?.replyMessage.repliedMessage.id,
+				};
+			} else {
+				return $chatState.selectedConversation?.replyMessage;
+			}
+		})();
+
+		const message: Message = {
+			id: crypto.randomUUID(),
+			content: typeValue.trim(),
+
+			writtenAt: new Date(),
+			sentAt: null,
+			receivedByAllAt: null,
+			readByAllAt: null,
+
+			conversationId: $chatState.selectedConversation?.id,
+			authorId: user.id,
+			repliedMessage: repliedMessage || null,
+		};
+
+		addMessageAsyncDB(message).catch(error => {
+			console.error(`Error on trying to add the "${message.id}" message at Indexed DB`, error);
+		});
+
+		chatDispatch.bringToTop(message.conversationId);
+
+		chatDispatch.addMessage({
+			conversationId: $chatState.selectedConversation?.id,
+			message,
+		});
+
+		if ($connection) {
+			sendMessageWebSocketEvent($connection, {
+				message: { ...message, readByAllAt: null, receivedByAllAt: null, sentAt: new Date() },
+				sender: user.id,
+				receiver: $chatState.selectedConversation.id,
+			});
+		} else {
+			console.error('Connection not established!');
+		}
+
+		changeMessageStatusAsyncDB({ messageId: message.id, status: 'sent' }).catch(error => {
+			console.error(`Error on trying to update the "${message.id}" message status at Indexed DB`, error);
+		});
+
+		chatDispatch.saveTypeMessageFromConversation({
+			conversationId: $chatState.selectedConversation.id,
+			typeMessage: '',
+		});
+
+		typeValue = '';
+		typeValueManaged = '';
+
+		chatDispatch.removeReplyMessageFromConversation({ conversationId: $chatState.selectedConversation.id });
+	}
 
 	function handleSpreadTypingStatusToConversation(typing: boolean) {
 		if ($connection) {
@@ -49,7 +121,7 @@
 	<div class="w-full p-2 flex gap-2 bg-black rounded-lg">
 		<div class="bg-gray-950 w-full p-2 rounded-md flex flex-col gap-1">
 			<span class="text-purple-300 text-xs">{'Name'}</span>
-			<span class="text-white text-sm">Conteudo de mensagem respondida</span>
+			<span class="text-white text-sm">Conteúdo de mensagem respondida</span>
 		</div>
 
 		<button
