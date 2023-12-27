@@ -8,11 +8,13 @@
 	import InputGroup from '$lib/design-system/Input/InputGroup.svelte';
 
 	import { getUserByEmailAsync } from '$lib/modules/chat/services/getUserByEmailAsync';
+	import { createGroupConversationAsync } from '$lib/modules/chat/services/createGroupConversationAsync';
 	import { createPrivateConversationAsync } from '$lib/modules/chat/services/createPrivateConversationAsync';
 
-	import type { UserApi } from '../../../../../../types/user';
 	import UserItem from './UserItem.svelte';
 	import SelectedUserItem from './SelectedUserItem.svelte';
+
+	import type { UserApi } from '../../../../../../types/user';
 
 	export let show: boolean;
 	export let closeModal: () => void;
@@ -76,7 +78,14 @@
 			return console.error('Access Token is not defined');
 		}
 
-		await createPrivateConversationAsync({ participantId: '' }, { accessToken });
+		if (isGroup) {
+			await createGroupConversationAsync(
+				{ participants: accountsData.selectedAccounts.map(account => account.id), name: '', description: '' },
+				{ accessToken }
+			);
+		} else {
+			await createPrivateConversationAsync({ participantId: accountsData.selectedAccounts[0].id }, { accessToken });
+		}
 	}
 </script>
 
@@ -90,7 +99,7 @@
 			<InputGroup let:Input let:Label let:ErrorMessage>
 				<Label>Search e-mail</Label>
 
-				<Input type="email" placeholder="E.g: john_doe@email.com" />
+				<Input type="email" placeholder="E.g: john_doe@email.com" bind:value />
 
 				{#if errorMessage}
 					<ErrorMessage>{errorMessage}</ErrorMessage>
@@ -101,23 +110,6 @@
 				<MagnifyingGlass color="white" size={24} />
 			</Button>
 		</fieldset>
-
-		<Text
-			size="lg"
-			className="flex gap-4 cursor-pointer items-center w-fit"
-			on:click={() => {
-				isGroup = !isGroup;
-			}}
-		>
-			<!-- <Switch checked={isGroup} /> -->
-			Is a group?
-
-			{#if isGroup}
-				<Text size="md" className="text-green-500 dark:text-green-500">Yes</Text>
-			{:else}
-				<Text size="md" className="text-red-500 dark:text-red-500">No</Text>
-			{/if}
-		</Text>
 
 		{#if accountsData.account}
 			<UserItem

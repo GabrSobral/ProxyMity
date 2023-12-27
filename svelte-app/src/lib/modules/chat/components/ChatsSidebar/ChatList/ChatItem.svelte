@@ -13,8 +13,6 @@
 
 	export let conversation: ConversationState;
 
-	$: console.log({ isSelectedContact, selectedConversation: $chatState.selectedConversation, conversation });
-
 	const conversationName =
 		conversation?.groupName || conversation?.participants.find(item => item.id !== user?.id)?.name || '';
 

@@ -1,5 +1,5 @@
-import { api } from '@/services/api/config';
-import { IServiceOptions } from '@/types/utils/IServiceOptions';
+import { api } from '../../../../services/api/config';
+import type { IServiceOptions } from '../../../../types/utils/IServiceOptions';
 
 interface Request {
 	name: string;

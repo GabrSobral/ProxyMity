@@ -1,0 +1,29 @@
+<script lang="ts">
+	import { page } from '$app/stores';
+	import { HttpTransportType, HubConnectionBuilder, HubConnectionState, LogLevel } from '@microsoft/signalr';
+
+	import { connection } from './stores/connection';
+
+	$: accessToken = $page.data.session?.accessToken;
+
+	$: if (accessToken) {
+		const hubConnection = new HubConnectionBuilder()
+			.withUrl('http://localhost:5000/chat', {
+				accessTokenFactory: () => accessToken || '',
+				logMessageContent: true,
+				transport: HttpTransportType.WebSockets,
+				skipNegotiation: true,
+				withCredentials: true,
+			})
+			.configureLogging(LogLevel.Information)
+			.build();
+
+		connection.set(hubConnection);
+	}
+
+	$: if (connection && $connection?.state === HubConnectionState.Disconnected) {
+		$connection.start().then(async () => console.log('Client connected to hub.'));
+	}
+</script>
+
+<slot><!-- optional fallback --></slot>
