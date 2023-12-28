@@ -1,6 +1,73 @@
 <script lang="ts" context="module">
-	export const setChatContext = () => setContext<Writable<State>>('chat-context', chatState);
-	export const getChatContext = () => getContext<Writable<State>>('chat-context');
+	export let typebarRef = writable<HTMLInputElement | null>(null);
+
+	let chatStateModule: State;
+	let connectionModule: HubConnection | null;
+	let userModule: Session['user'] | undefined;
+	let typebarRefModule: HTMLInputElement | null;
+
+	chatState.subscribe(value => {
+		chatStateModule = value;
+	});
+
+	connection.subscribe(value => {
+		connectionModule = value;
+	});
+
+	if (browser) {
+		page.subscribe(value => {
+			userModule = value.data?.session?.user as Session['user'] | undefined;
+		});
+
+		typebarRef.subscribe(value => {
+			typebarRefModule = value;
+		});
+	}
+
+	async function selectedConversationAsync({ conversation }: { conversation: ConversationState }) {
+		if (conversation === chatStateModule.selectedConversation || !userModule) return;
+
+		chatDispatch.saveTypeMessageFromConversation({
+			conversationId: chatStateModule.selectedConversation?.id || '',
+			typeMessage: typebarRefModule?.value || '',
+		});
+
+		chatDispatch.selectConversation(conversation);
+
+		if (!conversation.hasMessagesFetched) {
+			try {
+				const { messages } = await APIGetConversationMessages({ conversationId: conversation.id });
+				chatDispatch.setConversationMessages({ conversationId: conversation.id, messages });
+			} catch (error) {
+				console.error('Error fetching conversations, data will be taken from the cache', error);
+
+				const messages = await getConversationsMessagesAsyncDB(conversation.id);
+				chatDispatch.setConversationMessages({ conversationId: conversation.id, messages });
+			}
+		}
+
+		chatDispatch.updateConversationMessageStatus({ conversationId: conversation.id, status: 'read' });
+		readConversationMessagesAsyncDB({ conversationId: conversation.id, userId: userModule.id });
+
+		if (conversation.notifications > 0 && connectionModule)
+			sendReadMessageWebSocketEvent(connectionModule, {
+				userId: userModule.id,
+				conversationId: conversation.id,
+				isConversationGroup: conversation.isGroup,
+			});
+	}
+
+	interface ChatContextProps {
+		typebarRef: Writable<HTMLInputElement | null>;
+		selectedConversationAsync: (params: { conversation: ConversationState }) => Promise<void>;
+	}
+
+	export const getChatContext = () => getContext<ChatContextProps>('chat-context');
+	export const setChatContext = () =>
+		setContext<ChatContextProps>('chat-context', {
+			typebarRef,
+			selectedConversationAsync,
+		});
 </script>
 
 <script lang="ts">
@@ -8,17 +75,28 @@
 	import { chatDispatch } from './stores/chat';
 	import { setContext, getContext, onMount } from 'svelte';
 
+	// import { selectedConversationAsync } from './functions/selectedConversationAsync.svelte';
+
 	import { APIGetUserConversations } from '../../../../../services/api/get-user-conversations';
 	import { saveConversationsAsyncDB } from '../../../../../services/database/use-cases/save-conversations';
 	import { getConversationCacheAsyncDB } from '../../../../../services/database/use-cases/get-conversations-state';
 
-	import type { Writable } from 'svelte/store';
-	import type { State } from './stores/chat-store-types';
-
 	import { chatState } from './stores/chat';
+	import type { ConversationState, State } from './stores/chat-store-types';
+
+	import { writable, type Writable } from 'svelte/store';
+	import type { HubConnection } from '@microsoft/signalr';
+	import type { Session } from '@auth/sveltekit';
+	import { connection } from '../websocket-context/stores/connection';
+	import { browser } from '$app/environment';
+	import { APIGetConversationMessages } from '../../../../../services/api/get-conversation-messages';
+	import { getConversationsMessagesAsyncDB } from '../../../../../services/database/use-cases/get-conversations-messages';
+	import { readConversationMessagesAsyncDB } from '../../../../../services/database/use-cases/read-conversation-messages';
+	import { sendReadMessageWebSocketEvent } from '../websocket-context/emmiters/sendReadMessage';
+
+	setChatContext();
 
 	$: session = $page.data.session;
-
 	$: console.log({ state: $chatState });
 
 	onMount(() => {

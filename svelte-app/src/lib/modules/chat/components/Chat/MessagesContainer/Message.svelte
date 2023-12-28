@@ -30,7 +30,7 @@
 				? formatter.format(new Date(message.receivedByAllAt))
 				: null;
 
-	const isMine = message.authorId === user?.id;
+	$: isMine = message.authorId === user?.id;
 	const previousIsFromUser = previousMessage?.authorId === message.authorId;
 
 	const timeToShow = selectTimeToShow(isMine, message);
@@ -65,7 +65,7 @@
 			}
 		)}
 	>
-		{#if isMine && !previousIsFromUser}
+		{#if !isMine && !previousIsFromUser}
 			<img
 				src="https://github.com/diego3g.png"
 				alt="User Photo"

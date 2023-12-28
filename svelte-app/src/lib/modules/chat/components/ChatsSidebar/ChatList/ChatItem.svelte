@@ -7,6 +7,7 @@
 	import { connection } from '$lib/modules/chat/contexts/websocket-context/stores/connection';
 	import { chatDispatch, chatState } from '$lib/modules/chat/contexts/chat-context/stores/chat';
 	import type { ConversationState } from '$lib/modules/chat/contexts/chat-context/stores/chat-store-types';
+	import { getChatContext } from '$lib/modules/chat/contexts/chat-context/ChatContext.svelte';
 
 	$: user = $page.data.session?.user;
 	$: lastMessage = conversation.messages?.at(-1);
@@ -17,6 +18,8 @@
 			typing = typingWs;
 		}
 	});
+
+	let { selectedConversationAsync } = getChatContext();
 
 	export let conversation: ConversationState;
 
@@ -33,7 +36,7 @@
 	role="button"
 	tabindex="0"
 	class="w-full hover:dark:border-gray-700 hover:border-gray-100 border-[1px] dark:border-gray-900 border-white relative py-2 px-3 rounded-md flex gap-4 cursor-pointer hover:opacity-90 group dark:bg-gray-900 bg-white transition-all shadow-md"
-	on:click={() => chatDispatch.selectConversation(conversation)}
+	on:click={() => selectedConversationAsync({ conversation })}
 >
 	<div
 		class={`${
@@ -79,7 +82,7 @@
 			{#if typing}
 				<span>Typing...</span>
 			{:else if lastMessage}
-				<span>Last message here.</span>
+				<span>{lastMessage.content}</span>
 			{:else}
 				<span>Start the conversation...</span>
 			{/if}

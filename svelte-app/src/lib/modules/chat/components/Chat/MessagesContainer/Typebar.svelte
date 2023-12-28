@@ -15,15 +15,20 @@
 	import { changeMessageStatusAsyncDB } from '../../../../../../services/database/use-cases/change-message-status';
 
 	import type { Message } from '../../../../../../types/message';
+	import { getChatContext } from '$lib/modules/chat/contexts/chat-context/ChatContext.svelte';
 
-	let typeValue = '';
 	let typeValueManaged = '';
-	let input: HTMLInputElement;
+
+	$: if ($chatState.selectedConversation && $typebarRef) {
+		$typebarRef.value = $chatState.selectedConversation?.typeMessage;
+	}
+
+	let { typebarRef } = getChatContext();
 
 	$: user = $page.data.session?.user;
 
 	async function sendMessage() {
-		if (!user || !$chatState.selectedConversation || !typeValue.trim()) return;
+		if (!user || !$chatState.selectedConversation || !$typebarRef?.value.trim()) return;
 
 		const repliedMessage = (() => {
 			if (
@@ -42,7 +47,7 @@
 
 		const message: Message = {
 			id: crypto.randomUUID(),
-			content: typeValue.trim(),
+			content: $typebarRef?.value.trim(),
 
 			writtenAt: new Date(),
 			sentAt: null,
@@ -84,7 +89,7 @@
 			typeMessage: '',
 		});
 
-		typeValue = '';
+		$typebarRef.value = '';
 		typeValueManaged = '';
 
 		chatDispatch.removeReplyMessageFromConversation({ conversationId: $chatState.selectedConversation.id });
@@ -103,7 +108,7 @@
 	}
 
 	onMount(() => {
-		input?.addEventListener('input', (e: any) => {
+		$typebarRef?.addEventListener('input', (e: any) => {
 			const value = e.target.value as string;
 
 			if (value && !typeValueManaged) {
@@ -112,13 +117,13 @@
 				handleSpreadTypingStatusToConversation(false);
 			}
 
-			typeValueManaged = typeValue;
+			typeValueManaged = $typebarRef?.value || '';
 		});
 	});
 </script>
 
 <div class="flex flex-col gap-2 m-1 mt-auto">
-	<div class="w-full p-2 flex gap-2 bg-black rounded-lg">
+	<!-- <div class="w-full p-2 flex gap-2 bg-black rounded-lg">
 		<div class="bg-gray-950 w-full p-2 rounded-md flex flex-col gap-1">
 			<span class="text-purple-300 text-xs">{'Name'}</span>
 			<span class="text-white text-sm">Conteúdo de mensagem respondida</span>
@@ -132,19 +137,19 @@
 		>
 			<X size={24} color="white" />
 		</button>
-	</div>
+	</div> -->
 
 	<InputGroup let:Label let:Wrapper className="flex w-full">
 		<Label className="sr-only">Type a message</Label>
 
 		<Wrapper className="w-full h-fit">
 			<input
-				bind:this={input}
+				bind:this={$typebarRef}
 				type="text"
 				class="max-h-[20rem] min-h-[3.5rem] resize-none flex flex-1 py-3 focus:outline-none outline-none hover:ring-1 transition-all dark:ring-gray-700 ring-gray-100 rounded-md dark:bg-gray-900 bg-white dark:text-gray-200 text-gray-700 focus:outline-purple-500 focus:ring-0 dark:placeholder:text-gray-400 placeholder:text-gray-600 w-full px-4"
 				placeholder="Type your message"
-				bind:value={typeValue}
 				autoComplete="off"
+				id="typebar-input-id"
 			/>
 
 			<Button

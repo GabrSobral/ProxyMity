@@ -20,15 +20,6 @@ export const chatDispatch: Actions = {
 		chatState.update(store => {
 			const index = store.conversations.findIndex(conversation => conversation.id === conversationId);
 			if (index >= 0) {
-				if (store.selectedConversation?.id === store.conversations[index].id) {
-					store.selectedConversation.messages.push(message);
-					console.log({ index, message, conversationId });
-
-					if (store.selectedConversation.messages.length > 100) {
-						store.selectedConversation.messages.shift();
-					}
-				}
-
 				store.conversations[index].messages.push(message);
 
 				const currentNotifications = store.conversations[index].notifications;
