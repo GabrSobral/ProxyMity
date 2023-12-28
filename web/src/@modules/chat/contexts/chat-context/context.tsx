@@ -161,49 +161,49 @@ export function ChatProvider({ children }: { children: ReactNode }) {
 	// 	return () => removeEventListener('@ws.receive_message_status', handler);
 	// }, [updateConversationMessageStatus]);
 
-	// const selectConversationAsync = useCallback(
-	// 	async ({ conversation }: { conversation: ConversationState }) => {
-	// 		if (conversation === selectedConversation || !user) return;
+	const selectConversationAsync = useCallback(
+		async ({ conversation }: { conversation: ConversationState }) => {
+			if (conversation === selectedConversation || !user) return;
 
-	// 		saveTypeMessageFromConversation({
-	// 			conversationId: selectedConversation?.id || '',
-	// 			typeMessage: typebarRef.current?.value || '',
-	// 		});
+			saveTypeMessageFromConversation({
+				conversationId: selectedConversation?.id || '',
+				typeMessage: typebarRef.current?.value || '',
+			});
 
-	// 		selectConversation(conversation);
+			selectConversation(conversation);
 
-	// 		if (!conversation.hasMessagesFetched) {
-	// 			try {
-	// 				const { messages } = await APIGetConversationMessages({ conversationId: conversation.id });
-	// 				setConversationMessages({ conversationId: conversation.id, messages });
-	// 			} catch (error) {
-	// 				console.error('Error fetching conversations, data will be taken from the cache', error);
+			if (!conversation.hasMessagesFetched) {
+				try {
+					const { messages } = await APIGetConversationMessages({ conversationId: conversation.id });
+					setConversationMessages({ conversationId: conversation.id, messages });
+				} catch (error) {
+					console.error('Error fetching conversations, data will be taken from the cache', error);
 
-	// 				const messages = await getConversationsMessagesAsyncDB(conversation.id);
-	// 				setConversationMessages({ conversationId: conversation.id, messages });
-	// 			}
-	// 		}
+					const messages = await getConversationsMessagesAsyncDB(conversation.id);
+					setConversationMessages({ conversationId: conversation.id, messages });
+				}
+			}
 
-	// 		updateConversationMessageStatus({ conversationId: conversation.id, status: 'read' });
-	// 		readConversationMessagesAsyncDB({ conversationId: conversation.id, userId: user.id });
+			updateConversationMessageStatus({ conversationId: conversation.id, status: 'read' });
+			readConversationMessagesAsyncDB({ conversationId: conversation.id, userId: user.id });
 
-	// 		if (conversation.notifications > 0)
-	// 			sendReadMessageWebSocketEvent(connection, {
-	// 				userId: user.id,
-	// 				conversationId: conversation.id,
-	// 				isConversationGroup: conversation.isGroup,
-	// 			});
-	// 	},
-	// 	[
-	// 		selectedConversation,
-	// 		user,
-	// 		saveTypeMessageFromConversation,
-	// 		selectConversation,
-	// 		updateConversationMessageStatus,
-	// 		connection,
-	// 		setConversationMessages,
-	// 	]
-	// );
+			if (conversation.notifications > 0)
+				sendReadMessageWebSocketEvent(connection, {
+					userId: user.id,
+					conversationId: conversation.id,
+					isConversationGroup: conversation.isGroup,
+				});
+		},
+		[
+			selectedConversation,
+			user,
+			saveTypeMessageFromConversation,
+			selectConversation,
+			updateConversationMessageStatus,
+			connection,
+			setConversationMessages,
+		]
+	);
 
 	return (
 		<ChatContext.Provider
