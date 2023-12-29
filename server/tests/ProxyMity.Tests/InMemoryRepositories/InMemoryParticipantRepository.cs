@@ -16,25 +16,25 @@ internal class InMemoryParticipantRepository : InMemoryRepository<Participant>, 
         return Task.CompletedTask;
     }
 
-    public Task<IEnumerable<Participant>> GetByConversationIdAsync(Guid conversationId) {
+    public Task<IEnumerable<Participant>> GetByConversationIdAsync(Ulid conversationId) {
         var participants = Items.Where(p => p.ConversationId == conversationId);
         return Task.FromResult(participants);
     }
 
-    public async Task<Participant?> GetByIdAsync(Guid userId, Guid conversationId) {
+    public async Task<Participant?> GetByIdAsync(Ulid userId, Ulid conversationId) {
         var participant = Items.SingleOrDefault(p => p.UserId == userId && p.ConversationId == conversationId);
         await Task.Run(() => { });
 
         return participant;
     }
 
-    public Task<IEnumerable<Participant>> GetByUserIdAsync(Guid userId) {
+    public Task<IEnumerable<Participant>> GetByUserIdAsync(Ulid userId) {
         var participants = Items.Where(p => p.UserId == userId);
 
         return Task.FromResult(participants);
     }
 
-    public async Task<IEnumerable<GetConversationsByUserIdQuery>> GetConversationsByUserIdAsync(Guid userId) {
+    public async Task<IEnumerable<GetConversationsByUserIdQuery>> GetConversationsByUserIdAsync(Ulid userId) {
         var participationInConversations = Items.FindAll(p => p.UserId == userId);
         var conversationsWithParticipants = new List<GetConversationsByUserIdQuery>();
 
@@ -57,7 +57,7 @@ internal class InMemoryParticipantRepository : InMemoryRepository<Participant>, 
         return conversationsWithParticipants;
     }
 
-    public async Task<IEnumerable<GetParticipantsByConversationIdQuery>> GetParticipantsByConversationIdAsync(Guid conversationId) {
+    public async Task<IEnumerable<GetParticipantsByConversationIdQuery>> GetParticipantsByConversationIdAsync(Ulid conversationId) {
         var participantsOfConversation = Items.FindAll(x => x.ConversationId == conversationId);
 
         var participants = new List<GetParticipantsByConversationIdQuery>();

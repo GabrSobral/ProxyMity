@@ -6,9 +6,9 @@ internal static class MessageStatusTableScript
 
     private static string Table() => """
         CREATE TABLE IF NOT EXISTS "message_status" (
-            "user_id"           UUID NOT NULL,
-            "conversation_id"   UUID NOT NULL,
-            "message_id"        UUID NOT NULL,
+            "user_id"           BYTEA NOT NULL,
+            "conversation_id"   BYTEA NOT NULL,
+            "message_id"        BYTEA NOT NULL,
             "received_at"       TIMESTAMPTZ,
             "read_at"           TIMESTAMPTZ,
 

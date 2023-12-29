@@ -2,9 +2,9 @@
 
 public class Participant
 {
-    public required Guid UserId { get; set; }
+    public required Ulid UserId { get; set; }
 
-    public required Guid ConversationId { get; set; }
+    public required Ulid ConversationId { get; set; }
 
     public required DateTime CreatedAt { get; set; }
 
@@ -12,7 +12,7 @@ public class Participant
 
     public DateTime? UpdatedAt { get; set; }
 
-    public static Participant Create(Guid userId, Guid conversationId)
+    public static Participant Create(Ulid userId, Ulid conversationId)
     {
         return new Participant()
         {

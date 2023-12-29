@@ -1,7 +1,7 @@
 ﻿namespace ProxyMity.Application.Handlers.Conversations.Queries.GetUserConversations;
 
 public record GetUserConversationsQuery(
-    Guid UserId
+    Ulid UserId
 ) : IQuery<IEnumerable<GetUserConversationsResponse>>;
 
 public record GetUserConversationsResponse(

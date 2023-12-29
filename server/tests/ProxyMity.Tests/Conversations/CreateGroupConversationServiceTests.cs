@@ -1,8 +1,8 @@
 ﻿namespace ProxyMity.Unit.Conversations;
 
 public class CreateGroupConversationServiceTests {
-    private ILogger<CreateGroupConversationCommandHandler> _logger;
-    private IUnitOfWork _unitOfWork;
+    private readonly ILogger<CreateGroupConversationCommandHandler> _logger;
+    private readonly IUnitOfWork _unitOfWork;
 
     public CreateGroupConversationServiceTests() {
         _logger = LoggerFactory.Create(builder => { }).CreateLogger<CreateGroupConversationCommandHandler>();
@@ -53,8 +53,8 @@ public class CreateGroupConversationServiceTests {
         var inputModel = new CreateGroupConversationCommand(
             Name: "",
             Description: "Test Description",
-            CreatorId: Guid.NewGuid(),
-            Participants: new List<Guid>()
+            CreatorId: Ulid.NewUlid(),
+            Participants: new List<Ulid>()
         );
 
         var validator = new CreateGroupConversationCommandValidator();

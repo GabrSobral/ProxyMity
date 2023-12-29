@@ -31,7 +31,7 @@ public class GetUserByIdServiceTests {
 
         inMemoryUserRepository.Items.Add(john);
 
-        var command = new GetByIdQuery(Guid.NewGuid());
+        var command = new GetByIdQuery(Ulid.NewUlid());
         var getByIdCommandHandler = new GetByIdQueryHandler(_logger, inMemoryUserRepository);
 
         await Assert.ThrowsAsync<UserNotFoundException>(async () => {

@@ -3,24 +3,24 @@ namespace ProxyMity.Application.Handlers.Conversations.Commands.CreateGroupConve
 public record CreateGroupConversationCommand(
     string Name,
     string? Description,
-    Guid CreatorId,
-    IEnumerable<Guid> Participants
+    Ulid CreatorId,
+    IEnumerable<Ulid> Participants
 ) : ICommand<CreateGroupConversationResponse>;
 
 public record CreateGroupConversationRequest(
     string Name,
     string? Description,
-    IEnumerable<Guid> Participants
+    IEnumerable<Ulid> Participants
 );
 
 public record CreateGroupConversationResponse
 {
-    public Guid Id { get; set; }
-    public Guid? GroupId { get; set; }
+    public Ulid Id { get; set; }
+    public Ulid? GroupId { get; set; }
     public DateTime CreatedAt { get; set; }
-    public IEnumerable<Guid> Participants { get; set; }
+    public IEnumerable<Ulid> Participants { get; set; }
 
-    public CreateGroupConversationResponse(Conversation conversation, IEnumerable<Guid> participants)
+    public CreateGroupConversationResponse(Conversation conversation, IEnumerable<Ulid> participants)
     {
         Id = conversation.Id;
         GroupId = conversation.GroupId;

@@ -7,7 +7,7 @@ public class InMemoryGroupRepository : InMemoryRepository<Group>, IGroupReposito
         return Task.CompletedTask;
     }
 
-    public async Task<Group?> FindByIdAsync(Guid groupId) {
+    public async Task<Group?> FindByIdAsync(Ulid groupId) {
         await Task.Run(() => { });
 
         return Items.SingleOrDefault(x => x.Id == groupId);

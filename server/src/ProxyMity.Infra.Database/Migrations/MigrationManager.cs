@@ -1,20 +1,11 @@
 ﻿namespace ProxyMity.Infra.Database.Migrations;
 
-public class MigrationManager
+public class MigrationManager(DbSession session, ILogger<MigrationManager> logger, IUnitOfWork unitOfWork)
 {
-    private readonly DbSession _session;
-    private readonly IUnitOfWork _unitOfWork;
-    private readonly ILogger<MigrationManager> _logger;
-
-    public MigrationManager(DbSession session, ILogger<MigrationManager> logger, IUnitOfWork unitOfWork)
-    {
-        _session = session;
-        _logger = logger;
-        _unitOfWork = unitOfWork;
-    }
-
     public async Task CheckIfTablesExist()
     {
+        CancellationToken cancellationToken = new();
+
         var query = """
             SELECT 'user', EXISTS(SELECT FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'user') AS "User"
             UNION ALL
@@ -34,14 +25,14 @@ public class MigrationManager
             SELECT 'message_status', EXISTS(SELECT FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'message_status') AS "MessageStatus"
          """;
 
-        var lstTables = await _session.Connection.QueryAsync<(string Name, bool Exist)>(query, null, _session.Transaction);
+        var lstTables = await session.Connection.QueryAsync<(string Name, bool Exist)>(query, null, session.Transaction);
 
-        _unitOfWork.BeginTransaction();
+        unitOfWork.BeginTransaction();
 
         foreach (var (name, exist) in lstTables)
             if (!exist) await CreateTable(name);
 
-        _unitOfWork.Commit();
+        await unitOfWork.CommitAsync(cancellationToken);
     }
 
     private async Task CreateTable(string tableName)
@@ -51,9 +42,9 @@ public class MigrationManager
 
         try
         {
-            _logger.LogInformation($"Creating Table: {tableName} ({table})");
+            logger.LogInformation($"Creating Table: {tableName} ({table})");
 
-            await _session.Connection.ExecuteAsync(table switch
+            await session.Connection.ExecuteAsync(table switch
             {
                 ETables.user => UserTableScript.Create(),
                 ETables.group => GroupTableScript.Create(),
@@ -63,13 +54,13 @@ public class MigrationManager
                 ETables.message_status => MessageStatusTableScript.Create(),
 
                 _ => throw new NotImplementedException($"Failed: {tableName} not prepared"),
-            }, null, _session.Transaction);
+            }, null, session.Transaction);
 
-            _logger.LogInformation($"{table} was successfully created\n\n");
+            logger.LogInformation($"{table} was successfully created\n\n");
         }
         catch (Exception e)
         {
-            _logger.LogError($"Migration Failed: {e.Message}");
+            logger.LogError($"Migration Failed: {e.Message}");
             throw new InternalMigrationException(e.Message);
         }
     }

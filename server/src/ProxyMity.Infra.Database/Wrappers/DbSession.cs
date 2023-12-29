@@ -5,8 +5,8 @@
 /// </summary>
 public sealed class DbSession : IDisposable
 {
-    public IDbConnection Connection { get; set; }
-    public IDbTransaction? Transaction { get; set; }
+    public NpgsqlConnection Connection { get; set; }
+    public NpgsqlTransaction? Transaction { get; set; }
 
     public DbSession(IConfiguration configuration)
     {
@@ -14,5 +14,9 @@ public sealed class DbSession : IDisposable
         Connection.Open();
     }
 
-    public void Dispose() => Connection?.Dispose();
+    public void Dispose()
+    {
+        Connection?.Dispose();
+        Transaction?.Dispose();
+    }
 }

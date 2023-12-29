@@ -1,22 +1,22 @@
 ﻿namespace ProxyMity.Application.Handlers.Conversations.Commands.CreatePrivateConversation;
 
 public record CreatePrivateConversationCommand(
-    Guid RequesterId,
-    Guid ParticipantId
+    Ulid RequesterId,
+    Ulid ParticipantId
 ) : ICommand<CreatePrivateConversationResponse>;
 
 public record CreatePrivateConversationRequest(
-    Guid ParticipantId
+    Ulid ParticipantId
 );
 
 public record CreatePrivateConversationResponse
 {
-    public Guid Id { get; set; }
-    public Guid? GroupId { get; set; }
+    public Ulid Id { get; set; }
+    public Ulid? GroupId { get; set; }
     public DateTime CreatedAt { get; set; }
-    public IEnumerable<Guid> Participants { get; set; }
+    public IEnumerable<Ulid> Participants { get; set; }
 
-    public CreatePrivateConversationResponse(Conversation conversation, IEnumerable<Guid> participants)
+    public CreatePrivateConversationResponse(Conversation conversation, IEnumerable<Ulid> participants)
     {
         Id = conversation.Id;
         GroupId = conversation.GroupId;

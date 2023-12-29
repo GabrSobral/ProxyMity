@@ -2,13 +2,13 @@
 
 public class MessageStatus
 {
-    public required Guid UserId { get; set; }
-    public required Guid MessageId { get; set; }
-    public required Guid ConversationId { get; set; }
+    public required Ulid UserId { get; set; }
+    public required Ulid MessageId { get; set; }
+    public required Ulid ConversationId { get; set; }
     public DateTime? ReadAt { get; set; }
     public DateTime? ReceivedAt { get; set; }
 
-    public static MessageStatus Create(Guid userId, Guid messageId, Guid conversationId)
+    public static MessageStatus Create(Ulid userId, Ulid messageId, Ulid conversationId)
     {
         return new MessageStatus()
         {

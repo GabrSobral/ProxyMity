@@ -1,6 +1,6 @@
 ﻿namespace ProxyMity.Infra.Database.Repositories;
 
-public class UserRepository(DbSession session) : TRepository<UserRepository>(session), IUserRepository
+public class UserRepository(DbSession session):IUserRepository
 {
     public async Task CreateAsync(User newUser)
     {
@@ -29,7 +29,7 @@ public class UserRepository(DbSession session) : TRepository<UserRepository>(ses
             createdAt = newUser.CreatedAt,
         };
 
-        await _session.Connection.ExecuteAsync(sql, parameters, _session.Transaction);
+        await session.Connection.ExecuteAsync(sql, parameters, session.Transaction);
     }
 
     public async Task<User?> FindByEmailAsync(string email)
@@ -48,10 +48,10 @@ public class UserRepository(DbSession session) : TRepository<UserRepository>(ses
         """;
 
         object parameters = new { email };
-        return await _session.Connection.QueryFirstOrDefaultAsync<User>(sql, parameters);
+        return await session.Connection.QueryFirstOrDefaultAsync<User>(sql, parameters);
     }
 
-    public async Task<User?> FindByIdAsync(Guid userId)
+    public async Task<User?> FindByIdAsync(Ulid userId)
     {
         const string sql = """
             SELECT 
@@ -67,6 +67,6 @@ public class UserRepository(DbSession session) : TRepository<UserRepository>(ses
         """;
 
         object parameters = new { userId };
-        return await _session.Connection.QueryFirstOrDefaultAsync<User>(sql, parameters);
+        return await session.Connection.QueryFirstOrDefaultAsync<User>(sql, parameters);
     }
 }

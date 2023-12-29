@@ -25,7 +25,7 @@ public record SignInResponse
 };
 
 public record UserResponse(
-    Guid Id,
+    Ulid Id,
     string Name,
     string Email,
     DateTime CreatedAt,

@@ -3,6 +3,6 @@
 public interface IUserRepository
 {
     public Task CreateAsync(User newUser);
-    public Task<User?> FindByIdAsync(Guid userId);
+    public Task<User?> FindByIdAsync(Ulid userId);
     public Task<User?> FindByEmailAsync(string email);
 }

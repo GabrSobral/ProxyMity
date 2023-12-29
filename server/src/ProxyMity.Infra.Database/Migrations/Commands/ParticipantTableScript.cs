@@ -6,8 +6,8 @@ internal static class ParticipantTableScript
 
     private static string Table() => """
         CREATE TABLE IF NOT EXISTS "participant" (
-            "user_id"           UUID        NOT NULL,
-            "conversation_id"   UUID        NOT NULL,
+            "user_id"           BYTEA        NOT NULL,
+            "conversation_id"   BYTEA        NOT NULL,
             "created_at"        TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
             "removed_at"        TIMESTAMPTZ,
 

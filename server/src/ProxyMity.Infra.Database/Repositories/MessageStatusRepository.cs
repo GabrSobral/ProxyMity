@@ -1,9 +1,7 @@
 ﻿namespace ProxyMity.Infra.Database.Repositories;
 
-public class MessageStatusRepository : TRepository<MessageStatusRepository>, IMessageStatusRepository
+public class MessageStatusRepository(DbSession session) : IMessageStatusRepository
 {
-    public MessageStatusRepository(DbSession session) : base(session) { }
-
     public async Task CreateAsync(MessageStatus messageStatus)
     {
         const string sql = """
@@ -32,10 +30,10 @@ public class MessageStatusRepository : TRepository<MessageStatusRepository>, IMe
             receivedAt = messageStatus.ReceivedAt,
         };
 
-        await _session.Connection.ExecuteAsync(sql, parameters, _session.Transaction);
+        await session.Connection.ExecuteAsync(sql, parameters, session.Transaction);
     }
 
-    public async Task<IEnumerable<MessageStatus>> GetMessagesStatusByMessageIdAsync(Guid messageId, Guid conversationId)
+    public async Task<IEnumerable<MessageStatus>> GetMessagesStatusByMessageIdAsync(Ulid messageId, Ulid conversationId)
     {
         const string sql = """
             SELECT *
@@ -46,10 +44,10 @@ public class MessageStatusRepository : TRepository<MessageStatusRepository>, IMe
         """;
 
         object parameters = new { conversationId, messageId };
-        return await _session.Connection.QueryAsync<MessageStatus>(sql, parameters);
+        return await session.Connection.QueryAsync<MessageStatus>(sql, parameters);
     }
 
-    public async Task<int> GetUnreadMessagesStatusCountByUserIdAsync(Guid userId, Guid conversationId)
+    public async Task<int> GetUnreadMessagesStatusCountByUserIdAsync(Ulid userId, Ulid conversationId)
     {
         const string sql = """
             SELECT COUNT(*)
@@ -60,10 +58,10 @@ public class MessageStatusRepository : TRepository<MessageStatusRepository>, IMe
         """;
 
         object parameters = new { conversationId, userId };
-        return await _session.Connection.ExecuteScalarAsync<int>(sql, parameters);
+        return await session.Connection.ExecuteScalarAsync<int>(sql, parameters);
     }
 
-    public async Task<IEnumerable<MessageStatus>> GetUnreadMessagesStatusFromConversationByIdAsync(Guid conversationId)
+    public async Task<IEnumerable<MessageStatus>> GetUnreadMessagesStatusFromConversationByIdAsync(Ulid conversationId)
     {
         const string sql = """
             SELECT *
@@ -73,10 +71,10 @@ public class MessageStatusRepository : TRepository<MessageStatusRepository>, IMe
         """;
 
         object parameters = new { conversationId };
-        return await _session.Connection.QueryAsync<MessageStatus>(sql, parameters);
+        return await session.Connection.QueryAsync<MessageStatus>(sql, parameters);
     }
 
-    public async Task ReadAsync(Guid userId, Guid messageId)
+    public async Task ReadAsync(Ulid userId, Ulid messageId)
     {
         const string sql = """
             UPDATE "message_status"
@@ -86,10 +84,10 @@ public class MessageStatusRepository : TRepository<MessageStatusRepository>, IMe
         """;
 
         object parameters = new { userId, messageId, currentTime = DateTime.UtcNow };
-        await _session.Connection.QueryAsync<MessageStatus>(sql, parameters, _session.Transaction);
+        await session.Connection.QueryAsync<MessageStatus>(sql, parameters, session.Transaction);
     }
 
-    public async Task ReadUnreadMessagesByUserIdAsync(Guid userId, Guid conversationId)
+    public async Task ReadUnreadMessagesByUserIdAsync(Ulid userId, Ulid conversationId)
     {
         const string sql = """
             UPDATE "message_status"
@@ -98,10 +96,10 @@ public class MessageStatusRepository : TRepository<MessageStatusRepository>, IMe
         """;
 
         object parameters = new { userId, conversationId, currentTime = DateTime.UtcNow };
-        await _session.Connection.QueryAsync<MessageStatus>(sql, parameters, _session.Transaction);
+        await session.Connection.QueryAsync<MessageStatus>(sql, parameters, session.Transaction);
     }
 
-    public async Task ReceiveAsync(Guid userId, Guid messageId)
+    public async Task ReceiveAsync(Ulid userId, Ulid messageId)
     {
         const string sql = """
             UPDATE "message_status"
@@ -111,6 +109,6 @@ public class MessageStatusRepository : TRepository<MessageStatusRepository>, IMe
         """;
 
         object parameters = new { userId, messageId, currentTime = DateTime.UtcNow };
-        await _session.Connection.QueryAsync<MessageStatus>(sql, parameters, _session.Transaction);
+        await session.Connection.QueryAsync<MessageStatus>(sql, parameters, session.Transaction);
     }
 }

@@ -1,8 +1,8 @@
 namespace ProxyMity.Unit.Conversations;
 
 public class CreatePrivateConversationServiceTests {
-    private ILogger<CreatePrivateConversationCommandHandler> _logger;
-    private IUnitOfWork _unitOfWork;
+    private readonly ILogger<CreatePrivateConversationCommandHandler> _logger;
+    private readonly IUnitOfWork _unitOfWork;
 
     public CreatePrivateConversationServiceTests() {
         _logger = LoggerFactory.Create(builder => { }).CreateLogger<CreatePrivateConversationCommandHandler>();

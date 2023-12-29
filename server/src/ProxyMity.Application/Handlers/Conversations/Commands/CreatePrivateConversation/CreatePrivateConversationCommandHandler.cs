@@ -10,36 +10,34 @@ public class CreatePrivateConversationCommandHandler(
     IUnitOfWork unitOfWork
 ) : ICommandHandler<CreatePrivateConversationCommand, CreatePrivateConversationResponse>
 {
-    public async Task<CreatePrivateConversationResponse> Handle(CreatePrivateConversationCommand request, CancellationToken cancellationToken)
+    public async Task<CreatePrivateConversationResponse> Handle(
+        CreatePrivateConversationCommand command, 
+        CancellationToken cancellationToken)
     {
         logger.LogInformation($"Creating a private conversation...");
 
-        Guid requesterId = request.RequesterId;
-        Guid participantId = request.ParticipantId;
+        Ulid requesterId = command.RequesterId;
+        Ulid participantId = command.ParticipantId;
 
-        await Task.WhenAll([
-            userRepository.FindByIdAsync(requesterId) ?? throw new UserNotFoundException(requesterId),
-            userRepository.FindByIdAsync(participantId) ?? throw new UserNotFoundException(participantId)
-        ]);
+        unitOfWork.BeginTransaction();
+
+        _ = await userRepository.FindByIdAsync(participantId) ?? throw new UserNotFoundException(participantId);
+        _ = await userRepository.FindByIdAsync(requesterId) ?? throw new UserNotFoundException(requesterId);
 
         var conversation = Conversation.Create();
         var requesterParticipation = Participant.Create(requesterId, conversation.Id);
         var targetParticipation = Participant.Create(participantId, conversation.Id);
 
-        unitOfWork.BeginTransaction();
-
         await conversationRepository.CreateAsync(conversation);
 
-        await Task.WhenAll([
-            participantRepository.AddAsync(requesterParticipation),
-            participantRepository.AddAsync(targetParticipation)
-        ]);
+        await participantRepository.AddAsync(requesterParticipation);
+        await participantRepository.AddAsync(targetParticipation);
 
-        unitOfWork.Commit();
+        await unitOfWork.CommitAsync(cancellationToken);
 
         logger.LogInformation($"A private conversation between {requesterId} and {participantId} was created successfully!");
 
-        Guid[] participantsId = [requesterId, participantId];
+        Ulid[] participantsId = [requesterId, participantId];
 
         return new CreatePrivateConversationResponse(conversation, participantsId);
     }

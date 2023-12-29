@@ -1,9 +1,7 @@
 ﻿namespace ProxyMity.Infra.Database.Repositories;
 
-public class GroupRepository : TRepository<GroupRepository>, IGroupRepository
+public class GroupRepository(DbSession session) :  IGroupRepository
 {
-    public GroupRepository(DbSession session) : base(session) { }
-
     public async Task CreateAsync(Group newGroup)
     {
         const string sql = """
@@ -20,10 +18,10 @@ public class GroupRepository : TRepository<GroupRepository>, IGroupRepository
             created_by = newGroup.CreatedBy,
         };
 
-        await _session.Connection.ExecuteAsync(sql, parameters, _session.Transaction);
+        await session.Connection.ExecuteAsync(sql, parameters, session.Transaction);
     }
 
-    public async Task<Group?> FindByIdAsync(Guid groupId)
+    public async Task<Group?> FindByIdAsync(Ulid groupId)
     {
         const string sql = """
             SELECT 
@@ -37,6 +35,6 @@ public class GroupRepository : TRepository<GroupRepository>, IGroupRepository
         """;
 
         object parameters = new { groupId };
-        return await _session.Connection.QueryFirstOrDefaultAsync<Group>(sql, parameters);
+        return await session.Connection.QueryFirstOrDefaultAsync<Group>(sql, parameters);
     }
 }

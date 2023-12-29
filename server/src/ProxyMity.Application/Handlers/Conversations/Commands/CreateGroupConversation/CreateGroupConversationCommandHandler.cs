@@ -11,13 +11,15 @@ public class CreateGroupConversationCommandHandler(
     IUnitOfWork unitOfWork
 ) : ICommandHandler<CreateGroupConversationCommand, CreateGroupConversationResponse>
 {
-    public async Task<CreateGroupConversationResponse> Handle(CreateGroupConversationCommand request, CancellationToken cancellationToken)
+    public async Task<CreateGroupConversationResponse> Handle(
+        CreateGroupConversationCommand command, 
+        CancellationToken cancellationToken)
     {
         logger.LogInformation($"🟢 Creating a group conversation...");
 
-        var participantsCount = request.Participants.Count();
+        var participantsCount = command.Participants.Count();
 
-        var group = Group.Create(request.CreatorId, request.Name, request.Description);
+        var group = Group.Create(command.CreatorId, command.Name, command.Description);
         var conversation = Conversation.Create(group.Id);
 
         unitOfWork.BeginTransaction();
@@ -27,7 +29,7 @@ public class CreateGroupConversationCommandHandler(
 
         for (int i = 0; i < participantsCount; i++)
         {
-            var participantId = request.Participants.ElementAt(i);
+            var participantId = command.Participants.ElementAt(i);
 
             _ = await userRepository.FindByIdAsync(participantId) ?? throw new UserNotFoundException(participantId);
             var existentParticipation = await participantRepository.GetByIdAsync(participantId, conversation.Id);
@@ -41,10 +43,10 @@ public class CreateGroupConversationCommandHandler(
             }
         }
 
-        unitOfWork.Commit();
+        await unitOfWork.CommitAsync(cancellationToken);
 
         logger.LogInformation("🟢 A group conversation was created successfully!");
 
-        return new CreateGroupConversationResponse(conversation, request.Participants);
+        return new CreateGroupConversationResponse(conversation, command.Participants);
     }
 }

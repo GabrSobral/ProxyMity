@@ -3,5 +3,5 @@
 public interface IGroupRepository
 {
     public Task CreateAsync(Group newGroup);
-    public Task<Group?> FindByIdAsync(Guid groupId);
+    public Task<Group?> FindByIdAsync(Ulid groupId);
 }

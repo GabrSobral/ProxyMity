@@ -20,15 +20,15 @@ public sealed class UpdateMessageStatusCommandHandler(
         else
             await UpdatePrivateMessage(command.MessageId, command.Status);
 
-        unitOfWork.Commit();
+        await unitOfWork.CommitAsync(cancellationToken);
     }
 
-    private async Task UpdatePrivateMessage(Guid messageId, EMessageStatuses messageStatus)
+    private async Task UpdatePrivateMessage(Ulid messageId, EMessageStatuses messageStatus)
     {
         await messageRepository.UpdateStatusAsync(messageId, messageStatus);
     }
 
-    private async Task UpdateGroupMessage(Guid messageId, EMessageStatuses messageStatus, Guid userId, Guid conversationId)
+    private async Task UpdateGroupMessage(Ulid messageId, EMessageStatuses messageStatus, Ulid userId, Ulid conversationId)
     {
         switch (messageStatus)
         {

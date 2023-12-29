@@ -1,9 +1,9 @@
 ﻿namespace ProxyMity.Domain.Interfaces.Repositories.ParticipantRepository.CustomQueries;
 
 public record GetConversationsByUserIdQuery(
-    Guid Id,
+    Ulid Id,
     DateTime CreatedAt,
     string? GroupName,
     string? GroupDescription,
-    Guid? GroupId
+    Ulid? GroupId
 );

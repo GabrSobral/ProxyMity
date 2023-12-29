@@ -16,7 +16,7 @@ public sealed class ChatHub(
     {
         logger.LogInformation($"The user {Context.UserIdentifier} is connected.");
 
-        var userId = Guid.Parse(Context.UserIdentifier ?? "");
+        var userId = Ulid.Parse(Context.UserIdentifier ?? "");
         var getUserConversationsQuery = new GetUserConversationsQuery(userId);
         var userConversations = await sender.Send(getUserConversationsQuery);
 
@@ -32,7 +32,7 @@ public sealed class ChatHub(
     {
         logger.LogInformation($"The user {Context.UserIdentifier} is disconnected.");
 
-        var userId = Guid.Parse(Context.UserIdentifier ?? "");
+        var userId = Ulid.Parse(Context.UserIdentifier ?? "");
         var getUserConversationsQuery = new GetUserConversationsQuery(userId);
         var userConversations = await sender.Send(getUserConversationsQuery);
 

@@ -1,8 +1,8 @@
 ﻿namespace ProxyMity.Domain.Interfaces.Repositories.Shared;
 
-public interface IUnitOfWork : IDisposable
+public interface IUnitOfWork
 {
     void BeginTransaction();
-    void Commit();
-    void Rollback();
+    Task CommitAsync(CancellationToken cancellationToken);
+    Task RollbackAsync(CancellationToken cancellationToken);
 }

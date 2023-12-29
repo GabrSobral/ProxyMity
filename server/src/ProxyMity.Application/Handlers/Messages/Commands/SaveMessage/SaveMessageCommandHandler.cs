@@ -24,7 +24,7 @@ public sealed class SaveMessageCommandHandler(
 
         await messageRepository.CreateAsync(message);
 
-        if (conversation.GroupId is Guid)
+        if (conversation.GroupId is Ulid)
         {
             var participants = await participantRepository.GetByConversationIdAsync(message.ConversationId);
 
@@ -47,6 +47,6 @@ public sealed class SaveMessageCommandHandler(
             await Task.WhenAll(tasks);
         }
 
-        unitOfWork.Commit();
+        await unitOfWork.CommitAsync(cancellationToken);
     }
 }

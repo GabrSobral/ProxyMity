@@ -7,7 +7,7 @@ internal class InMemoryMessageRepository : InMemoryRepository<Message>, IMessage
         return Task.CompletedTask;
     }
 
-    public async Task<IEnumerable<Message>> GetMessagesFromConversationAsync(Guid conversationId, int quantity) {
+    public async Task<IEnumerable<Message>> GetMessagesFromConversationAsync(Ulid conversationId, int quantity) {
         await Task.Run(() => { });
 
         var messagesFromConversation = Items.Where(x => x.ConversationId == conversationId);
@@ -16,7 +16,7 @@ internal class InMemoryMessageRepository : InMemoryRepository<Message>, IMessage
         return orderedMessages.Take(quantity);
     }
 
-    public async Task<int> GetUnreadConversationMessagesCountAsync(Guid userId, Guid conversationId) {
+    public async Task<int> GetUnreadConversationMessagesCountAsync(Ulid userId, Ulid conversationId) {
         await Task.Run(() => { });
 
         var unreadMessagesFromConversation = Items.Where(x => x.ConversationId == conversationId && x.ReadByAll == null);
@@ -24,7 +24,7 @@ internal class InMemoryMessageRepository : InMemoryRepository<Message>, IMessage
         return unreadMessagesFromConversation.Count();
     }
 
-    public Task ReadUnreadMessagesByConversationIdAsync(Guid userId, Guid conversationId) {
+    public Task ReadUnreadMessagesByConversationIdAsync(Ulid userId, Ulid conversationId) {
         var messagesFromConversation = Items.Where(x => x.ConversationId == conversationId);
 
         foreach (var item in messagesFromConversation) {
@@ -35,7 +35,7 @@ internal class InMemoryMessageRepository : InMemoryRepository<Message>, IMessage
         return Task.CompletedTask;
     }
 
-    public Task UpdateStatusAsync(Guid messageId, EMessageStatuses status) {
+    public Task UpdateStatusAsync(Ulid messageId, EMessageStatuses status) {
         for (int i = 0; i < Items.Count(); i++) {
             if (Items.ElementAt(i).Id != messageId)
                 continue;

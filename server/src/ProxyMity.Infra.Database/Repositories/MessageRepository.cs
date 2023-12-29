@@ -1,6 +1,6 @@
 ﻿namespace ProxyMity.Infra.Database.Repositories;
 
-public class MessageRepository(DbSession session) : TRepository<MessageRepository>(session), IMessageRepository
+public class MessageRepository(DbSession session) : IMessageRepository
 {
     public async Task CreateAsync(Message message)
     {
@@ -41,10 +41,10 @@ public class MessageRepository(DbSession session) : TRepository<MessageRepositor
             read_by_all_at = message.ReadByAllAt,
         };
 
-        await _session.Connection.ExecuteAsync(sql, parameters, _session.Transaction);
+        await session.Connection.ExecuteAsync(sql, parameters, session.Transaction);
     }
 
-    public async Task<IEnumerable<Message>> GetMessagesFromConversationAsync(Guid conversationId, int quantity)
+    public async Task<IEnumerable<Message>> GetMessagesFromConversationAsync(Ulid conversationId, int quantity)
     {
         const string sql = """
             SELECT 
@@ -59,15 +59,15 @@ public class MessageRepository(DbSession session) : TRepository<MessageRepositor
                 read_by_all_at AS "ReadByAllAt"
             FROM "message"
             WHERE "conversation_id" = @conversationId
-            ORDER BY "written_at" DESC
+            ORDER BY "id"
             LIMIT @quantity;
         """;
 
         object parameters = new { conversationId, quantity };
-        return await _session.Connection.QueryAsync<Message>(sql, parameters);
+        return await session.Connection.QueryAsync<Message>(sql, parameters);
     }
 
-    public async Task<int> GetUnreadConversationMessagesCountAsync(Guid userId, Guid conversationId)
+    public async Task<int> GetUnreadConversationMessagesCountAsync(Ulid userId, Ulid conversationId)
     {
         const string sql = """
             SELECT COUNT(*)
@@ -79,10 +79,10 @@ public class MessageRepository(DbSession session) : TRepository<MessageRepositor
         """;
 
         object parameters = new { conversationId, userId };
-        return await _session.Connection.ExecuteScalarAsync<int>(sql, parameters);
+        return await session.Connection.ExecuteScalarAsync<int>(sql, parameters);
     }
 
-    public async Task ReadUnreadMessagesByConversationIdAsync(Guid userId, Guid conversationId)
+    public async Task ReadUnreadMessagesByConversationIdAsync(Ulid userId, Ulid conversationId)
     {
         const string sql = """
             WITH cte AS (
@@ -97,10 +97,10 @@ public class MessageRepository(DbSession session) : TRepository<MessageRepositor
         """;
 
         object parameters = new { conversationId, currentTime = DateTime.UtcNow };
-        await _session.Connection.ExecuteAsync(sql, parameters, _session.Transaction);
+        await session.Connection.ExecuteAsync(sql, parameters, session.Transaction);
     }
 
-    public async Task UpdateStatusAsync(Guid messageId, EMessageStatuses status)
+    public async Task UpdateStatusAsync(Ulid messageId, EMessageStatuses status)
     {
 
         string sql = status switch
@@ -124,6 +124,6 @@ public class MessageRepository(DbSession session) : TRepository<MessageRepositor
         };
 
         object parameters = new { messageId, currentTime = DateTime.UtcNow };
-        await _session.Connection.ExecuteAsync(sql, parameters, _session.Transaction);
+        await session.Connection.ExecuteAsync(sql, parameters, session.Transaction);
     }
 }

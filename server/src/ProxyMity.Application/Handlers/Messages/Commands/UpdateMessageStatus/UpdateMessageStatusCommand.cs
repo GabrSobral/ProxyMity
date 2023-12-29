@@ -1,9 +1,9 @@
 ﻿namespace ProxyMity.Application.Handlers.Messages.Commands.UpdateMessageStatus;
 
 public record UpdateMessageStatusCommand(
-    Guid MessageId,
+    Ulid MessageId,
     bool IsConversationGroup,
-    Guid ConversationId,
+    Ulid ConversationId,
     EMessageStatuses Status,
-    Guid UserId
+    Ulid UserId
 ) : ICommand;

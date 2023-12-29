@@ -13,7 +13,7 @@ internal class InMemoryUserRepository : InMemoryRepository<User>, IUserRepositor
         return Items.SingleOrDefault(x => x.Email == email);
     }
 
-    public async Task<User?> FindByIdAsync(Guid userId) {
+    public async Task<User?> FindByIdAsync(Ulid userId) {
         await Task.Run(() => { });
 
         return Items.SingleOrDefault(x => x.Id == userId);

@@ -6,14 +6,24 @@ public static class ConversationEndpoints
     {
         var group = app.MapGroup("conversation").RequireAuthorization();
 
-        group.MapGet("get-by-user/{userId}", GetUserConversations).WithName(nameof(GetUserConversations));
-        group.MapPost("private", CreatePrivateConversation).WithName(nameof(CreatePrivateConversation));
         group.MapPost("group", CreateGroupConversation).WithName(nameof(CreateGroupConversation));
+        group.MapPost("private", CreatePrivateConversation).WithName(nameof(CreatePrivateConversation));
+
+        group.MapGet("get-by-user/{userId}", GetUserConversations).WithName(nameof(GetUserConversations));
+        group.MapGet("messages/{conversationId}", GetConversationMessages).WithName(nameof(GetConversationMessages));
     }
 
-    public static async Task<IResult> GetUserConversations(Guid userId, ISender sender)
+    public static async Task<IResult> GetConversationMessages(Ulid conversationId, ISender sender)
     {
-        var query = new GetUserConversationsQuery(userId);
+        GetConversationMessagesQuery query = new(conversationId);
+        var response = await sender.Send(query);
+
+        return TypedResults.Ok(response);
+    }
+
+    public static async Task<IResult> GetUserConversations(Ulid userId, ISender sender)
+    {
+        GetUserConversationsQuery query = new(userId);
         var response = await sender.Send(query);
 
         return TypedResults.Ok(response);
@@ -24,8 +34,10 @@ public static class ConversationEndpoints
         HttpContext httpContext,
         ISender sender)
     {
-        var userId = HttpUserClaims.GetId(httpContext);
-        var command = new CreatePrivateConversationCommand(userId, model.ParticipantId);
+        CreatePrivateConversationCommand command = new (
+            RequesterId: HttpUserClaims.GetId(httpContext), 
+            ParticipantId: model.ParticipantId
+        );
 
         var response = await sender.Send(command);
 
@@ -37,11 +49,10 @@ public static class ConversationEndpoints
         HttpContext httpContext,
         ISender sender)
     {
-        var userId = HttpUserClaims.GetId(httpContext);
-        var command = new CreateGroupConversationCommand(
+        CreateGroupConversationCommand command = new(
             Name: model.Name,
             Description: model.Description,
-            CreatorId: userId,
+            CreatorId: HttpUserClaims.GetId(httpContext),
             Participants: model.Participants);
 
         var response = await sender.Send(command);

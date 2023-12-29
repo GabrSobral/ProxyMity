@@ -19,6 +19,7 @@ global using ProxyMity.Application.Handlers.Messages.Commands.SaveMessage;
 global using ProxyMity.Application.Handlers.Messages.Commands.UpdateMessageStatus;
 global using ProxyMity.Application.Handlers.Users.GetByEmail;
 global using ProxyMity.Application.Handlers.Users.GetById;
+global using ProxyMity.Application.Handlers.Conversations.Queries.GetConversationMessages;
 global using ProxyMity.Domain.Entities;
 global using ProxyMity.Domain.Enums;
 global using ProxyMity.Domain.Exceptions;

@@ -2,11 +2,11 @@
 
 public class Message
 {
-    public Guid Id { get; set; }
+    public Ulid Id { get; set; }
 
     public required string Content { get; set; }
 
-    public Guid ConversationId { get; set; }
+    public Ulid ConversationId { get; set; }
 
     public DateTime WrittenAt { get; set; }
 
@@ -16,15 +16,15 @@ public class Message
 
     public DateTime? ReadByAllAt { get; set; }
 
-    public Guid? RepliedMessageId { get; set; }
+    public Ulid? RepliedMessageId { get; set; }
 
-    public required Guid AuthorId { get; set; }
+    public required Ulid AuthorId { get; set; }
 
-    public static Message Create(string content, Guid conversationId, Guid authorId, DateTime? writtenAt = null)
+    public static Message Create(string content, Ulid conversationId, Ulid authorId, DateTime? writtenAt = null)
     {
         return new Message()
         {
-            Id = Guid.NewGuid(),
+            Id = Ulid.NewUlid(),
             Content = content,
             ConversationId = conversationId,
             AuthorId = authorId,

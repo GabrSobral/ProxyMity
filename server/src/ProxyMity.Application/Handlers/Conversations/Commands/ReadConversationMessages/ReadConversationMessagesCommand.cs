@@ -1,7 +1,7 @@
 ﻿namespace ProxyMity.Application.Handlers.Conversations.Commands.ReadConversationMessages;
 
 public record ReadConversationMessagesCommand(
-    Guid UserId,
-    Guid ConversationId,
+    Ulid UserId,
+    Ulid ConversationId,
     bool IsConversationGroup
 ) : ICommand;

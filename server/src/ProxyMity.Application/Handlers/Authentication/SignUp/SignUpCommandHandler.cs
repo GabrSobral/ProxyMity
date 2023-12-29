@@ -9,7 +9,7 @@ public sealed class SignUpCommandHandler(
 {
     public async Task<SignInResponse> Handle(SignUpCommand command, CancellationToken cancellationToken)
     {
-        var userId = Guid.NewGuid();
+        var userId = Ulid.NewUlid();
 
         User newUser = new()
         {
@@ -24,7 +24,7 @@ public sealed class SignUpCommandHandler(
         unitOfWork.BeginTransaction();
 
         await userRepository.CreateAsync(newUser);
-        unitOfWork.Commit();
+        await unitOfWork.CommitAsync(cancellationToken);
 
         logger.LogInformation($"An user was screated at application: {newUser.Email}");
 

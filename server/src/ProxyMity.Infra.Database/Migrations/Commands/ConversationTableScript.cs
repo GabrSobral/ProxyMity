@@ -6,8 +6,8 @@ internal static class ConversationTableScript
 
     private static string Table() => """
         CREATE TABLE IF NOT EXISTS "conversation" (
-            "id"            UUID NOT NULL,
-            "group_id"      UUID,
+            "id"            BYTEA NOT NULL,
+            "group_id"      BYTEA,
             "created_at"    TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
             "updated_at"    TIMESTAMPTZ,
 

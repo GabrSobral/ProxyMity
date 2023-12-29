@@ -6,7 +6,7 @@ internal static class UserTableScript
 
     private static string Table() => """
         CREATE TABLE IF NOT EXISTS "user" (
-            "id"            UUID         NOT NULL,
+            "id"            BYTEA         NOT NULL,
             "name"          VARCHAR(120) NOT NULL,
             "email"         VARCHAR(120) NOT NULL UNIQUE,
             "password"      VARCHAR(240) NOT NULL,

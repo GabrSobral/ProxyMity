@@ -5,7 +5,7 @@
 /// </summary>
 public class User
 {
-    public required Guid Id { get; set; }
+    public required Ulid Id { get; set; }
 
     public required string Name { get; set; }
 
@@ -23,7 +23,7 @@ public class User
     {
         return new User()
         {
-            Id = Guid.NewGuid(),
+            Id = Ulid.NewUlid(),
             Name = name,
             Email = email,
             Password = password,

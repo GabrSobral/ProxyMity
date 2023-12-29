@@ -2,6 +2,6 @@
 
 public record ChatSendTypingPayload(
     bool Typing,
-    Guid ConversationId,
-    Guid AuthorId
+    Ulid ConversationId,
+    Ulid AuthorId
 );

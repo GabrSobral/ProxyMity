@@ -2,7 +2,7 @@
 
 public class Group
 {
-    public required Guid Id { get; set; }
+    public required Ulid Id { get; set; }
 
     public required string Name { get; set; }
 
@@ -12,13 +12,13 @@ public class Group
 
     public DateTime? UpdatedAt { get; set; }
 
-    public Guid CreatedBy { get; set; }
+    public Ulid CreatedBy { get; set; }
 
-    public static Group Create(Guid CreatedBy, string name, string? description = null)
+    public static Group Create(Ulid CreatedBy, string name, string? description = null)
     {
         return new Group()
         {
-            Id = Guid.NewGuid(),
+            Id = Ulid.NewUlid(),
             Name = name,
             Description = description,
             CreatedAt = DateTime.UtcNow,

@@ -6,7 +6,7 @@ public record GetByEmailQuery(
 
 public record GetByEmailResponse
 {
-    public Guid Id { get; set; }
+    public Ulid Id { get; set; }
     public string Name { get; set; }
     public string Email { get; set; }
     public string? PhotoUrl { get; set; }

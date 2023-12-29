@@ -1,10 +1,10 @@
 ﻿namespace ProxyMity.Unit.Conversations;
 
 public class ReadConversationMessagesServiceTest {
-    private ILogger<ReadConversationMessagesCommandHandler> _logger;
-    private ILogger<SaveMessageCommandHandler> _saveMessageLogger;
+    private readonly ILogger<ReadConversationMessagesCommandHandler> _logger;
+    private readonly ILogger<SaveMessageCommandHandler> _saveMessageLogger;
 
-    private IUnitOfWork _unitOfWork;
+    private readonly IUnitOfWork _unitOfWork;
 
     public ReadConversationMessagesServiceTest() {
         _logger = LoggerFactory.Create(builder => { }).CreateLogger<ReadConversationMessagesCommandHandler>();

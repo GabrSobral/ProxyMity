@@ -7,19 +7,12 @@ public class UnitOfWork(DbSession session) : IUnitOfWork
         session.Transaction = session.Connection.BeginTransaction();
     }
 
-    public void Commit()
+    public async Task CommitAsync(CancellationToken cancellationToken)
     {
-        session.Transaction?.Commit();
-        Dispose();
+        await session?.Transaction?.CommitAsync(cancellationToken);
     }
-    public void Rollback()
+    public async Task RollbackAsync(CancellationToken cancellationToken)
     {
-        session.Transaction?.Rollback();
-        Dispose();
-    }
-
-    public void Dispose()
-    {
-        session.Transaction?.Dispose();
+        await session?.Transaction?.RollbackAsync(cancellationToken);
     }
 }

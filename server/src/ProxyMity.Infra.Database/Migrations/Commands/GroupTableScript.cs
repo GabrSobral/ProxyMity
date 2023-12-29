@@ -6,12 +6,12 @@ internal static class GroupTableScript
 
     private static string Table() => """
         CREATE TABLE IF NOT EXISTS "group" (
-            "id"            UUID NOT NULL,
+            "id"            BYTEA NOT NULL,
             "name"          VARCHAR(90),
             "description"   VARCHAR(240),
             "created_at"    TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
             "updated_at"    TIMESTAMPTZ,
-            "created_by"    UUID NOT NULL,
+            "created_by"    BYTEA NOT NULL,
 
             PRIMARY KEY ("id"),
             FOREIGN KEY ("created_by") REFERENCES "user" ("id")

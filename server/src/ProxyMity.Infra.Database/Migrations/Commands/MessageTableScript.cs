@@ -6,10 +6,10 @@ internal static class MessageTableScript
 
     private static string Table() => """
         CREATE TABLE IF NOT EXISTS "message" (
-            "id"                    UUID NOT NULL,
-            "conversation_id"       UUID NOT NULL,
-            "author_id"             UUID NOT NULL,
-            "replied_message_id"    UUID,
+            "id"                    BYTEA NOT NULL,
+            "conversation_id"       BYTEA NOT NULL,
+            "author_id"             BYTEA NOT NULL,
+            "replied_message_id"    BYTEA,
             "content"               VARCHAR(1000),
             "written_at"            TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
             "sent_at"               TIMESTAMPTZ,

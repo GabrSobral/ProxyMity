@@ -2,9 +2,9 @@
 
 public class Conversation
 {
-    public Guid Id { get; set; }
+    public Ulid Id { get; set; }
 
-    public Guid? GroupId { get; set; }
+    public Ulid? GroupId { get; set; }
 
     public DateTime CreatedAt { get; set; }
 
@@ -12,11 +12,11 @@ public class Conversation
 
     public DateTime? DisabledAt { get; set; }
 
-    public static Conversation Create(Guid? groupId = null)
+    public static Conversation Create(Ulid? groupId = null)
     {
         return new Conversation
         {
-            Id = Guid.NewGuid(),
+            Id = Ulid.NewUlid(),
             GroupId = groupId,
             CreatedAt = DateTime.UtcNow,
         };

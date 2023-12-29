@@ -7,7 +7,7 @@ public class InMemoryConversationRepository : InMemoryRepository<Conversation>, 
         return Task.CompletedTask;
     }
 
-    public Task DisableConversationByIdAsync(Guid conversationId) {
+    public Task DisableConversationByIdAsync(Ulid conversationId) {
         foreach (var item in Items) {
             if (item.Id == conversationId)
                 item.DisabledAt = DateTime.UtcNow;
@@ -16,7 +16,7 @@ public class InMemoryConversationRepository : InMemoryRepository<Conversation>, 
         return Task.CompletedTask;
     }
 
-    public async Task<Conversation?> GetByIdAsync(Guid conversationId) {
+    public async Task<Conversation?> GetByIdAsync(Ulid conversationId) {
         await Task.Run(() => { });
 
         return Items.SingleOrDefault(x => x.Id == conversationId);

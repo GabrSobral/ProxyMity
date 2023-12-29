@@ -1,12 +1,12 @@
 ﻿namespace ProxyMity.Application.Handlers.Users.GetById;
 
 public record GetByIdQuery(
-    Guid Id
+    Ulid Id
 ) : IQuery<GetByIdResponse>;
 
 public record GetByIdResponse
 {
-    public Guid Id { get; set; }
+    public Ulid Id { get; set; }
     public string Name { get; set; }
     public string Email { get; set; }
     public string? PhotoUrl { get; set; }

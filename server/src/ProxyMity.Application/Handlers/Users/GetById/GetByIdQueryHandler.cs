@@ -5,9 +5,9 @@ public class GetByIdQueryHandler(
     IUserRepository userRepository
 ) : IQueryHandler<GetByIdQuery, GetByIdResponse>
 {
-    public async Task<GetByIdResponse> Handle(GetByIdQuery request, CancellationToken cancellationToken)
+    public async Task<GetByIdResponse> Handle(GetByIdQuery query, CancellationToken cancellationToken)
     {
-        var userId = request.Id;
+        var userId = query.Id;
 
         logger.LogInformation($"Searching for user ID: {userId}");
 

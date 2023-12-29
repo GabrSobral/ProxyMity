@@ -1,7 +1,7 @@
 ﻿namespace ProxyMity.Domain.Interfaces.Repositories.ParticipantRepository.CustomQueries;
 
 public record GetParticipantsByConversationIdQuery(
-    Guid Id,
+    Ulid Id,
     string Name,
     string Email,
     string? PhotoUrl,

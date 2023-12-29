@@ -1,7 +1,6 @@
 ﻿namespace ProxyMity.Infra.Database.Repositories;
 
-public class ConversationRepository(DbSession session) 
-    : TRepository<ConversationRepository>(session), IConversationRepository
+public class ConversationRepository(DbSession session) : IConversationRepository
 {
     public async Task CreateAsync(Conversation newConversation)
     {
@@ -17,10 +16,10 @@ public class ConversationRepository(DbSession session)
             createdAt = newConversation.CreatedAt,
         };
 
-        await _session.Connection.ExecuteAsync(sql, parameters, _session.Transaction);
+        await session.Connection.ExecuteAsync(sql, parameters, session.Transaction);
     }
 
-    public async Task<Conversation?> GetByIdAsync(Guid conversationId)
+    public async Task<Conversation?> GetByIdAsync(Ulid conversationId)
     {
         const string sql = """
             SELECT
@@ -32,6 +31,6 @@ public class ConversationRepository(DbSession session)
         """;
 
         object parameters = new { conversationId };
-        return await _session.Connection.QueryFirstOrDefaultAsync<Conversation>(sql, parameters);
+        return await session.Connection.QueryFirstOrDefaultAsync<Conversation>(sql, parameters);
     }
 }

@@ -16,6 +16,8 @@ public static class DependenyInjection
         services.AddScoped<IConversationRepository, ConversationRepository>();
         services.AddScoped<IMessageStatusRepository, MessageStatusRepository>();
 
+        SqlMapper.AddTypeHandler(new BinaryUlidHandler());
+
         return services;
     }
 }

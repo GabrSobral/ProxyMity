@@ -8,24 +8,24 @@ internal sealed class ReadConversationMessagesCommandHandler(
     IMessageStatusRepository messageStatusRepository
 ) : ICommandHandler<ReadConversationMessagesCommand>
 {
-    public async Task Handle(ReadConversationMessagesCommand request, CancellationToken cancellationToken)
+    public async Task Handle(ReadConversationMessagesCommand command, CancellationToken cancellationToken)
     {
-        var conversation = await conversationRepository.GetByIdAsync(request.ConversationId)
-            ?? throw new ConversationNotFoundException(request.ConversationId);
+        var conversation = await conversationRepository.GetByIdAsync(command.ConversationId)
+            ?? throw new ConversationNotFoundException(command.ConversationId);
 
-        logger.LogInformation($"The user {request.UserId} is reading the messages of conversation {request.ConversationId}");
+        logger.LogInformation($"The user {command.UserId} is reading the messages of conversation {command.ConversationId}");
 
         unitOfWork.BeginTransaction();
 
-        if (request.IsConversationGroup)
-            await GroupConversationHandler(request.UserId, conversation);
+        if (command.IsConversationGroup)
+            await GroupConversationHandler(command.UserId, conversation);
         else
-            await PrivateConversationHandler(request.UserId, conversation);
+            await PrivateConversationHandler(command.UserId, conversation);
 
-        unitOfWork.Commit();
+        await unitOfWork.CommitAsync(cancellationToken);
     }
 
-    private async Task GroupConversationHandler(Guid userId, Conversation conversation)
+    private async Task GroupConversationHandler(Ulid userId, Conversation conversation)
     {
         await messageStatusRepository.ReadUnreadMessagesByUserIdAsync(userId, conversation.Id);
 
@@ -38,7 +38,7 @@ internal sealed class ReadConversationMessagesCommandHandler(
             await messageRepository.ReadUnreadMessagesByConversationIdAsync(userId, conversation.Id);
     }
 
-    private async Task PrivateConversationHandler(Guid userId, Conversation conversation)
+    private async Task PrivateConversationHandler(Ulid userId, Conversation conversation)
     {
         await messageRepository.ReadUnreadMessagesByConversationIdAsync(userId, conversation.Id);
     }

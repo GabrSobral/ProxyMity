@@ -1,9 +1,7 @@
 ﻿namespace ProxyMity.Infra.Database.Repositories;
 
-public class ParticipantRepository : TRepository<ParticipantRepository>, IParticipantRepository
+public class ParticipantRepository(DbSession session) : IParticipantRepository
 {
-    public ParticipantRepository(DbSession session) : base(session) { }
-
     public async Task AddAsync(Participant participant)
     {
         const string sql = """
@@ -18,10 +16,10 @@ public class ParticipantRepository : TRepository<ParticipantRepository>, IPartic
             created_at = participant.CreatedAt,
         };
 
-        await _session.Connection.ExecuteAsync(sql, parameters, _session.Transaction);
+        await session.Connection.ExecuteAsync(sql, parameters, session.Transaction);
     }
 
-    public async Task<IEnumerable<Participant>> GetByConversationIdAsync(Guid conversationId)
+    public async Task<IEnumerable<Participant>> GetByConversationIdAsync(Ulid conversationId)
     {
         const string sql = """
             SELECT 
@@ -33,10 +31,10 @@ public class ParticipantRepository : TRepository<ParticipantRepository>, IPartic
         """;
 
         object parameters = new { conversationId };
-        return await _session.Connection.QueryAsync<Participant>(sql, parameters);
+        return await session.Connection.QueryAsync<Participant>(sql, parameters);
     }
 
-    public async Task<IEnumerable<GetConversationsByUserIdQuery>> GetConversationsByUserIdAsync(Guid userId)
+    public async Task<IEnumerable<GetConversationsByUserIdQuery>> GetConversationsByUserIdAsync(Ulid userId)
     {
         const string sql = """
             SELECT 
@@ -52,10 +50,10 @@ public class ParticipantRepository : TRepository<ParticipantRepository>, IPartic
         """;
 
         object parameters = new { userId };
-        return await _session.Connection.QueryAsync<GetConversationsByUserIdQuery>(sql, parameters);
+        return await session.Connection.QueryAsync<GetConversationsByUserIdQuery>(sql, parameters);
     }
 
-    public async Task<IEnumerable<Participant>> GetByUserIdAsync(Guid userId)
+    public async Task<IEnumerable<Participant>> GetByUserIdAsync(Ulid userId)
     {
         const string sql = """
             SELECT 
@@ -67,10 +65,10 @@ public class ParticipantRepository : TRepository<ParticipantRepository>, IPartic
         """;
 
         object parameters = new { userId };
-        return await _session.Connection.QueryAsync<Participant>(sql, parameters);
+        return await session.Connection.QueryAsync<Participant>(sql, parameters);
     }
 
-    public async Task<IEnumerable<GetParticipantsByConversationIdQuery>> GetParticipantsByConversationIdAsync(Guid conversationId)
+    public async Task<IEnumerable<GetParticipantsByConversationIdQuery>> GetParticipantsByConversationIdAsync(Ulid conversationId)
     {
         const string sql = """
             SELECT 
@@ -88,7 +86,7 @@ public class ParticipantRepository : TRepository<ParticipantRepository>, IPartic
         ;
 
         object parameters = new { conversationId };
-        return await _session.Connection.QueryAsync<GetParticipantsByConversationIdQuery>(sql, parameters);
+        return await session.Connection.QueryAsync<GetParticipantsByConversationIdQuery>(sql, parameters);
     }
 
     public async Task RemoveAsync(Participant participant)
@@ -101,10 +99,10 @@ public class ParticipantRepository : TRepository<ParticipantRepository>, IPartic
         """
 ;
         object parameters = new { userId = participant.UserId, conversationId = participant.ConversationId };
-        await _session.Connection.ExecuteAsync(sql, parameters, _session.Transaction);
+        await session.Connection.ExecuteAsync(sql, parameters, session.Transaction);
     }
 
-    public async Task<Participant?> GetByIdAsync(Guid userId, Guid conversationId)
+    public async Task<Participant?> GetByIdAsync(Ulid userId, Ulid conversationId)
     {
         const string sql = """
             SELECT
@@ -119,6 +117,6 @@ public class ParticipantRepository : TRepository<ParticipantRepository>, IPartic
         """;
 
         object parameters = new { userId, conversationId };
-        return await _session.Connection.QueryFirstOrDefaultAsync<Participant>(sql, parameters);
+        return await session.Connection.QueryFirstOrDefaultAsync<Participant>(sql, parameters);
     }
 }

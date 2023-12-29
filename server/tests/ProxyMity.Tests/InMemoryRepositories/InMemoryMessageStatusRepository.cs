@@ -9,25 +9,25 @@ internal class InMemoryMessageStatusRepository : InMemoryRepository<MessageStatu
         return Task.CompletedTask;
     }
 
-    public async Task<IEnumerable<MessageStatus>> GetMessagesStatusByMessageIdAsync(Guid messageId, Guid conversationId) {
+    public async Task<IEnumerable<MessageStatus>> GetMessagesStatusByMessageIdAsync(Ulid messageId, Ulid conversationId) {
         await Task.Run(() => { });
 
         return Items.Where(x => x.MessageId == messageId && x.ConversationId == conversationId);
     }
 
-    public async Task<int> GetUnreadMessagesStatusCountByUserIdAsync(Guid userId, Guid conversationId) {
+    public async Task<int> GetUnreadMessagesStatusCountByUserIdAsync(Ulid userId, Ulid conversationId) {
         await Task.Run(() => { });
 
         return Items.Where(x => x.UserId == userId && x.ConversationId == conversationId && x.ReadAt == null).Count();
     }
 
-    public async Task<IEnumerable<MessageStatus>> GetUnreadMessagesStatusFromConversationByIdAsync(Guid conversationId) {
+    public async Task<IEnumerable<MessageStatus>> GetUnreadMessagesStatusFromConversationByIdAsync(Ulid conversationId) {
         await Task.Run(() => { });
 
         return Items.Where(x => x.ConversationId == conversationId);
     }
 
-    public Task ReadAsync(Guid userId, Guid messageId) {
+    public Task ReadAsync(Ulid userId, Ulid messageId) {
         foreach (var item in Items) {
             if (item.UserId == userId && item.MessageId == messageId) {
                 item.Read();
@@ -37,7 +37,7 @@ internal class InMemoryMessageStatusRepository : InMemoryRepository<MessageStatu
         return Task.CompletedTask;
     }
 
-    public Task ReadUnreadMessagesByUserIdAsync(Guid userId, Guid conversationId) {
+    public Task ReadUnreadMessagesByUserIdAsync(Ulid userId, Ulid conversationId) {
         foreach (var item in Items) {
             if (item.UserId == userId && item.ConversationId == conversationId) {
                 item.Read();
@@ -47,7 +47,7 @@ internal class InMemoryMessageStatusRepository : InMemoryRepository<MessageStatu
         return Task.CompletedTask;
     }
 
-    public Task ReceiveAsync(Guid userId, Guid messageId) {
+    public Task ReceiveAsync(Ulid userId, Ulid messageId) {
         foreach (var item in Items) {
             if (item.UserId == userId && item.MessageId == messageId) {
                 item.Receive();

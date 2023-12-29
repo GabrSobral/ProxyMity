@@ -22,7 +22,7 @@ public static class UserEndpoints
     /// </summary>
     /// <param name="userId">User Id</param>
     /// <param name="sender">MediatR sender</param>
-    public static async Task<IResult> GetUserById(Guid userId, ISender sender)
+    public static async Task<IResult> GetUserById(Ulid userId, ISender sender)
     {
         var query = new GetByIdQuery(userId);
 

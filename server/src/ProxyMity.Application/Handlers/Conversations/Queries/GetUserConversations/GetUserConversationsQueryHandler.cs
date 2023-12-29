@@ -11,7 +11,7 @@ public sealed class GetUserConversationsQueryHandler(
         GetUserConversationsQuery query,
         CancellationToken cancellationToken)
     {
-        Guid userId = query.UserId;
+        Ulid userId = query.UserId;
 
         logger.LogInformation($"Listing conversations of {userId}...");
 
