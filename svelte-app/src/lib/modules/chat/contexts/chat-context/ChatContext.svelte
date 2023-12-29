@@ -4,6 +4,7 @@
 	let chatStateModule: State;
 	let connectionModule: HubConnection | null;
 	let userModule: Session['user'] | undefined;
+	let accessToken: string;
 	let typebarRefModule: HTMLInputElement | null;
 
 	chatState.subscribe(value => {
@@ -17,6 +18,7 @@
 	if (browser) {
 		page.subscribe(value => {
 			userModule = value.data?.session?.user as Session['user'] | undefined;
+			accessToken = value.data?.session?.accessToken as string;
 		});
 
 		typebarRef.subscribe(value => {
@@ -36,7 +38,7 @@
 
 		if (!conversation.hasMessagesFetched) {
 			try {
-				const { messages } = await APIGetConversationMessages({ conversationId: conversation.id });
+				const { messages } = await APIGetConversationMessages({ conversationId: conversation.id }, { accessToken });
 				chatDispatch.setConversationMessages({ conversationId: conversation.id, messages });
 			} catch (error) {
 				console.error('Error fetching conversations, data will be taken from the cache', error);
@@ -73,7 +75,7 @@
 <script lang="ts">
 	import { page } from '$app/stores';
 	import { chatDispatch } from './stores/chat';
-	import { setContext, getContext, onMount } from 'svelte';
+	import { setContext, getContext, onMount, afterUpdate } from 'svelte';
 
 	// import { selectedConversationAsync } from './functions/selectedConversationAsync.svelte';
 
@@ -93,11 +95,13 @@
 	import { getConversationsMessagesAsyncDB } from '../../../../../services/database/use-cases/get-conversations-messages';
 	import { readConversationMessagesAsyncDB } from '../../../../../services/database/use-cases/read-conversation-messages';
 	import { sendReadMessageWebSocketEvent } from '../websocket-context/emmiters/sendReadMessage';
+	import { addMessageAsyncDB } from '../../../../../services/database/use-cases/add-message';
+	import type { Message } from '../../../../../types/message';
+	import { sendReceiveMessageWebSocketEvent } from '../websocket-context/emmiters/sendReceiveMessage';
 
 	setChatContext();
 
 	$: session = $page.data.session;
-	$: console.log({ state: $chatState });
 
 	onMount(() => {
 		if (session?.user && session?.accessToken) {
@@ -127,6 +131,69 @@
 				});
 		}
 	});
+
+	function receiveMessageHandler(message: Message) {
+		console.log({ receiveMessageHandler: message });
+		if (!message || !session?.user || !$connection) {
+			return;
+		}
+
+		if ($chatState.selectedConversation && $chatState.selectedConversation?.id === message.conversationId) {
+			sendReceiveMessageWebSocketEvent($connection, {
+				userId: session?.user.id,
+				conversationId: message.conversationId,
+				messageId: message.id,
+				isConversationGroup: $chatState.selectedConversation.isGroup,
+			});
+
+			sendReadMessageWebSocketEvent($connection, {
+				userId: session?.user.id,
+				conversationId: $chatState.selectedConversation.id,
+				isConversationGroup: $chatState.selectedConversation.isGroup,
+			});
+		} else {
+			const messageConversation = $chatState.conversations.find(item => item.id === message.conversationId);
+
+			if (messageConversation && $connection)
+				sendReceiveMessageWebSocketEvent($connection, {
+					userId: session?.user.id,
+					conversationId: message.conversationId,
+					messageId: message.id,
+					isConversationGroup: messageConversation?.isGroup,
+				});
+		}
+
+		const payload: Message = {
+			...message,
+			receivedByAllAt: new Date(),
+			readByAllAt: $chatState.selectedConversation?.id === message.authorId ? new Date() : null,
+		};
+
+		const shouldNotification = $chatState.selectedConversation?.id !== message.authorId;
+
+		addMessageAsyncDB(payload);
+		chatDispatch.addMessage({ conversationId: message.conversationId, message: payload, shouldNotification });
+		chatDispatch.bringToTop(message.authorId);
+	}
+
+	function receiveReadMessageHandler(userId: string, conversationId: string) {
+		if (!session?.user) return;
+
+		chatDispatch.updateConversationMessageStatus({ conversationId, status: 'read' });
+		readConversationMessagesAsyncDB({ conversationId, userId: session?.user?.id });
+	}
+
+	function receiveMessageStatusHandler(messageStatus: string, messageId: string, conversationId: string) {
+		const messageStatusEvent = new CustomEvent(messageId, { detail: { messageStatus, messageId, conversationId } });
+
+		dispatchEvent(messageStatusEvent);
+	}
+
+	$: if ($connection) {
+		$connection?.on('receivemessage', receiveMessageHandler);
+		$connection?.on('receivereadmessage', receiveReadMessageHandler);
+		$connection?.on('receivemessagestatus', receiveMessageStatusHandler);
+	}
 </script>
 
 <slot />

@@ -30,6 +30,8 @@ export const chatDispatch: Actions = {
 				}
 			}
 
+			console.log({ selectedConversation: store.selectedConversation });
+
 			return { ...store };
 		});
 	},

@@ -9,5 +9,5 @@ interface ISendReadMessageWebSocketPayload {
 
 export function sendReadMessageWebSocketEvent(connection: HubConnection, payload: ISendReadMessageWebSocketPayload) {
 	// socket.send(toBinary(JSON.stringify({ event: 'send_read_message', payload })));
-	connection.invoke('sendReadMessage', payload);
+	connection.invoke('onSendReadMessage', payload);
 }

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { ulid } from 'ulidx';
 	import { onMount } from 'svelte';
 	import { page } from '$app/stores';
 	import { PaperPlaneTilt, X } from 'phosphor-svelte';
@@ -46,7 +47,7 @@
 		})();
 
 		const message: Message = {
-			id: crypto.randomUUID(),
+			id: ulid(),
 			content: $typebarRef?.value.trim(),
 
 			writtenAt: new Date(),

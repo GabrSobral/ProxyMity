@@ -5,7 +5,7 @@
 	import { twMerge } from 'tailwind-merge';
 
 	import { connection } from '$lib/modules/chat/contexts/websocket-context/stores/connection';
-	import { chatDispatch, chatState } from '$lib/modules/chat/contexts/chat-context/stores/chat';
+	import { chatState } from '$lib/modules/chat/contexts/chat-context/stores/chat';
 	import type { ConversationState } from '$lib/modules/chat/contexts/chat-context/stores/chat-store-types';
 	import { getChatContext } from '$lib/modules/chat/contexts/chat-context/ChatContext.svelte';
 
