@@ -59,7 +59,7 @@ public class MessageRepository(DbSession session) : IMessageRepository
                 read_by_all_at AS "ReadByAllAt"
             FROM "message"
             WHERE "conversation_id" = @conversationId
-            ORDER BY "id"
+            ORDER BY "id" DESC
             LIMIT @quantity;
         """;
 
