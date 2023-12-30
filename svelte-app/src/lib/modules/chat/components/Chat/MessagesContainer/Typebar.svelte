@@ -8,6 +8,7 @@
 	import InputGroup from '$lib/design-system/Input/InputGroup.svelte';
 
 	import { connection } from '$lib/modules/chat/contexts/websocket-context/stores/connection';
+	import { getChatContext } from '$lib/modules/chat/contexts/chat-context/ChatContext.svelte';
 	import { chatDispatch, chatState } from '$lib/modules/chat/contexts/chat-context/stores/chat';
 	import { sendTypingWebSocketEvent } from '$lib/modules/chat/contexts/websocket-context/emmiters/sendTyping';
 	import { sendMessageWebSocketEvent } from '$lib/modules/chat/contexts/websocket-context/emmiters/sendMessage';
@@ -16,7 +17,6 @@
 	import { changeMessageStatusAsyncDB } from '../../../../../../services/database/use-cases/change-message-status';
 
 	import type { Message } from '../../../../../../types/message';
-	import { getChatContext } from '$lib/modules/chat/contexts/chat-context/ChatContext.svelte';
 
 	let typeValueManaged = '';
 
@@ -65,11 +65,7 @@
 		});
 
 		chatDispatch.bringToTop(message.conversationId);
-
-		chatDispatch.addMessage({
-			conversationId: $chatState.selectedConversation?.id,
-			message,
-		});
+		chatDispatch.addMessage({ message });
 
 		if ($connection) {
 			sendMessageWebSocketEvent($connection, {

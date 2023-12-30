@@ -1,4 +1,5 @@
 <script lang="ts">
+	import autoAnimate from '@formkit/auto-animate';
 	import UserPlus from 'phosphor-svelte/lib/UserPlus';
 
 	import Button from '$lib/design-system/Button.svelte';
@@ -42,7 +43,7 @@
 		</Button>
 	</div>
 
-	<div class="flex flex-col gap-[2px] mt-4 overflow-auto rounded-md h-full" role="list">
+	<div class="flex flex-col gap-[2px] mt-4 overflow-auto rounded-md h-full" role="list" use:autoAnimate>
 		{#each $chatState.conversations as conversation (conversation.id)}
 			<ChatItem {conversation} />
 		{/each}

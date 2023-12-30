@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { afterUpdate, beforeUpdate } from 'svelte';
+
 	import Heading from '$lib/design-system/Heading.svelte';
 	import { chatState } from '$lib/modules/chat/contexts/chat-context/stores/chat';
 
@@ -6,10 +8,24 @@
 	import Typebar from './Typebar.svelte';
 	import ScrollToBottomButton from './ScrollToBottomButton.svelte';
 
+	$: isFirstAccess = true;
+	let messagesContainer: HTMLUListElement;
+
+	$: selectedConversationId = $chatState.selectedConversation?.id;
 	$: conversationMessages = $chatState.selectedConversation?.messages || [];
 
-	let isFirstAccess = false;
-	let messagesContainer: HTMLUListElement;
+	afterUpdate(() => {
+		if (selectedConversationId || !selectedConversationId) {
+			isFirstAccess = true;
+		}
+
+		messagesContainer?.scroll({
+			top: messagesContainer.scrollHeight,
+			behavior: isFirstAccess ? 'auto' : 'smooth',
+		});
+
+		isFirstAccess = false;
+	});
 </script>
 
 <div class="overflow-hidden w-full flex-1 h-full flex flex-col p-1 relative">

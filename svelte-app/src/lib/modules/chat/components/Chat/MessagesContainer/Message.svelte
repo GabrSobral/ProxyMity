@@ -6,6 +6,8 @@
 
 	import type { Message } from '../../../../../../types/message';
 	import { connection } from '$lib/modules/chat/contexts/websocket-context/stores/connection';
+	import { chatDispatch } from '$lib/modules/chat/contexts/chat-context/stores/chat';
+	import { changeMessageStatusAsyncDB } from '../../../../../../services/database/use-cases/change-message-status';
 
 	export let message: Message;
 	export let previousMessage: Message;
@@ -34,6 +36,31 @@
 	const previousIsFromUser = previousMessage?.authorId === message.authorId;
 
 	const timeToShow = selectTimeToShow(isMine, message);
+
+	onMount(() => {
+		function handler(
+			event: CustomEventInit<{
+				messageStatus: 'sent' | 'received';
+				messageId: string;
+				conversationId: string;
+			}>
+		) {
+			if (!event.detail) {
+				return;
+			}
+
+			const { messageId, messageStatus, conversationId } = event.detail;
+
+			if (messageStatus && messageId && conversationId) {
+				status = messageStatus;
+				chatDispatch.updateConversationMessageStatus({ conversationId, messageId: message.id, status: messageStatus });
+				changeMessageStatusAsyncDB({ messageId: messageId, status: messageStatus });
+			}
+		}
+
+		addEventListener(message.id, handler);
+		return () => removeEventListener(message.id, handler);
+	});
 
 	onMount(() => {
 		$connection?.on(
