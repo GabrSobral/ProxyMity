@@ -16,9 +16,9 @@ export const chatDispatch: Actions = {
 		}));
 	},
 
-	addMessage({ message, conversationId, shouldNotification }) {
+	addMessage({ message, shouldNotification }) {
 		chatState.update(store => {
-			const index = store.conversations.findIndex(conversation => conversation.id === conversationId);
+			const index = store.conversations.findIndex(conversation => conversation.id === message.conversationId);
 			if (index >= 0) {
 				store.conversations[index].messages.push(message);
 
@@ -29,8 +29,6 @@ export const chatDispatch: Actions = {
 					store.conversations[index].messages.shift();
 				}
 			}
-
-			console.log({ selectedConversation: store.selectedConversation });
 
 			return { ...store };
 		});
@@ -107,7 +105,7 @@ export const chatDispatch: Actions = {
 					groupDescription: conversation.conversation.groupDescription,
 					groupName: conversation.conversation.groupName,
 					isGroup: !!conversation.conversation.groupId,
-					messages: conversation.lastMessages,
+					messages: conversation.lastMessages.toReversed(),
 					notifications: conversation.unreadMessagesCount,
 					participants: conversation.participants.filter(item => item.id !== userId),
 					replyMessage: null,

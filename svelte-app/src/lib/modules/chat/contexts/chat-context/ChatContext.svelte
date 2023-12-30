@@ -39,12 +39,12 @@
 		if (!conversation.hasMessagesFetched) {
 			try {
 				const { messages } = await APIGetConversationMessages({ conversationId: conversation.id }, { accessToken });
-				chatDispatch.setConversationMessages({ conversationId: conversation.id, messages });
+				chatDispatch.setConversationMessages({ conversationId: conversation.id, messages: messages.toReversed() });
 			} catch (error) {
 				console.error('Error fetching conversations, data will be taken from the cache', error);
 
 				const messages = await getConversationsMessagesAsyncDB(conversation.id);
-				chatDispatch.setConversationMessages({ conversationId: conversation.id, messages });
+				chatDispatch.setConversationMessages({ conversationId: conversation.id, messages: messages.toReversed() });
 			}
 		}
 
@@ -133,7 +133,7 @@
 	});
 
 	function receiveMessageHandler(message: Message) {
-		console.log({ receiveMessageHandler: message });
+		console.trace({ receiveMessageHandler: message });
 		if (!message || !session?.user || !$connection) {
 			return;
 		}
@@ -172,11 +172,13 @@
 		const shouldNotification = $chatState.selectedConversation?.id !== message.authorId;
 
 		addMessageAsyncDB(payload);
-		chatDispatch.addMessage({ conversationId: message.conversationId, message: payload, shouldNotification });
-		chatDispatch.bringToTop(message.authorId);
+		chatDispatch.addMessage({ message: payload, shouldNotification });
+		chatDispatch.bringToTop(message.conversationId);
 	}
 
 	function receiveReadMessageHandler(userId: string, conversationId: string) {
+		console.trace('receive Read Message');
+
 		if (!session?.user) return;
 
 		chatDispatch.updateConversationMessageStatus({ conversationId, status: 'read' });
@@ -184,8 +186,9 @@
 	}
 
 	function receiveMessageStatusHandler(messageStatus: string, messageId: string, conversationId: string) {
-		const messageStatusEvent = new CustomEvent(messageId, { detail: { messageStatus, messageId, conversationId } });
+		console.trace('receive Message Status');
 
+		const messageStatusEvent = new CustomEvent(messageId, { detail: { messageStatus, messageId, conversationId } });
 		dispatchEvent(messageStatusEvent);
 	}
 
