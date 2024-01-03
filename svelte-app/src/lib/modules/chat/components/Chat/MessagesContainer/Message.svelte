@@ -130,17 +130,20 @@
 				'bg-purple-500 rounded-tr-none': isMine,
 			})}
 		>
-			<div
-				class={clsx('dark:bg-black bg-white transition-colors p-2 rounded-[8px] w-full flex flex-col', {
-					'ml-auto': isMine,
-				})}
-			>
-				<span class="text-purple-300 text-xs">{'Typescript'}</span>
-				<span class="text-gray-200 text-sm">
-					{typeof message.repliedMessage === 'object' ? message.repliedMessage?.content : null}
-				</span>
-			</div>
-
+			{#if message.repliedMessage}
+				<div
+					class={clsx('dark:bg-black bg-white transition-colors p-2 rounded-[8px] w-full flex flex-col', {
+						'ml-auto': isMine,
+					})}
+				>
+					<span class="text-purple-300 text-xs"
+						>{typeof message.repliedMessage === 'object' ? message.repliedMessage?.authorId : null}</span
+					>
+					<span class="text-gray-200 text-sm">
+						{typeof message.repliedMessage === 'object' ? message.repliedMessage?.content : null}
+					</span>
+				</div>
+			{/if}
 			<p class="p-1">{message.content}</p>
 		</div>
 
