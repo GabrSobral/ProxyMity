@@ -4,8 +4,7 @@ import type { Message } from '../../../../../../types/message';
 
 interface ISendMessageWebSocketPayload {
 	message: Message;
-	sender: string;
-	receiver: string;
+	isConversationGroup: boolean;
 }
 
 export function sendMessageWebSocketEvent(connection: HubConnection, payload: ISendMessageWebSocketPayload) {

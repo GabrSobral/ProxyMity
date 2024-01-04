@@ -79,7 +79,13 @@
 	on:mouseover={() => {
 		isMessageConfigVisible = true;
 	}}
+	on:focus={() => {
+		isMessageConfigVisible = true;
+	}}
 	on:mouseout={() => {
+		isMessageConfigVisible = false;
+	}}
+	on:blur={() => {
 		isMessageConfigVisible = false;
 	}}
 	class="flex flex-col gap-1 rounded-[1rem] w-full"
@@ -95,7 +101,7 @@
 		{#if !isMine && !previousIsFromUser}
 			<img
 				src="https://github.com/diego3g.png"
-				alt="User Photo"
+				alt="User"
 				width={30}
 				height={30}
 				class="min-w-[30px] min-h-[30px] rounded-full z-0 shadow-xl"
@@ -130,27 +136,31 @@
 				'bg-purple-500 rounded-tr-none': isMine,
 			})}
 		>
-			{#if message.repliedMessage}
+			{#if message.repliedMessageId}
 				<div
 					class={clsx('dark:bg-black bg-white transition-colors p-2 rounded-[8px] w-full flex flex-col', {
 						'ml-auto': isMine,
 					})}
 				>
-					<span class="text-purple-300 text-xs"
-						>{typeof message.repliedMessage === 'object' ? message.repliedMessage?.authorId : null}</span
-					>
+					<span class="text-purple-300 text-xs">
+						{message.repliedMessageId}
+					</span>
+
 					<span class="text-gray-200 text-sm">
-						{typeof message.repliedMessage === 'object' ? message.repliedMessage?.content : null}
+						{message.repliedMessageId}
 					</span>
 				</div>
 			{/if}
 			<p class="p-1">{message.content}</p>
 		</div>
 
-		{#if isMessageConfigVisible}
-			<button class="p-2 bg-gray-700 shadow-lg z-10 rounded-full">
-				<ShareFat size={16} color="white" weight="fill" />
-			</button>
-		{/if}
+		<button
+			class="p-2 bg-gray-700 shadow-lg z-10 rounded-full"
+			on:click={() => {
+				chatDispatch.setReplyMessageFromConversation({ conversationId: message.conversationId, message });
+			}}
+		>
+			<ShareFat size={12} color="white" weight="fill" />
+		</button>
 	</div>
 </li>

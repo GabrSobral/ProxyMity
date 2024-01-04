@@ -12,6 +12,8 @@ export interface Message {
 	readByAllAt: Date | null;
 
 	conversationId: Conversation['id'];
-	repliedMessage: Message | Message['id'] | null;
+
+	repliedMessageId: Message['id'] | null;
+
 	authorId: User['id'];
 }

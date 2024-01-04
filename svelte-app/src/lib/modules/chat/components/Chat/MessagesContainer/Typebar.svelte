@@ -31,21 +31,6 @@
 	async function sendMessage() {
 		if (!user || !$chatState.selectedConversation || !$typebarRef?.value.trim()) return;
 
-		const repliedMessage = (() => {
-			if (
-				$chatState.selectedConversation?.replyMessage &&
-				$chatState.selectedConversation.replyMessage.repliedMessage &&
-				typeof $chatState.selectedConversation.replyMessage.repliedMessage === 'object'
-			) {
-				return {
-					...$chatState.selectedConversation?.replyMessage,
-					repliedMessage: $chatState.selectedConversation?.replyMessage.repliedMessage.id,
-				};
-			} else {
-				return $chatState.selectedConversation?.replyMessage;
-			}
-		})();
-
 		const message: Message = {
 			id: ulid(),
 			content: $typebarRef?.value.trim(),
@@ -57,29 +42,29 @@
 
 			conversationId: $chatState.selectedConversation?.id,
 			authorId: user.id,
-			repliedMessage: repliedMessage || null,
+
+			repliedMessageId: $chatState.selectedConversation.replyMessage?.id || null,
 		};
 
 		addMessageAsyncDB(message).catch(error => {
 			console.error(`Error on trying to add the "${message.id}" message at Indexed DB`, error);
 		});
 
-		chatDispatch.bringToTop(message.conversationId);
 		chatDispatch.addMessage({ message });
+		chatDispatch.bringToTop(message.conversationId);
 
 		if ($connection) {
 			sendMessageWebSocketEvent($connection, {
-				message: { ...message, readByAllAt: null, receivedByAllAt: null, sentAt: new Date() },
-				sender: user.id,
-				receiver: $chatState.selectedConversation.id,
+				message: { ...message, sentAt: new Date() },
+				isConversationGroup: $chatState.selectedConversation.isGroup,
+			});
+
+			changeMessageStatusAsyncDB({ messageId: message.id, status: 'sent' }).catch(error => {
+				console.error(`Error on trying to update the "${message.id}" message status at Indexed DB`, error);
 			});
 		} else {
 			console.error('Connection not established!');
 		}
-
-		changeMessageStatusAsyncDB({ messageId: message.id, status: 'sent' }).catch(error => {
-			console.error(`Error on trying to update the "${message.id}" message status at Indexed DB`, error);
-		});
 
 		chatDispatch.saveTypeMessageFromConversation({
 			conversationId: $chatState.selectedConversation.id,
@@ -120,21 +105,33 @@
 </script>
 
 <div class="flex flex-col gap-2 m-1 mt-auto">
-	<!-- <div class="w-full p-2 flex gap-2 bg-black rounded-lg">
-		<div class="bg-gray-950 w-full p-2 rounded-md flex flex-col gap-1">
-			<span class="text-purple-300 text-xs">{'Name'}</span>
-			<span class="text-white text-sm">Conteúdo de mensagem respondida</span>
-		</div>
+	{#if $chatState.selectedConversation?.replyMessage}
+		<div class="w-full p-2 flex gap-2 bg-black rounded-lg">
+			<div class="bg-gray-950 w-full p-2 rounded-md flex flex-col gap-1">
+				<span class="text-purple-300 text-xs">
+					{typeof $chatState.selectedConversation?.replyMessage === 'object' &&
+						$chatState.selectedConversation?.replyMessage.authorId}
+				</span>
 
-		<button
-			type="button"
-			title="Cancel reply message"
-			on:click={() => /*removeReplyMessageFromConversation({ conversationId: selectedConversation?.id || ''  }) */ {}}
-			class="ml-auto bg-gray-900 hover:brightness-125 flex items-center justify-center rounded-full max-w-[2.5rem] min-w-[2.5rem] max-h-[2.5rem] min-h-[2.5rem]"
-		>
-			<X size={24} color="white" />
-		</button>
-	</div> -->
+				<span class="text-white text-sm">
+					{typeof $chatState.selectedConversation?.replyMessage === 'object' &&
+						$chatState.selectedConversation?.replyMessage.content}
+				</span>
+			</div>
+
+			<button
+				type="button"
+				title="Cancel reply message"
+				on:click={() =>
+					chatDispatch.removeReplyMessageFromConversation({
+						conversationId: $chatState.selectedConversation?.id || '',
+					})}
+				class="ml-auto bg-gray-900 hover:brightness-125 flex items-center justify-center rounded-full max-w-[2.5rem] min-w-[2.5rem] max-h-[2.5rem] min-h-[2.5rem]"
+			>
+				<X size={24} color="white" />
+			</button>
+		</div>
+	{/if}
 
 	<InputGroup let:Label let:Wrapper className="flex w-full">
 		<Label className="sr-only">Type a message</Label>

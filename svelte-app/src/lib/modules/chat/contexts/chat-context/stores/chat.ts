@@ -19,6 +19,7 @@ export const chatDispatch: Actions = {
 	addMessage({ message, shouldNotification }) {
 		chatState.update(store => {
 			const index = store.conversations.findIndex(conversation => conversation.id === message.conversationId);
+
 			if (index >= 0) {
 				store.conversations[index].messages.push(message);
 
@@ -30,7 +31,7 @@ export const chatDispatch: Actions = {
 				}
 			}
 
-			return { ...store };
+			return store;
 		});
 	},
 
