@@ -74,7 +74,7 @@ public sealed class ChatHub(
         await sender.Send(readConversationMessagesCommand);
 
         var hubGroupId = payload.ConversationId.ToString();
-        await Clients.OthersInGroup(hubGroupId).ReceiveReadMessage(payload.UserId, payload.ConversationId);
+        await Clients.OthersInGroup(hubGroupId).ReceiveReadMessage(payload.UserId, payload.ConversationId, payload.IsConversationGroup);
     }
 
     /// <summary>
