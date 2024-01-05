@@ -17,13 +17,14 @@ export const chatDispatch: Actions = {
 		}));
 	},
 
-	addMessage({ message, shouldNotification }) {
+	addMessage({ message }) {
 		chatState.update(store => {
 			const index = store.conversations.findIndex(conversation => conversation.id === message.conversationId);
 
 			if (index >= 0) {
 				store.conversations[index].messages.push(message);
 
+				const shouldNotification = store.selectedConversation?.id !== message.conversationId;
 				const currentNotifications = store.conversations[index].notifications;
 				store.conversations[index].notifications = shouldNotification ? currentNotifications + 1 : 0;
 

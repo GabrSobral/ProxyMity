@@ -23,7 +23,7 @@ export type Actions = {
 	bringToTop(ConversationId: ConversationState['id']): void;
 	handleShowConversationDetail(): void;
 
-	addMessage(payload: { message: Message; shouldNotification?: boolean }): void;
+	addMessage(payload: { message: Message }): void;
 	setConversationMessages(payload: { conversationId: string; messages: Message[] }): void;
 	updateConversationMessageStatus(
 		payload:

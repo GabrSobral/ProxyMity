@@ -167,13 +167,11 @@
 		const payload: Message = {
 			...message,
 			receivedByAllAt: new Date(),
-			readByAllAt: $chatState.selectedConversation?.id === message.authorId ? new Date() : null,
+			readByAllAt: $chatState.selectedConversation?.id === message.conversationId ? new Date() : null,
 		};
 
-		const shouldNotification = $chatState.selectedConversation?.id !== message.authorId;
-
 		addMessageAsyncDB(payload);
-		chatDispatch.addMessage({ message: payload, shouldNotification });
+		chatDispatch.addMessage({ message: payload });
 		chatDispatch.bringToTop(message.conversationId);
 	}
 
