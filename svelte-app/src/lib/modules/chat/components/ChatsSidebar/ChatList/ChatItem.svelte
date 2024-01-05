@@ -1,13 +1,15 @@
 <script lang="ts">
 	import clsx from 'clsx';
-	import { User } from 'phosphor-svelte';
 	import { page } from '$app/stores';
+	import { User } from 'phosphor-svelte';
 	import { twMerge } from 'tailwind-merge';
 
-	import { connection } from '$lib/modules/chat/contexts/websocket-context/stores/connection';
 	import { chatState } from '$lib/modules/chat/contexts/chat-context/stores/chat';
-	import type { ConversationState } from '$lib/modules/chat/contexts/chat-context/stores/chat-store-types';
+	import { connection } from '$lib/modules/chat/contexts/websocket-context/stores/connection';
 	import { getChatContext } from '$lib/modules/chat/contexts/chat-context/ChatContext.svelte';
+	import type { ConversationState } from '$lib/modules/chat/contexts/chat-context/stores/chat-store-types';
+
+	export let conversation: ConversationState;
 
 	$: user = $page.data.session?.user;
 	$: lastMessage = conversation.messages?.at(-1);
@@ -16,19 +18,17 @@
 	$connection?.on('receiveTyping', (typingWs, authorId, conversationId) => {
 		if (conversationId === conversation.id) {
 			typing = typingWs;
+
+			const author = conversation.participants.find(item => item.id === authorId);
 		}
 	});
 
 	let { selectedConversationAsync } = getChatContext();
-
-	export let conversation: ConversationState;
-
-	const conversationName =
-		conversation?.groupName || conversation?.participants.find(item => item.id !== user?.id)?.name || '';
-
 	let typing = false;
 
 	const formatLastMessageDate = Intl.DateTimeFormat('pt-br', { hour: 'numeric', minute: 'numeric' });
+	const conversationName =
+		conversation?.groupName || conversation?.participants.find(item => item.id !== user?.id)?.name || '';
 </script>
 
 <!-- svelte-ignore a11y-click-events-have-key-events -->
@@ -36,7 +36,7 @@
 	role="button"
 	tabindex="0"
 	class="w-full hover:dark:border-gray-700 hover:border-gray-100 border-[1px] dark:border-gray-900 border-white relative py-2 px-3 rounded-md flex gap-4 cursor-pointer hover:opacity-90 group dark:bg-gray-900 bg-white transition-all shadow-md"
-	on:click={() => selectedConversationAsync({ conversation })}
+	on:click={() => selectedConversationAsync(conversation)}
 >
 	<div
 		class={`${

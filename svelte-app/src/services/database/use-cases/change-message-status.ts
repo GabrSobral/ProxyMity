@@ -1,19 +1,17 @@
+import { EMessageStatuses } from '../../../enums/EMessageStatuses';
 import { database } from '../db';
-
-const options = {
-	async sent(messageId: string) {
-		await database.messages.where({ id: messageId }).modify({ sentAt: new Date() });
-	},
-	async received(messageId: string) {
-		await database.messages.where({ id: messageId }).modify({ receivedAt: new Date() });
-	},
-};
 
 interface ChangeMessageStatusProps {
 	messageId: string;
-	status: 'sent' | 'received';
+	status: EMessageStatuses;
 }
 
 export async function changeMessageStatusAsyncDB({ messageId, status }: ChangeMessageStatusProps) {
-	await options[status](messageId);
+	if (status === EMessageStatuses.RECEIVED) {
+		await database.messages.where({ id: messageId }).modify({ receivedByAllAt: new Date() });
+	}
+
+	if (status === EMessageStatuses.SENT) {
+		await database.messages.where({ id: messageId }).modify({ sentAt: new Date() });
+	}
 }

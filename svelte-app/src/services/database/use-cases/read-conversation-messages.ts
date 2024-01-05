@@ -1,26 +1,22 @@
+import { database } from '../db';
 import type { Conversation } from '../../../types/conversation';
 
 interface ReadContactMessagesParams {
 	conversationId: Conversation['id'];
-	userId: string;
+	whoRead: string;
+	myId: string;
+	isConversationGroup: boolean;
 }
 
 export async function readConversationMessagesAsyncDB({
 	conversationId,
-	userId,
+	myId,
+	whoRead,
+	isConversationGroup,
 }: ReadContactMessagesParams): Promise<void> {
-	// const whereClause: {
-	// 	contactRef: string;
-	// 	readAt: string;
-	// 	recipientId?: string;
-	// } = {
-	// 	contactRef: userId + contactId,
-	// 	readAt: 'none',
-	// };
-	// if (itsMe) {
-	// 	whereClause.recipientId = userId;
-	// } else {
-	// 	whereClause.recipientId = contactId;
-	// }
-	// await database.messages.where(whereClause).modify({ readAt: new Date() });
+	await database.messages
+		.where({ conversationId })
+		.and(item => item.authorId !== whoRead)
+		.and(item => item.readByAllAt === null)
+		.modify({ readByAllAt: new Date() });
 }

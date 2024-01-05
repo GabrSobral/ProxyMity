@@ -1,6 +1,7 @@
 import type { Message } from '../../../../../../types/message';
 import type { Conversation } from '../../../../../../types/conversation';
 import type { GetUserConversationsResponse } from '../../../../../../services/api/get-user-conversations';
+import type { EMessageStatuses } from '../../../../../../enums/EMessageStatuses';
 
 export interface ConversationState extends Conversation {
 	messages: Message[];
@@ -18,7 +19,7 @@ export type State = {
 
 export type Actions = {
 	addConversation(Conversation: ConversationState): void;
-	selectConversation(Conversation: ConversationState | null): void;
+	selectConversation(params: { conversation: ConversationState | null; typeMessage: string }): void;
 	bringToTop(ConversationId: ConversationState['id']): void;
 	handleShowConversationDetail(): void;
 
@@ -29,9 +30,9 @@ export type Actions = {
 			| {
 					conversationId: string;
 					messageId: string;
-					status: 'sent' | 'received';
+					status: EMessageStatuses.SENT | EMessageStatuses.RECEIVED;
 			  }
-			| { conversationId: string; status: 'read' }
+			| { conversationId: string; status: EMessageStatuses.READ }
 	): void;
 	setConversationInitialState(payload: { conversationsData: GetUserConversationsResponse; userId: string }): void;
 	saveTypeMessageFromConversation(payload: { conversationId: string; typeMessage: string }): void;

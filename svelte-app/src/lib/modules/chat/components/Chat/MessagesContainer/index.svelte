@@ -7,6 +7,7 @@
 	import Message from './Message.svelte';
 	import Typebar from './Typebar.svelte';
 	import ScrollToBottomButton from './ScrollToBottomButton.svelte';
+	import Text from '$lib/design-system/Text.svelte';
 
 	$: isFirstAccess = true;
 	let messagesContainer: HTMLUListElement;
@@ -30,6 +31,10 @@
 
 <div class="overflow-hidden w-full flex-1 h-full flex flex-col p-1 relative">
 	<ul class="flex flex-col gap-2 overflow-auto p-4" bind:this={messagesContainer}>
+		{#if !$chatState.selectedConversation?.hasMessagesFetched}
+			<Text size="md">Loading messages...</Text>
+		{/if}
+
 		{#if $chatState.selectedConversation?.messages.length === 0}
 			<div class="flex-1 flex items-center justify-center flex-col gap-3 pointer-events-none">
 				<img src="/no-messages.svg" alt="No message" class="w-[25rem]" />

@@ -26,15 +26,25 @@
 		});
 	}
 
-	async function selectedConversationAsync({ conversation }: { conversation: ConversationState }) {
+	async function selectedConversationAsync(conversation: ConversationState) {
 		if (conversation === chatStateModule.selectedConversation || !userModule) return;
 
-		chatDispatch.saveTypeMessageFromConversation({
-			conversationId: chatStateModule.selectedConversation?.id || '',
-			typeMessage: typebarRefModule?.value || '',
-		});
+		console.log({ notifications: conversation.notifications });
 
-		chatDispatch.selectConversation(conversation);
+		if (conversation.notifications > 0 && connectionModule)
+			sendReadMessageWebSocketEvent(connectionModule, {
+				userId: userModule.id,
+				conversationId: conversation.id,
+				isConversationGroup: conversation.isGroup,
+			});
+
+		chatDispatch.selectConversation({ conversation, typeMessage: typebarRefModule?.value || '' });
+		readConversationMessagesAsyncDB({
+			conversationId: conversation.id,
+			whoRead: userModule.id,
+			myId: userModule.id,
+			isConversationGroup: conversation.isGroup,
+		});
 
 		if (!conversation.hasMessagesFetched) {
 			try {
@@ -47,21 +57,11 @@
 				chatDispatch.setConversationMessages({ conversationId: conversation.id, messages: messages.toReversed() });
 			}
 		}
-
-		chatDispatch.updateConversationMessageStatus({ conversationId: conversation.id, status: 'read' });
-		readConversationMessagesAsyncDB({ conversationId: conversation.id, userId: userModule.id });
-
-		if (conversation.notifications > 0 && connectionModule)
-			sendReadMessageWebSocketEvent(connectionModule, {
-				userId: userModule.id,
-				conversationId: conversation.id,
-				isConversationGroup: conversation.isGroup,
-			});
 	}
 
 	interface ChatContextProps {
 		typebarRef: Writable<HTMLInputElement | null>;
-		selectedConversationAsync: (params: { conversation: ConversationState }) => Promise<void>;
+		selectedConversationAsync: (conversation: ConversationState) => Promise<void>;
 	}
 
 	export const getChatContext = () => getContext<ChatContextProps>('chat-context');
@@ -74,30 +74,31 @@
 
 <script lang="ts">
 	import { page } from '$app/stores';
+	import { browser } from '$app/environment';
 	import { chatDispatch } from './stores/chat';
-	import { setContext, getContext, onMount, afterUpdate } from 'svelte';
-
-	// import { selectedConversationAsync } from './functions/selectedConversationAsync.svelte';
-
-	import { APIGetUserConversations } from '../../../../../services/api/get-user-conversations';
-	import { saveConversationsAsyncDB } from '../../../../../services/database/use-cases/save-conversations';
-	import { getConversationCacheAsyncDB } from '../../../../../services/database/use-cases/get-conversations-state';
+	import type { Session } from '@auth/sveltekit';
+	import { writable, type Writable } from 'svelte/store';
+	import type { HubConnection } from '@microsoft/signalr';
+	import { setContext, getContext, onMount } from 'svelte';
 
 	import { chatState } from './stores/chat';
 	import type { ConversationState, State } from './stores/chat-store-types';
 
-	import { writable, type Writable } from 'svelte/store';
-	import type { HubConnection } from '@microsoft/signalr';
-	import type { Session } from '@auth/sveltekit';
-	import { connection } from '../websocket-context/stores/connection';
-	import { browser } from '$app/environment';
+	import { APIGetUserConversations } from '../../../../../services/api/get-user-conversations';
 	import { APIGetConversationMessages } from '../../../../../services/api/get-conversation-messages';
+
+	import { addMessageAsyncDB } from '../../../../../services/database/use-cases/add-message';
+	import { saveConversationsAsyncDB } from '../../../../../services/database/use-cases/save-conversations';
+	import { getConversationCacheAsyncDB } from '../../../../../services/database/use-cases/get-conversations-state';
 	import { getConversationsMessagesAsyncDB } from '../../../../../services/database/use-cases/get-conversations-messages';
 	import { readConversationMessagesAsyncDB } from '../../../../../services/database/use-cases/read-conversation-messages';
+
+	import { connection } from '../websocket-context/stores/connection';
 	import { sendReadMessageWebSocketEvent } from '../websocket-context/emmiters/sendReadMessage';
-	import { addMessageAsyncDB } from '../../../../../services/database/use-cases/add-message';
-	import type { Message } from '../../../../../types/message';
 	import { sendReceiveMessageWebSocketEvent } from '../websocket-context/emmiters/sendReceiveMessage';
+
+	import type { Message } from '../../../../../types/message';
+	import { EMessageStatuses } from '../../../../../enums/EMessageStatuses';
 
 	setChatContext();
 
@@ -176,18 +177,16 @@
 		chatDispatch.bringToTop(message.conversationId);
 	}
 
-	function receiveReadMessageHandler(userId: string, conversationId: string) {
+	function receiveReadMessageHandler(userId: string, conversationId: string, isConversationGroup: boolean) {
 		console.trace('receive Read Message');
 
 		if (!session?.user) return;
 
-		chatDispatch.updateConversationMessageStatus({ conversationId, status: 'read' });
-		readConversationMessagesAsyncDB({ conversationId, userId: session?.user?.id });
+		chatDispatch.updateConversationMessageStatus({ conversationId, status: EMessageStatuses.READ });
+		readConversationMessagesAsyncDB({ conversationId, myId: session?.user?.id, whoRead: userId, isConversationGroup });
 	}
 
 	function receiveMessageStatusHandler(messageStatus: string, messageId: string, conversationId: string) {
-		console.trace('receive Message Status');
-
 		const messageStatusEvent = new CustomEvent(messageId, { detail: { messageStatus, messageId, conversationId } });
 		dispatchEvent(messageStatusEvent);
 	}

@@ -17,6 +17,7 @@
 	import { changeMessageStatusAsyncDB } from '../../../../../../services/database/use-cases/change-message-status';
 
 	import type { Message } from '../../../../../../types/message';
+	import { EMessageStatuses } from '../../../../../../enums/EMessageStatuses';
 
 	let typeValueManaged = '';
 
@@ -59,7 +60,7 @@
 				isConversationGroup: $chatState.selectedConversation.isGroup,
 			});
 
-			changeMessageStatusAsyncDB({ messageId: message.id, status: 'sent' }).catch(error => {
+			changeMessageStatusAsyncDB({ messageId: message.id, status: EMessageStatuses.SENT }).catch(error => {
 				console.error(`Error on trying to update the "${message.id}" message status at Indexed DB`, error);
 			});
 		} else {

@@ -1,6 +1,7 @@
 import { writable } from 'svelte/store';
 
 import type { Actions, State } from './chat-store-types';
+import { EMessageStatuses } from '../../../../../../enums/EMessageStatuses';
 
 export const chatState = writable<State>({
 	conversations: [],
@@ -38,14 +39,14 @@ export const chatDispatch: Actions = {
 	bringToTop(conversationId) {
 		chatState.update(store => {
 			if (store.conversations.length <= 1 || conversationId === store.conversations[0]?.id) {
-				return { ...store };
+				return store;
 			}
 
 			store.conversations = store.conversations.sort((first, second) =>
 				first.id === conversationId ? -1 : second.id === conversationId ? 1 : 0
 			);
 
-			return { ...store };
+			return store;
 		});
 	},
 
@@ -53,7 +54,7 @@ export const chatDispatch: Actions = {
 		chatState.update(store => {
 			store.showConversationDetail = !store.showConversationDetail;
 
-			return { ...store };
+			return store;
 		});
 	},
 
@@ -65,35 +66,36 @@ export const chatDispatch: Actions = {
 				store.conversations[conversationIndex].replyMessage = null;
 			}
 
-			return { ...store };
+			return store;
 		});
 	},
 
-	saveTypeMessageFromConversation({ conversationId, typeMessage }) {
+	selectConversation({ conversation, typeMessage }) {
 		chatState.update(store => {
-			const conversationIndex = store.conversations.findIndex(item => item.id === conversationId);
+			if (conversation) {
+				const targetIndex = store.conversations.findIndex(conversation => conversation.id === conversation?.id);
 
-			if (conversationIndex >= 0) {
-				store.conversations[conversationIndex].typeMessage = typeMessage;
-			}
+				if (targetIndex !== -1) {
+					store.conversations[targetIndex].notifications = 0;
+					store.conversations[targetIndex].messages = store.conversations[targetIndex].messages.map(message => {
+						if (!message.readByAllAt) {
+							message.readByAllAt = new Date();
+						}
 
-			return { ...store };
-		});
-	},
-
-	selectConversation(selectedConversation) {
-		chatState.update(store => {
-			if (selectedConversation) {
-				const index = store.conversations.findIndex(conversation => conversation.id === selectedConversation?.id);
-
-				if (index !== -1) {
-					store.conversations[index].notifications = 0;
+						return message;
+					});
 				}
 			}
 
-			store.selectedConversation = selectedConversation;
+			// Storing the current value of input at current conversation
+			const currentIndex = store.conversations.findIndex(item => item.id === store.selectedConversation?.id);
+			if (currentIndex >= 0) {
+				store.conversations[currentIndex].typeMessage = typeMessage;
+			}
 
-			return { ...store };
+			store.selectedConversation = conversation;
+
+			return store;
 		});
 	},
 
@@ -115,7 +117,7 @@ export const chatDispatch: Actions = {
 				});
 			});
 
-			return { ...store };
+			return store;
 		});
 	},
 
@@ -129,7 +131,7 @@ export const chatDispatch: Actions = {
 				store.selectedConversation && (store.selectedConversation.messages = messages);
 			}
 
-			return { ...store };
+			return store;
 		});
 	},
 
@@ -139,6 +141,18 @@ export const chatDispatch: Actions = {
 
 			if (conversationIndex >= 0) {
 				store.conversations[conversationIndex].replyMessage = message;
+			}
+
+			return store;
+		});
+	},
+
+	saveTypeMessageFromConversation({ conversationId, typeMessage }) {
+		chatState.update(store => {
+			const conversationIndex = store.conversations.findIndex(item => item.id === conversationId);
+
+			if (conversationIndex >= 0) {
+				store.conversations[conversationIndex].typeMessage = typeMessage;
 			}
 
 			return { ...store };
@@ -153,18 +167,18 @@ export const chatDispatch: Actions = {
 			if (conversationIndex > -1) {
 				store.conversations[conversationIndex].messages = store.conversations[conversationIndex].messages.map(
 					message => {
-						if (status === 'read' && message.conversationId !== conversationId) {
+						if (status === EMessageStatuses.READ && !message.readByAllAt) {
 							store.conversations[conversationIndex].notifications = 0;
-
 							message.readByAllAt = new Date();
-							return message;
+
+							console.log({ message });
 						}
 
-						if (status === 'received' && message.id === params.messageId) {
+						if (status === EMessageStatuses.RECEIVED && message.id === params.messageId) {
 							message.receivedByAllAt = new Date();
 						}
 
-						if (status === 'sent' && message.id === params.messageId) {
+						if (status === EMessageStatuses.SENT && message.id === params.messageId) {
 							message.sentAt = new Date();
 						}
 
@@ -173,7 +187,7 @@ export const chatDispatch: Actions = {
 				);
 			}
 
-			return { ...store };
+			return store;
 		});
 	},
 };

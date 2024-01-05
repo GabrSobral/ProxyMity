@@ -4,21 +4,22 @@
 	import { page } from '$app/stores';
 	import { Clock, ShareFat } from 'phosphor-svelte';
 
-	import type { Message } from '../../../../../../types/message';
-	import { connection } from '$lib/modules/chat/contexts/websocket-context/stores/connection';
 	import { chatDispatch } from '$lib/modules/chat/contexts/chat-context/stores/chat';
+
+	import type { Message } from '../../../../../../types/message';
+	import { EMessageStatuses } from '../../../../../../enums/EMessageStatuses';
 	import { changeMessageStatusAsyncDB } from '../../../../../../services/database/use-cases/change-message-status';
 
 	export let message: Message;
 	export let previousMessage: Message;
 
 	let isMessageConfigVisible = false;
-	let status: 'sent' | 'received' | 'read' | 'wrote' = (() => {
-		if (message.readByAllAt !== null) return 'read';
-		if (message.receivedByAllAt !== null) return 'received';
-		if (message.sentAt !== null) return 'sent';
+	let status: EMessageStatuses = (() => {
+		if (message.readByAllAt !== null) return EMessageStatuses.READ;
+		if (message.receivedByAllAt !== null) return EMessageStatuses.RECEIVED;
+		if (message.sentAt !== null) return EMessageStatuses.SENT;
 
-		return 'wrote';
+		return EMessageStatuses.WROTE;
 	})();
 
 	$: user = $page.data.session?.user;
@@ -40,7 +41,7 @@
 	onMount(() => {
 		function handler(
 			event: CustomEventInit<{
-				messageStatus: 'sent' | 'received';
+				messageStatus: EMessageStatuses.SENT | EMessageStatuses.RECEIVED;
 				messageId: string;
 				conversationId: string;
 			}>
@@ -60,18 +61,6 @@
 
 		addEventListener(message.id, handler);
 		return () => removeEventListener(message.id, handler);
-	});
-
-	onMount(() => {
-		$connection?.on(
-			'receiveReadMessage',
-			(status: 'received' | 'read' | 'sent', messageId: string, conversationId: string) => {
-				if (conversationId === message.conversationId && message.readByAllAt === null) {
-					console.log('receiveMessageStatus', conversationId);
-					status = 'read';
-				}
-			}
-		);
 	});
 </script>
 
@@ -110,15 +99,15 @@
 		{/if}
 
 		<span class="dark:text-gray-300 text-gray-700 transition-colors text-xs ml-2 flex items-center gap-2">
-			{#if isMine && status === 'wrote'}
+			{#if isMine && status === EMessageStatuses.WROTE}
 				<Clock size={13} class="dark:text-gray-100 text-gray-600 transition-colors" />
 			{:else}
 				<div
-					title={status}
+					title={status.toString()}
 					class={clsx('w-6 h-3 rounded-full flex items-center p-[2px] transition-all', {
-						'justify-end bg-transparent': status === 'sent',
-						'justify-end dark:bg-gray-600 bg-gray-300': status === 'received',
-						'justify-start bg-purple-500': status === 'read',
+						'justify-end bg-transparent': status === EMessageStatuses.SENT,
+						'justify-end dark:bg-gray-600 bg-gray-300': status === EMessageStatuses.RECEIVED,
+						'justify-start bg-purple-500': status === EMessageStatuses.READ,
 					})}
 				>
 					<div class="rounded-full w-2 h-2 bg-white transition-all" />
