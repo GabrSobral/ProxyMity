@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { page } from '$app/stores';
+	import { afterUpdate } from 'svelte';
 	import { HttpTransportType, HubConnectionBuilder, HubConnectionState, LogLevel } from '@microsoft/signalr';
 
 	import { connection } from './stores/connection';
-	import { afterUpdate } from 'svelte';
 
 	$: accessToken = $page.data.session?.accessToken;
 

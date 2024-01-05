@@ -110,7 +110,7 @@
 
 			APIGetUserConversations({ id: user.id }, { accessToken: session.accessToken })
 				.then(conversationsData => {
-					console.log('Fetching conversations data was successfully.');
+					console.log('🟢 Fetching conversations data was successfully.');
 
 					chatDispatch.setConversationInitialState({ conversationsData, userId: user.id });
 
@@ -120,11 +120,13 @@
 					}));
 
 					saveConversationsAsyncDB(filteredData)
-						.then(() => console.log('Local database was successfully synchronized with API data.'))
-						.catch(error => console.error('Error on try to synchronize API data with local database', error.message));
+						.then(() => console.log('🟢 Local database was successfully synchronized with API data.'))
+						.catch(error =>
+							console.error('🔴 Error on try to synchronize API data with local database', error.message)
+						);
 				})
 				.catch(error => {
-					console.error('Error on trying to fetch conversations, data will be taken from the cache', error.message);
+					console.error('🔴 Error on trying to fetch conversations, data will be taken from the cache', error.message);
 
 					getConversationCacheAsyncDB({ userId: user.id })
 						.then(conversationsData => chatDispatch.setConversationInitialState({ conversationsData, userId: user.id }))
