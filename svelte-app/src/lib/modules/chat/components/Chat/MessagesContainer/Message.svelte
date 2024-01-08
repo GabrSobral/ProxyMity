@@ -14,7 +14,10 @@
 	export let previousMessage: Message;
 
 	let isMessageConfigVisible = false;
-	let status: EMessageStatuses = (() => {
+
+	$: user = $page.data.session?.user;
+	$: isMine = message.authorId === user?.id;
+	$: status = (() => {
 		if (message.readByAllAt !== null) return EMessageStatuses.READ;
 		if (message.receivedByAllAt !== null) return EMessageStatuses.RECEIVED;
 		if (message.sentAt !== null) return EMessageStatuses.SENT;
@@ -22,10 +25,8 @@
 		return EMessageStatuses.WROTE;
 	})();
 
-	$: user = $page.data.session?.user;
-
+	const previousIsFromUser = previousMessage?.authorId === message.authorId;
 	const formatter = Intl.DateTimeFormat('pt-br', { hour: 'numeric', minute: 'numeric' });
-
 	const selectTimeToShow = (isMine: boolean, message: Message) =>
 		isMine
 			? formatter.format(new Date(message.writtenAt))
@@ -33,32 +34,29 @@
 				? formatter.format(new Date(message.receivedByAllAt))
 				: null;
 
-	$: isMine = message.authorId === user?.id;
-	const previousIsFromUser = previousMessage?.authorId === message.authorId;
-
 	const timeToShow = selectTimeToShow(isMine, message);
 
-	onMount(() => {
-		function handler(
-			event: CustomEventInit<{
-				messageStatus: EMessageStatuses.SENT | EMessageStatuses.RECEIVED;
-				messageId: string;
-				conversationId: string;
-			}>
-		) {
-			if (!event.detail) {
-				return;
-			}
+	type EventHandler = CustomEventInit<{
+		messageStatus: EMessageStatuses.SENT | EMessageStatuses.RECEIVED;
+		messageId: string;
+		conversationId: string;
+	}>;
 
-			const { messageId, messageStatus, conversationId } = event.detail;
-
-			if (messageStatus && messageId && conversationId) {
-				status = messageStatus;
-				chatDispatch.updateConversationMessageStatus({ conversationId, messageId: message.id, status: messageStatus });
-				changeMessageStatusAsyncDB({ messageId: messageId, status: messageStatus });
-			}
+	function handler(event: EventHandler) {
+		if (!event.detail) {
+			return;
 		}
 
+		const { messageId, messageStatus, conversationId } = event.detail;
+
+		if (messageStatus && messageId && conversationId) {
+			status = messageStatus;
+			chatDispatch.updateConversationMessageStatus({ conversationId, messageId: message.id, status: messageStatus });
+			changeMessageStatusAsyncDB({ messageId: messageId, status: messageStatus });
+		}
+	}
+
+	onMount(() => {
 		addEventListener(message.id, handler);
 		return () => removeEventListener(message.id, handler);
 	});
@@ -95,13 +93,13 @@
 				height={30}
 				class="min-w-[30px] min-h-[30px] rounded-full z-0 shadow-xl"
 			/>
-			<span class="dark:text-gray-200 text-gray-700 transition-colors text-xs">Diego</span>
+			<span class="dark:text-gray-200 text-gray-700 transition-colors text-xs">{message.authorId}</span>
 		{/if}
 
 		<span class="dark:text-gray-300 text-gray-700 transition-colors text-xs ml-2 flex items-center gap-2">
 			{#if isMine && status === EMessageStatuses.WROTE}
 				<Clock size={13} class="dark:text-gray-100 text-gray-600 transition-colors" />
-			{:else}
+			{:else if isMine}
 				<div
 					title={status.toString()}
 					class={clsx('w-6 h-3 rounded-full flex items-center p-[2px] transition-all', {

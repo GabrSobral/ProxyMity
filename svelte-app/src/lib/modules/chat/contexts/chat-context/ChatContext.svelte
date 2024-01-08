@@ -29,8 +29,6 @@
 	async function selectedConversationAsync(conversation: ConversationState) {
 		if (conversation === chatStateModule.selectedConversation || !userModule) return;
 
-		console.log({ notifications: conversation.notifications });
-
 		if (conversation.notifications > 0 && connectionModule)
 			sendReadMessageWebSocketEvent(connectionModule, {
 				userId: userModule.id,
@@ -39,12 +37,12 @@
 			});
 
 		chatDispatch.selectConversation({ conversation, typeMessage: typebarRefModule?.value || '' });
-		readConversationMessagesAsyncDB({
-			conversationId: conversation.id,
-			whoRead: userModule.id,
-			myId: userModule.id,
-			isConversationGroup: conversation.isGroup,
-		});
+		// readConversationMessagesAsyncDB({
+		// 	conversationId: conversation.id,
+		// 	whoRead: userModule.id,
+		// 	myId: userModule.id,
+		// 	isConversationGroup: conversation.isGroup,
+		// });
 
 		if (!conversation.hasMessagesFetched) {
 			try {
@@ -53,8 +51,8 @@
 			} catch (error) {
 				console.error('Error fetching conversations, data will be taken from the cache', error);
 
-				const messages = await getConversationsMessagesAsyncDB(conversation.id);
-				chatDispatch.setConversationMessages({ conversationId: conversation.id, messages: messages.toReversed() });
+				// const messages = await getConversationsMessagesAsyncDB(conversation.id);
+				// chatDispatch.setConversationMessages({ conversationId: conversation.id, messages: messages.toReversed() });
 			}
 		}
 	}
@@ -87,11 +85,11 @@
 	import { APIGetUserConversations } from '../../../../../services/api/get-user-conversations';
 	import { APIGetConversationMessages } from '../../../../../services/api/get-conversation-messages';
 
-	import { addMessageAsyncDB } from '../../../../../services/database/use-cases/add-message';
-	import { saveConversationsAsyncDB } from '../../../../../services/database/use-cases/save-conversations';
-	import { getConversationCacheAsyncDB } from '../../../../../services/database/use-cases/get-conversations-state';
-	import { getConversationsMessagesAsyncDB } from '../../../../../services/database/use-cases/get-conversations-messages';
-	import { readConversationMessagesAsyncDB } from '../../../../../services/database/use-cases/read-conversation-messages';
+	// import { addMessageAsyncDB } from '../../../../../services/database/use-cases/add-message';
+	// import { saveConversationsAsyncDB } from '../../../../../services/database/use-cases/save-conversations';
+	// import { getConversationCacheAsyncDB } from '../../../../../services/database/use-cases/get-conversations-state';
+	// import { getConversationsMessagesAsyncDB } from '../../../../../services/database/use-cases/get-conversations-messages';
+	// import { readConversationMessagesAsyncDB } from '../../../../../services/database/use-cases/read-conversation-messages';
 
 	import { connection } from '../websocket-context/stores/connection';
 	import { sendReadMessageWebSocketEvent } from '../websocket-context/emmiters/sendReadMessage';
@@ -112,56 +110,50 @@
 				.then(conversationsData => {
 					console.log('🟢 Fetching conversations data was successfully.');
 
-					chatDispatch.setConversationInitialState({ conversationsData, userId: user.id });
-
 					const filteredData = conversationsData.map(data => ({
 						...data,
 						participants: data.participants.filter(item => item.id !== user.id),
 					}));
 
-					saveConversationsAsyncDB(filteredData)
-						.then(() => console.log('🟢 Local database was successfully synchronized with API data.'))
-						.catch(error =>
-							console.error('🔴 Error on try to synchronize API data with local database', error.message)
-						);
+					chatDispatch.setConversationInitialState({ conversationsData: filteredData });
+
+					// saveConversationsAsyncDB(filteredData)
+					// 	.then(() => console.log('🟢 Local database was successfully synchronized with API data.'))
+					// 	.catch(error =>
+					// 		console.error('🔴 Error on try to synchronize API data with local database', error.message)
+					// 	);
 				})
 				.catch(error => {
 					console.error('🔴 Error on trying to fetch conversations, data will be taken from the cache', error.message);
 
-					getConversationCacheAsyncDB({ userId: user.id })
-						.then(conversationsData => chatDispatch.setConversationInitialState({ conversationsData, userId: user.id }))
-						.catch(console.error);
+					// getConversationCacheAsyncDB({ userId: user.id })
+					// 	.then(conversationsData => chatDispatch.setConversationInitialState({ conversationsData, userId: user.id }))
+					// 	.catch(console.error);
 				});
 		}
 	});
 
 	function receiveMessageHandler(message: Message) {
-		console.trace({ receiveMessageHandler: message });
 		if (!message || !session?.user || !$connection) {
 			return;
 		}
 
-		if ($chatState.selectedConversation && $chatState.selectedConversation?.id === message.conversationId) {
-			sendReceiveMessageWebSocketEvent($connection, {
-				userId: session?.user.id,
-				conversationId: message.conversationId,
-				messageId: message.id,
-				isConversationGroup: $chatState.selectedConversation.isGroup,
-			});
+		const webSocketsPayload = {
+			userId: session?.user.id,
+			conversationId: message.conversationId,
+			messageId: message.id,
+			isConversationGroup: $chatState.selectedConversation?.isGroup || false,
+		};
 
-			sendReadMessageWebSocketEvent($connection, {
-				userId: session?.user.id,
-				conversationId: $chatState.selectedConversation.id,
-				isConversationGroup: $chatState.selectedConversation.isGroup,
-			});
+		if ($chatState.selectedConversation && $chatState.selectedConversation?.id === message.conversationId) {
+			sendReceiveMessageWebSocketEvent($connection, webSocketsPayload);
+			sendReadMessageWebSocketEvent($connection, webSocketsPayload);
 		} else {
 			const messageConversation = $chatState.conversations.find(item => item.id === message.conversationId);
 
 			if (messageConversation && $connection)
 				sendReceiveMessageWebSocketEvent($connection, {
-					userId: session?.user.id,
-					conversationId: message.conversationId,
-					messageId: message.id,
+					...webSocketsPayload,
 					isConversationGroup: messageConversation?.isGroup,
 				});
 		}
@@ -172,18 +164,24 @@
 			readByAllAt: $chatState.selectedConversation?.id === message.conversationId ? new Date() : null,
 		};
 
-		addMessageAsyncDB(payload);
 		chatDispatch.addMessage({ message: payload });
 		chatDispatch.bringToTop(message.conversationId);
+
+		// addMessageAsyncDB(payload);
 	}
 
-	function receiveReadMessageHandler(userId: string, conversationId: string, isConversationGroup: boolean) {
-		console.trace('receive Read Message');
-
+	async function receiveReadMessageHandler(userId: string, conversationId: string, isConversationGroup: boolean) {
 		if (!session?.user) return;
 
+		await new Promise((resolve, reject) => {
+			const conversationIndex = $chatState.conversations.findIndex(item => item.id === conversationId);
+			console.log({ opa: $chatState.conversations[conversationIndex] });
+
+			resolve(true);
+		});
+
 		chatDispatch.updateConversationMessageStatus({ conversationId, status: EMessageStatuses.READ });
-		readConversationMessagesAsyncDB({ conversationId, myId: session?.user?.id, whoRead: userId, isConversationGroup });
+		// readConversationMessagesAsyncDB({ conversationId, myId: session?.user?.id, whoRead: userId, isConversationGroup });
 	}
 
 	function receiveMessageStatusHandler(messageStatus: string, messageId: string, conversationId: string) {

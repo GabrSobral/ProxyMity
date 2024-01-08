@@ -13,8 +13,8 @@
 	import { sendTypingWebSocketEvent } from '$lib/modules/chat/contexts/websocket-context/emmiters/sendTyping';
 	import { sendMessageWebSocketEvent } from '$lib/modules/chat/contexts/websocket-context/emmiters/sendMessage';
 
-	import { addMessageAsyncDB } from '../../../../../../services/database/use-cases/add-message';
-	import { changeMessageStatusAsyncDB } from '../../../../../../services/database/use-cases/change-message-status';
+	// import { addMessageAsyncDB } from '../../../../../../services/database/use-cases/add-message';
+	// import { changeMessageStatusAsyncDB } from '../../../../../../services/database/use-cases/change-message-status';
 
 	import type { Message } from '../../../../../../types/message';
 	import { EMessageStatuses } from '../../../../../../enums/EMessageStatuses';
@@ -47,9 +47,9 @@
 			repliedMessageId: $chatState.selectedConversation.replyMessage?.id || null,
 		};
 
-		addMessageAsyncDB(message).catch(error => {
-			console.error(`Error on trying to add the "${message.id}" message at Indexed DB`, error);
-		});
+		// addMessageAsyncDB(message).catch(error => {
+		// 	console.error(`Error on trying to add the "${message.id}" message at Indexed DB`, error);
+		// });
 
 		chatDispatch.addMessage({ message });
 		chatDispatch.bringToTop(message.conversationId);
@@ -60,9 +60,9 @@
 				isConversationGroup: $chatState.selectedConversation.isGroup,
 			});
 
-			changeMessageStatusAsyncDB({ messageId: message.id, status: EMessageStatuses.SENT }).catch(error => {
-				console.error(`Error on trying to update the "${message.id}" message status at Indexed DB`, error);
-			});
+			// changeMessageStatusAsyncDB({ messageId: message.id, status: EMessageStatuses.SENT }).catch(error => {
+			// 	console.error(`Error on trying to update the "${message.id}" message status at Indexed DB`, error);
+			// });
 		} else {
 			console.error('Connection not established!');
 		}

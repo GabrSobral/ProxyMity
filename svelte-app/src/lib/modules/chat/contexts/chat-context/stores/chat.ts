@@ -81,6 +81,8 @@ export const chatDispatch: Actions = {
 					store.conversations[targetIndex].messages = store.conversations[targetIndex].messages.map(message => {
 						if (!message.readByAllAt) {
 							message.readByAllAt = new Date();
+
+							console.log({ message });
 						}
 
 						return message;
@@ -100,7 +102,7 @@ export const chatDispatch: Actions = {
 		});
 	},
 
-	setConversationInitialState({ conversationsData, userId }) {
+	setConversationInitialState({ conversationsData }) {
 		chatState.update(store => {
 			conversationsData.forEach(conversation => {
 				store.conversations.push({
@@ -111,7 +113,7 @@ export const chatDispatch: Actions = {
 					isGroup: !!conversation.conversation.groupId,
 					messages: conversation.lastMessages.toReversed(),
 					notifications: conversation.unreadMessagesCount,
-					participants: conversation.participants.filter(item => item.id !== userId),
+					participants: conversation.participants,
 					replyMessage: null,
 					typeMessage: '',
 					hasMessagesFetched: false,
@@ -171,8 +173,6 @@ export const chatDispatch: Actions = {
 						if (status === EMessageStatuses.READ && !message.readByAllAt) {
 							store.conversations[conversationIndex].notifications = 0;
 							message.readByAllAt = new Date();
-
-							console.log({ message });
 						}
 
 						if (status === EMessageStatuses.RECEIVED && message.id === params.messageId) {

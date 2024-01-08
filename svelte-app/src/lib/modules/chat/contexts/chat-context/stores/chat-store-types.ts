@@ -34,7 +34,7 @@ export type Actions = {
 			  }
 			| { conversationId: string; status: EMessageStatuses.READ }
 	): void;
-	setConversationInitialState(payload: { conversationsData: GetUserConversationsResponse; userId: string }): void;
+	setConversationInitialState(payload: { conversationsData: GetUserConversationsResponse }): void;
 	saveTypeMessageFromConversation(payload: { conversationId: string; typeMessage: string }): void;
 	setReplyMessageFromConversation(payload: { conversationId: string; message: Message }): void;
 	removeReplyMessageFromConversation(payload: { conversationId: string }): void;

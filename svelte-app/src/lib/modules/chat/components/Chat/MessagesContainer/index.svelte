@@ -1,17 +1,17 @@
 <script lang="ts">
-	import { afterUpdate, beforeUpdate } from 'svelte';
+	import { afterUpdate } from 'svelte';
 
+	import Text from '$lib/design-system/Text.svelte';
 	import Heading from '$lib/design-system/Heading.svelte';
 	import { chatState } from '$lib/modules/chat/contexts/chat-context/stores/chat';
 
 	import Message from './Message.svelte';
 	import Typebar from './Typebar.svelte';
 	import ScrollToBottomButton from './ScrollToBottomButton.svelte';
-	import Text from '$lib/design-system/Text.svelte';
 
-	$: isFirstAccess = true;
 	let messagesContainer: HTMLUListElement;
 
+	$: isFirstAccess = true;
 	$: selectedConversationId = $chatState.selectedConversation?.id;
 	$: conversationMessages = $chatState.selectedConversation?.messages || [];
 

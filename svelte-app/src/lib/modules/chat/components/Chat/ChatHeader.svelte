@@ -7,7 +7,7 @@
 
 	$: user = $page.data.session?.user;
 
-	const conversationName =
+	$: conversationName =
 		$chatState.selectedConversation?.groupName ||
 		$chatState.selectedConversation?.participants.find(item => item.id !== user?.id)?.name ||
 		'';
@@ -58,7 +58,7 @@
 
 		<button
 			type="button"
-			on:click={() => chatDispatch.selectConversation(null)}
+			on:click={() => chatDispatch.selectConversation({ conversation: null, typeMessage: '' })}
 			title="Close chat"
 			class="rounded-full p-2 dark:bg-black bg-white hover:bg-purple-500 hover:text-white group transition-all dark:text-white text-gray-700"
 		>
