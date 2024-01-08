@@ -85,7 +85,7 @@ public sealed class ChatHub(
     {
         var hubGroupId = payload.ConversationId.ToString();
         var updateMessageStatusCommand = new UpdateMessageStatusCommand(
-            payload.MessageId, payload.IsConversationGroup, payload.ConversationId, EMessageStatuses.SENT, payload.UserId);
+            payload.MessageId, payload.IsConversationGroup, payload.ConversationId, EMessageStatuses.RECEIVED, payload.UserId);
 
         await sender.Send(updateMessageStatusCommand);
 
