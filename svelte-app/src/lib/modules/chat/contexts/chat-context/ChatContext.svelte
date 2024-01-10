@@ -55,33 +55,7 @@
 				const { messages } = await APIGetConversationMessages({ conversationId: conversation.id }, { accessToken });
 				chatDispatch.setConversationMessages({
 					conversationId: conversation.id,
-					messages: messages
-						.map(message => ({
-							id: message.id,
-							content: message.content,
-							author: {
-								id: message.authorId,
-								name: '',
-							},
-							writtenAt: message.writtenAt,
-							read: {
-								byAllAt: message.readByAllAt,
-								users: [],
-							},
-							received: {
-								byAllAt: message.receivedByAllAt,
-								users: [],
-							},
-							repliedMessage: message.repliedMessageId
-								? {
-										id: message.repliedMessageId,
-										content: '',
-									}
-								: null,
-							sentAt: message.sentAt,
-							conversationId: message.conversationId,
-						}))
-						.toReversed(),
+					messages: messages,
 				});
 			} catch (error) {
 				console.error('Error fetching conversations, data will be taken from the cache', error);
@@ -236,6 +210,7 @@
 		const messageStatusEvent = new CustomEvent(messageId, {
 			detail: { messageStatus, messageId, conversationId, userId },
 		});
+
 		dispatchEvent(messageStatusEvent);
 	}
 

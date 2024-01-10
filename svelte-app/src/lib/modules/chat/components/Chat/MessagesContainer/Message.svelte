@@ -2,13 +2,14 @@
 	import clsx from 'clsx';
 	import { onMount } from 'svelte';
 	import { page } from '$app/stores';
-	import { Clock, ShareFat } from 'phosphor-svelte';
+	import { Clock, Info, ShareFat } from 'phosphor-svelte';
 
 	import { chatDispatch, chatState } from '$lib/modules/chat/contexts/chat-context/stores/chat';
 
 	import type { ILocalMessage } from '../../../../../../types/message';
 	import { EMessageStatuses } from '../../../../../../enums/EMessageStatuses';
 	import { changeMessageStatusAsyncDB } from '../../../../../../services/database/use-cases/change-message-status';
+	import { getStatusFromMessage } from '$lib/modules/chat/services/getStatusFromMessage';
 
 	export let message: ILocalMessage;
 	export let previousMessage: ILocalMessage;
@@ -17,6 +18,8 @@
 	const previousIsFromUser = previousMessage?.author?.id === message.author?.id;
 	const formatter = Intl.DateTimeFormat('pt-br', { hour: 'numeric', minute: 'numeric' });
 	const selectTimeToShow = (isMine: boolean, message: ILocalMessage) => formatter.format(new Date(message.writtenAt));
+
+	$: accessToken = $page.data.session?.accessToken;
 
 	$: timeToShow = selectTimeToShow(isMine, message);
 	$: user = $page.data.session?.user;
@@ -147,6 +150,20 @@
 			}}
 		>
 			<ShareFat size={12} color="white" weight="fill" />
+		</button>
+
+		<button
+			class="p-2 bg-gray-700 shadow-lg z-10 rounded-full"
+			on:click={async () => {
+				const response = await getStatusFromMessage(
+					{ messageId: message.id, conversationId: message.conversationId },
+					{ accessToken: accessToken || '' }
+				);
+
+				console.log({ response });
+			}}
+		>
+			<Info size={12} color="white" weight="fill" />
 		</button>
 	</div>
 </li>

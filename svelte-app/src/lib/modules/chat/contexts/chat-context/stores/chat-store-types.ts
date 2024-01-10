@@ -1,4 +1,4 @@
-import type { ILocalMessage } from '../../../../../../types/message';
+import type { ILocalMessage, IServerMessage } from '../../../../../../types/message';
 import type { Conversation } from '../../../../../../types/conversation';
 import type { GetUserConversationsResponse } from '../../../../../../services/api/get-user-conversations';
 import type { EMessageStatuses } from '../../../../../../enums/EMessageStatuses';
@@ -28,7 +28,7 @@ export type Actions = {
 	handleShowConversationDetail(): void;
 
 	addMessage(payload: { message: ILocalMessage }): void;
-	setConversationMessages(payload: { conversationId: string; messages: ILocalMessage[] }): void;
+	setConversationMessages(payload: { conversationId: string; messages: IServerMessage[] }): void;
 	updateConversationMessageStatus(
 		payload:
 			| {
