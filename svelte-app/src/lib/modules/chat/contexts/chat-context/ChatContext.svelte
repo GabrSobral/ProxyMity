@@ -29,6 +29,8 @@
 	async function selectedConversationAsync(conversation: ConversationState) {
 		if (conversation === chatStateModule.selectedConversation || !userModule) return;
 
+		console.log({ conversation });
+
 		if (conversation.notifications > 0 && connectionModule)
 			sendReadMessageWebSocketEvent(connectionModule, {
 				userId: userModule.id,
@@ -51,7 +53,30 @@
 		if (!conversation.hasMessagesFetched) {
 			try {
 				const { messages } = await APIGetConversationMessages({ conversationId: conversation.id }, { accessToken });
-				chatDispatch.setConversationMessages({ conversationId: conversation.id, messages: messages.toReversed() });
+				chatDispatch.setConversationMessages({
+					conversationId: conversation.id,
+					messages: messages
+						.map(message => ({
+							id: message.id,
+							content: message.content,
+							author: {
+								id: message.authorId,
+								name: '',
+							},
+							writtenAt: message.writtenAt,
+							read: [],
+							received: [],
+							repliedMessage: message.repliedMessageId
+								? {
+										id: message.repliedMessageId,
+										content: '',
+									}
+								: null,
+							sent: [],
+							conversationId: message.conversationId,
+						}))
+						.toReversed(),
+				});
 			} catch (error) {
 				console.error('Error fetching conversations, data will be taken from the cache', error);
 
@@ -99,7 +124,7 @@
 	import { sendReadMessageWebSocketEvent } from '../websocket-context/emmiters/sendReadMessage';
 	import { sendReceiveMessageWebSocketEvent } from '../websocket-context/emmiters/sendReceiveMessage';
 
-	import type { Message } from '../../../../../types/message';
+	import type { ILocalMessage, IServerMessage } from '../../../../../types/message';
 	import { EMessageStatuses } from '../../../../../enums/EMessageStatuses';
 
 	setChatContext();
@@ -137,7 +162,7 @@
 		}
 	});
 
-	function receiveMessageHandler(message: Message) {
+	function receiveMessageHandler(message: IServerMessage) {
 		if (!message || !session?.user || !$connection) {
 			return;
 		}
@@ -162,10 +187,25 @@
 				});
 		}
 
-		const payload: Message = {
-			...message,
-			receivedByAllAt: new Date(),
-			readByAllAt: $chatState.selectedConversation?.id === message.conversationId ? new Date() : null,
+		const payload: ILocalMessage = {
+			id: message.id,
+			content: message.content,
+			conversationId: message.conversationId,
+			writtenAt: message.writtenAt,
+			author: {
+				id: message.authorId,
+				name: 'name',
+			},
+			repliedMessage: message.repliedMessageId
+				? {
+						id: message.repliedMessageId,
+						content: 'replied message',
+					}
+				: null,
+			received: [],
+			sent: [],
+			read: [],
+			// readByAllAt: $chatState.selectedConversation?.id === message.conversationId ? new Date() : null,
 		};
 
 		chatDispatch.addMessage({ message: payload });
@@ -177,12 +217,19 @@
 	async function receiveReadMessageHandler(userId: string, conversationId: string, isConversationGroup: boolean) {
 		if (!session?.user) return;
 
-		chatDispatch.updateConversationMessageStatus({ conversationId, status: EMessageStatuses.READ });
+		chatDispatch.updateConversationMessageStatus({ conversationId, status: EMessageStatuses.READ, userId });
 		// readConversationMessagesAsyncDB({ conversationId, myId: session?.user?.id, whoRead: userId, isConversationGroup });
 	}
 
-	function receiveMessageStatusHandler(messageStatus: string, messageId: string, conversationId: string) {
-		const messageStatusEvent = new CustomEvent(messageId, { detail: { messageStatus, messageId, conversationId } });
+	function receiveMessageStatusHandler(
+		messageStatus: string,
+		messageId: string,
+		conversationId: string,
+		userId: string
+	) {
+		const messageStatusEvent = new CustomEvent(messageId, {
+			detail: { messageStatus, messageId, conversationId, userId },
+		});
 		dispatchEvent(messageStatusEvent);
 	}
 

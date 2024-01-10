@@ -1,6 +1,6 @@
 import { api } from './config';
 
-import type { Message } from '../../types/message';
+import type { IServerMessage } from '../../types/message';
 import type { IServiceOptions } from '../../types/utils/IServiceOptions';
 
 interface Request {
@@ -25,7 +25,7 @@ export interface IConversationAPI {
 		createdAt: Date;
 		removedAt: Date | null;
 	}[];
-	lastMessages: Message[];
+	lastMessages: IServerMessage[];
 }
 
 export type GetUserConversationsResponse = IConversationAPI[];

@@ -79,11 +79,10 @@ export const chatDispatch: Actions = {
 				);
 
 				if (targetIndex > -1) {
-					console.log({ notifications: store.conversations[targetIndex] });
 					store.conversations[targetIndex].notifications = 0;
 					store.conversations[targetIndex].messages = store.conversations[targetIndex].messages.map(message => {
-						if (!message.readByAllAt && message.authorId !== currentUserId) {
-							message.readByAllAt = new Date();
+						if (message.read.length !== conversation.participants.length && message.author.id !== currentUserId) {
+							message.read.push({ at: new Date(), userId: currentUserId });
 						}
 
 						return message;
@@ -112,7 +111,27 @@ export const chatDispatch: Actions = {
 					groupDescription: conversation.conversation.groupDescription,
 					groupName: conversation.conversation.groupName,
 					isGroup: !!conversation.conversation.groupId,
-					messages: conversation.lastMessages.toReversed(),
+					messages: conversation.lastMessages
+						.map(message => ({
+							id: message.id,
+							content: message.content,
+							author: {
+								id: message.authorId,
+								name: '',
+							},
+							writtenAt: message.writtenAt,
+							read: [],
+							received: [],
+							repliedMessage: message.repliedMessageId
+								? {
+										id: message.repliedMessageId,
+										content: '',
+									}
+								: null,
+							sent: [],
+							conversationId: message.conversationId,
+						}))
+						.toReversed(),
 					notifications: conversation.unreadMessagesCount,
 					participants: conversation.participants,
 					replyMessage: null,
@@ -164,24 +183,26 @@ export const chatDispatch: Actions = {
 	},
 
 	updateConversationMessageStatus(params) {
+		const { conversationId, status, userId } = params;
+
 		chatState.update(store => {
-			const { conversationId, status } = params;
 			const conversationIndex = store.conversations.findIndex(item => item.id === conversationId);
+			const numberOfParticipants = store.conversations[conversationIndex].participants.length;
 
 			if (conversationIndex > -1) {
 				store.conversations[conversationIndex].messages = store.conversations[conversationIndex].messages.map(
 					message => {
-						if (status === EMessageStatuses.READ && !message.readByAllAt) {
+						if (status === EMessageStatuses.READ && message.read.length !== numberOfParticipants) {
 							store.conversations[conversationIndex].notifications = 0;
-							message.readByAllAt = new Date();
+							message.read.push({ at: new Date(), userId });
 						}
 
 						if (status === EMessageStatuses.RECEIVED && message.id === params.messageId) {
-							message.receivedByAllAt = new Date();
+							message.received.push({ at: new Date(), userId });
 						}
 
 						if (status === EMessageStatuses.SENT && message.id === params.messageId) {
-							message.sentAt = new Date();
+							message.sent.push({ at: new Date(), userId });
 						}
 
 						return message;

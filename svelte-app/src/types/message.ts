@@ -1,8 +1,36 @@
 import type { User } from './user';
 import type { Conversation } from './conversation';
 
-export interface Message {
+interface TimestampWithAccount {
+	at: Date;
+	userId: string;
+}
+
+export interface ILocalMessage {
 	dbId?: number;
+	id: string;
+	content: string;
+
+	writtenAt: Date;
+
+	sent: TimestampWithAccount[];
+	received: TimestampWithAccount[];
+	read: TimestampWithAccount[];
+
+	conversationId: Conversation['id'];
+
+	repliedMessage: {
+		id: ILocalMessage['id'];
+		content: ILocalMessage['content'];
+	} | null;
+
+	author: {
+		id: User['id'];
+		name: User['name'];
+	};
+}
+
+export interface IServerMessage {
 	id: string;
 	content: string;
 
@@ -13,7 +41,7 @@ export interface Message {
 
 	conversationId: Conversation['id'];
 
-	repliedMessageId: Message['id'] | null;
+	repliedMessageId: IServerMessage['id'] | null;
 
 	authorId: User['id'];
 }

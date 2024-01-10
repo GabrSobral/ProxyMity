@@ -1,13 +1,13 @@
-import type { Message } from '../../../../../../types/message';
+import type { ILocalMessage } from '../../../../../../types/message';
 import type { Conversation } from '../../../../../../types/conversation';
 import type { GetUserConversationsResponse } from '../../../../../../services/api/get-user-conversations';
 import type { EMessageStatuses } from '../../../../../../enums/EMessageStatuses';
 
 export interface ConversationState extends Conversation {
-	messages: Message[];
+	messages: ILocalMessage[];
 	notifications: number;
 	typeMessage: string;
-	replyMessage: Message | null;
+	replyMessage: ILocalMessage | null;
 	hasMessagesFetched: boolean;
 }
 
@@ -27,19 +27,20 @@ export type Actions = {
 	bringToTop(ConversationId: ConversationState['id']): void;
 	handleShowConversationDetail(): void;
 
-	addMessage(payload: { message: Message }): void;
-	setConversationMessages(payload: { conversationId: string; messages: Message[] }): void;
+	addMessage(payload: { message: ILocalMessage }): void;
+	setConversationMessages(payload: { conversationId: string; messages: ILocalMessage[] }): void;
 	updateConversationMessageStatus(
 		payload:
 			| {
 					conversationId: string;
 					messageId: string;
 					status: EMessageStatuses.SENT | EMessageStatuses.RECEIVED;
+					userId: string;
 			  }
-			| { conversationId: string; status: EMessageStatuses.READ }
+			| { conversationId: string; status: EMessageStatuses.READ; userId: string }
 	): void;
 	setConversationInitialState(payload: { conversationsData: GetUserConversationsResponse }): void;
 	saveTypeMessageFromConversation(payload: { conversationId: string; typeMessage: string }): void;
-	setReplyMessageFromConversation(payload: { conversationId: string; message: Message }): void;
+	setReplyMessageFromConversation(payload: { conversationId: string; message: ILocalMessage }): void;
 	removeReplyMessageFromConversation(payload: { conversationId: string }): void;
 };

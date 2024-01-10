@@ -16,7 +16,7 @@
 	// import { addMessageAsyncDB } from '../../../../../../services/database/use-cases/add-message';
 	// import { changeMessageStatusAsyncDB } from '../../../../../../services/database/use-cases/change-message-status';
 
-	import type { Message } from '../../../../../../types/message';
+	import type { ILocalMessage } from '../../../../../../types/message';
 	import { EMessageStatuses } from '../../../../../../enums/EMessageStatuses';
 
 	let typeValueManaged = '';
@@ -32,19 +32,27 @@
 	async function sendMessage() {
 		if (!user || !$chatState.selectedConversation || !$typebarRef?.value.trim()) return;
 
-		const message: Message = {
+		const message: ILocalMessage = {
 			id: ulid(),
 			content: $typebarRef?.value.trim(),
 
 			writtenAt: new Date(),
-			sentAt: null,
-			receivedByAllAt: null,
-			readByAllAt: null,
+			sent: [],
+			received: [],
+			read: [],
 
 			conversationId: $chatState.selectedConversation?.id,
-			authorId: user.id,
+			author: {
+				id: user.id,
+				name: user.name,
+			},
 
-			repliedMessageId: $chatState.selectedConversation.replyMessage?.id || null,
+			repliedMessage: $chatState.selectedConversation.replyMessage
+				? {
+						id: $chatState.selectedConversation.replyMessage.id,
+						content: $chatState.selectedConversation.replyMessage?.content,
+					}
+				: null,
 		};
 
 		// addMessageAsyncDB(message).catch(error => {
@@ -111,7 +119,7 @@
 			<div class="bg-gray-950 w-full p-2 rounded-md flex flex-col gap-1">
 				<span class="text-purple-300 text-xs">
 					{typeof $chatState.selectedConversation?.replyMessage === 'object' &&
-						$chatState.selectedConversation?.replyMessage.authorId}
+						$chatState.selectedConversation?.replyMessage.author.name}
 				</span>
 
 				<span class="text-white text-sm">

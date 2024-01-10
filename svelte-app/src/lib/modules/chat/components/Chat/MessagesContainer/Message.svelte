@@ -4,42 +4,37 @@
 	import { page } from '$app/stores';
 	import { Clock, ShareFat } from 'phosphor-svelte';
 
-	import { chatDispatch } from '$lib/modules/chat/contexts/chat-context/stores/chat';
+	import { chatDispatch, chatState } from '$lib/modules/chat/contexts/chat-context/stores/chat';
 
-	import type { Message } from '../../../../../../types/message';
+	import type { ILocalMessage } from '../../../../../../types/message';
 	import { EMessageStatuses } from '../../../../../../enums/EMessageStatuses';
 	import { changeMessageStatusAsyncDB } from '../../../../../../services/database/use-cases/change-message-status';
 
-	export let message: Message;
-	export let previousMessage: Message;
+	export let message: ILocalMessage;
+	export let previousMessage: ILocalMessage;
 
 	let isMessageConfigVisible = false;
+	const previousIsFromUser = previousMessage?.author?.id === message.author?.id;
+	const formatter = Intl.DateTimeFormat('pt-br', { hour: 'numeric', minute: 'numeric' });
+	const selectTimeToShow = (isMine: boolean, message: ILocalMessage) => formatter.format(new Date(message.writtenAt));
 
+	$: timeToShow = selectTimeToShow(isMine, message);
+	$: conversation = $chatState.selectedConversation;
 	$: user = $page.data.session?.user;
-	$: isMine = message.authorId === user?.id;
+	$: isMine = message.author?.id === user?.id;
 	$: status = (() => {
-		if (message.readByAllAt !== null) return EMessageStatuses.READ;
-		if (message.receivedByAllAt !== null) return EMessageStatuses.RECEIVED;
-		if (message.sentAt !== null) return EMessageStatuses.SENT;
+		if (message.read.length !== conversation?.participants.length) return EMessageStatuses.READ;
+		if (message.received.length !== conversation?.participants.length) return EMessageStatuses.RECEIVED;
+		if (message.sent.length !== conversation?.participants.length) return EMessageStatuses.SENT;
 
 		return EMessageStatuses.WROTE;
 	})();
-
-	const previousIsFromUser = previousMessage?.authorId === message.authorId;
-	const formatter = Intl.DateTimeFormat('pt-br', { hour: 'numeric', minute: 'numeric' });
-	const selectTimeToShow = (isMine: boolean, message: Message) =>
-		isMine
-			? formatter.format(new Date(message.writtenAt))
-			: message.receivedByAllAt && new Date(message.receivedByAllAt) !== null
-				? formatter.format(new Date(message.receivedByAllAt))
-				: null;
-
-	$: timeToShow = selectTimeToShow(isMine, message);
 
 	type EventHandler = CustomEventInit<{
 		messageStatus: EMessageStatuses.SENT | EMessageStatuses.RECEIVED;
 		messageId: string;
 		conversationId: string;
+		userId: string;
 	}>;
 
 	function handler(event: EventHandler) {
@@ -47,11 +42,16 @@
 			return;
 		}
 
-		const { messageId, messageStatus, conversationId } = event.detail;
+		const { messageId, messageStatus, conversationId, userId } = event.detail;
 
 		if (messageStatus && messageId && conversationId) {
 			status = messageStatus;
-			chatDispatch.updateConversationMessageStatus({ conversationId, messageId: message.id, status: messageStatus });
+			chatDispatch.updateConversationMessageStatus({
+				conversationId,
+				messageId: message.id,
+				status: messageStatus,
+				userId,
+			});
 			changeMessageStatusAsyncDB({ messageId: messageId, status: messageStatus });
 		}
 	}
@@ -93,7 +93,7 @@
 				height={30}
 				class="min-w-[30px] min-h-[30px] rounded-full z-0 shadow-xl"
 			/>
-			<span class="dark:text-gray-200 text-gray-700 transition-colors text-xs">{message.authorId}</span>
+			<span class="dark:text-gray-200 text-gray-700 transition-colors text-xs">{message.author.name}</span>
 		{/if}
 
 		<span class="dark:text-gray-300 text-gray-700 transition-colors text-xs ml-2 flex items-center gap-2">
@@ -123,18 +123,18 @@
 				'bg-purple-500 rounded-tr-none': isMine,
 			})}
 		>
-			{#if message.repliedMessageId}
+			{#if message.repliedMessage}
 				<div
 					class={clsx('dark:bg-black bg-white transition-colors p-2 rounded-[8px] w-full flex flex-col', {
 						'ml-auto': isMine,
 					})}
 				>
 					<span class="text-purple-300 text-xs">
-						{message.repliedMessageId}
+						{message.repliedMessage.id}
 					</span>
 
 					<span class="text-gray-200 text-sm">
-						{message.repliedMessageId}
+						{message.repliedMessage.content}
 					</span>
 				</div>
 			{/if}
