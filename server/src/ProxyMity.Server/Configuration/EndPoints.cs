@@ -18,6 +18,8 @@ public static class EndPoints
             endpoints.MapConversationEndpoints();
 
             endpoints.MapUserEndpoints();
+
+            endpoints.MapMessageEndpoints();
         });
 
         return app;

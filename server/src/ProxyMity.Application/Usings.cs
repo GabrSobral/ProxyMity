@@ -19,6 +19,8 @@ global using ProxyMity.Domain.Interfaces.Repositories.ParticipantRepository.Cust
 global using ProxyMity.Domain.Interfaces.Repositories.Shared;
 global using ProxyMity.Domain.Interfaces.Repositories.UserRepository;
 global using System.Reflection;
+global using ProxyMity.Infra.Database.Repositories;
+
 
 
 
