@@ -34,7 +34,7 @@
 				? formatter.format(new Date(message.receivedByAllAt))
 				: null;
 
-	const timeToShow = selectTimeToShow(isMine, message);
+	$: timeToShow = selectTimeToShow(isMine, message);
 
 	type EventHandler = CustomEventInit<{
 		messageStatus: EMessageStatuses.SENT | EMessageStatuses.RECEIVED;

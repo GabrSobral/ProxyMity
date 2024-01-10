@@ -29,7 +29,7 @@
 	});
 </script>
 
-<div class="overflow-hidden w-full flex-1 h-full flex flex-col p-1 relative">
+<div class="overflow-hidden w-full flex-1 h-full flex flex-col p-1 relative max-w-5xl mx-auto">
 	<ul class="flex flex-col gap-2 overflow-auto p-4" bind:this={messagesContainer}>
 		{#if !$chatState.selectedConversation?.hasMessagesFetched}
 			<Text size="md">Loading messages...</Text>

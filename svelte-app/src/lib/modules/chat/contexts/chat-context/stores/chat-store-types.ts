@@ -19,7 +19,11 @@ export type State = {
 
 export type Actions = {
 	addConversation(Conversation: ConversationState): void;
-	selectConversation(params: { conversation: ConversationState | null; typeMessage: string }): void;
+	selectConversation(params: {
+		conversation: ConversationState | null;
+		typeMessage: string;
+		currentUserId: string;
+	}): void;
 	bringToTop(ConversationId: ConversationState['id']): void;
 	handleShowConversationDetail(): void;
 

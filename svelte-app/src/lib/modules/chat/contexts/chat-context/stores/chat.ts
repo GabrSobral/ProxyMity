@@ -71,18 +71,19 @@ export const chatDispatch: Actions = {
 		});
 	},
 
-	selectConversation({ conversation, typeMessage }) {
+	selectConversation({ conversation, typeMessage, currentUserId }) {
 		chatState.update(store => {
 			if (conversation) {
-				const targetIndex = store.conversations.findIndex(conversation => conversation.id === conversation?.id);
+				const targetIndex = store.conversations.findIndex(
+					conversationState => conversationState.id === conversation?.id
+				);
 
-				if (targetIndex !== -1) {
+				if (targetIndex > -1) {
+					console.log({ notifications: store.conversations[targetIndex] });
 					store.conversations[targetIndex].notifications = 0;
 					store.conversations[targetIndex].messages = store.conversations[targetIndex].messages.map(message => {
-						if (!message.readByAllAt) {
+						if (!message.readByAllAt && message.authorId !== currentUserId) {
 							message.readByAllAt = new Date();
-
-							console.log({ message });
 						}
 
 						return message;

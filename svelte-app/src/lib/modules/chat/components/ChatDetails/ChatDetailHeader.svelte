@@ -11,12 +11,12 @@
 
 	$: user = $page.data.session?.user;
 
-	const conversationName =
+	$: conversationName =
 		$chatState.selectedConversation?.groupName ||
 		$chatState.selectedConversation?.participants.find(item => item.id !== user?.id)?.name ||
 		'';
 
-	const contact = $chatState.selectedConversation?.participants[0];
+	$: contact = $chatState.selectedConversation?.participants[0];
 </script>
 
 <header class="rounded-[10px] p-3 bg-purple-400 flex flex-col gap-3">

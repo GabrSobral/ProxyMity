@@ -36,7 +36,11 @@
 				isConversationGroup: conversation.isGroup,
 			});
 
-		chatDispatch.selectConversation({ conversation, typeMessage: typebarRefModule?.value || '' });
+		chatDispatch.selectConversation({
+			conversation,
+			typeMessage: typebarRefModule?.value || '',
+			currentUserId: userModule.id,
+		});
 		// readConversationMessagesAsyncDB({
 		// 	conversationId: conversation.id,
 		// 	whoRead: userModule.id,
@@ -172,13 +176,6 @@
 
 	async function receiveReadMessageHandler(userId: string, conversationId: string, isConversationGroup: boolean) {
 		if (!session?.user) return;
-
-		await new Promise((resolve, reject) => {
-			const conversationIndex = $chatState.conversations.findIndex(item => item.id === conversationId);
-			console.log({ opa: $chatState.conversations[conversationIndex] });
-
-			resolve(true);
-		});
 
 		chatDispatch.updateConversationMessageStatus({ conversationId, status: EMessageStatuses.READ });
 		// readConversationMessagesAsyncDB({ conversationId, myId: session?.user?.id, whoRead: userId, isConversationGroup });
