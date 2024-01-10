@@ -48,6 +48,7 @@ public sealed class ChatHub(
     {
         var message = payload.Message;
         var hubGroupId = message.ConversationId.ToString();
+        var userId = Ulid.Parse(Context.UserIdentifier ?? "");
 
         var saveMessageCommand = new SaveMessageCommand(message);
         await sender.Send(saveMessageCommand);
@@ -60,7 +61,7 @@ public sealed class ChatHub(
 
         await sender.Send(updateMessageStatusCommand);
 
-        await Clients.Clients(Context.ConnectionId).ReceiveMessageStatus(EMessageStatuses.SENT, message.Id, message.ConversationId);
+        await Clients.Clients(Context.ConnectionId).ReceiveMessageStatus(EMessageStatuses.SENT, message.Id, message.ConversationId, userId);
     }
 
     /// <summary>
@@ -84,12 +85,13 @@ public sealed class ChatHub(
     public async Task OnSendReceiveMessage(ChatSendReceiveMessagePayload payload)
     {
         var hubGroupId = payload.ConversationId.ToString();
+        var userId = Ulid.Parse(Context.UserIdentifier ?? "");
         var updateMessageStatusCommand = new UpdateMessageStatusCommand(
             payload.MessageId, payload.IsConversationGroup, payload.ConversationId, EMessageStatuses.RECEIVED, payload.UserId);
 
         await sender.Send(updateMessageStatusCommand);
 
-        await Clients.OthersInGroup(hubGroupId).ReceiveMessageStatus(EMessageStatuses.RECEIVED, payload.MessageId, payload.ConversationId);
+        await Clients.OthersInGroup(hubGroupId).ReceiveMessageStatus(EMessageStatuses.RECEIVED, payload.MessageId, payload.ConversationId, userId);
     }
 
     /// <summary>
