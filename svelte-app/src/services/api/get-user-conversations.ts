@@ -15,7 +15,7 @@ export interface IConversationAPI {
 		groupDescription: null | string;
 		groupId: null | string;
 	};
-	unreadMessagesCount: 0;
+	unreadMessagesCount: number;
 	participants: {
 		id: string;
 		name: string;

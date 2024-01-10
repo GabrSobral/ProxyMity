@@ -37,9 +37,9 @@
 			content: $typebarRef?.value.trim(),
 
 			writtenAt: new Date(),
-			sent: [],
-			received: [],
-			read: [],
+			sentAt: null,
+			received: { byAllAt: null, users: [] },
+			read: { byAllAt: null, users: [] },
 
 			conversationId: $chatState.selectedConversation?.id,
 			author: {
@@ -64,7 +64,7 @@
 
 		if ($connection) {
 			sendMessageWebSocketEvent($connection, {
-				message: { ...message, sentAt: new Date() },
+				message: message,
 				isConversationGroup: $chatState.selectedConversation.isGroup,
 			});
 

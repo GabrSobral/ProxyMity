@@ -12,10 +12,16 @@ export interface ILocalMessage {
 	content: string;
 
 	writtenAt: Date;
+	sentAt: Date | null;
 
-	sent: TimestampWithAccount[];
-	received: TimestampWithAccount[];
-	read: TimestampWithAccount[];
+	received: {
+		users: TimestampWithAccount[];
+		byAllAt: Date | null;
+	};
+	read: {
+		users: TimestampWithAccount[];
+		byAllAt: Date | null;
+	};
 
 	conversationId: Conversation['id'];
 

@@ -64,15 +64,21 @@
 								name: '',
 							},
 							writtenAt: message.writtenAt,
-							read: [],
-							received: [],
+							read: {
+								byAllAt: message.readByAllAt,
+								users: [],
+							},
+							received: {
+								byAllAt: message.receivedByAllAt,
+								users: [],
+							},
 							repliedMessage: message.repliedMessageId
 								? {
 										id: message.repliedMessageId,
 										content: '',
 									}
 								: null,
-							sent: [],
+							sentAt: message.sentAt,
 							conversationId: message.conversationId,
 						}))
 						.toReversed(),
@@ -202,9 +208,9 @@
 						content: 'replied message',
 					}
 				: null,
-			received: [],
-			sent: [],
-			read: [],
+			received: { byAllAt: message.receivedByAllAt, users: [] },
+			sentAt: message.sentAt,
+			read: { byAllAt: message.readByAllAt, users: [] },
 			// readByAllAt: $chatState.selectedConversation?.id === message.conversationId ? new Date() : null,
 		};
 

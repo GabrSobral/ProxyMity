@@ -81,8 +81,8 @@ export const chatDispatch: Actions = {
 				if (targetIndex > -1) {
 					store.conversations[targetIndex].notifications = 0;
 					store.conversations[targetIndex].messages = store.conversations[targetIndex].messages.map(message => {
-						if (message.read.length !== conversation.participants.length && message.author.id !== currentUserId) {
-							message.read.push({ at: new Date(), userId: currentUserId });
+						if (message.read.byAllAt === null && message.author.id !== currentUserId) {
+							message.read.users.push({ at: new Date(), userId: currentUserId });
 						}
 
 						return message;
@@ -120,15 +120,15 @@ export const chatDispatch: Actions = {
 								name: '',
 							},
 							writtenAt: message.writtenAt,
-							read: [],
-							received: [],
+							read: { users: [], byAllAt: message.readByAllAt },
+							received: { users: [], byAllAt: message.receivedByAllAt },
 							repliedMessage: message.repliedMessageId
 								? {
 										id: message.repliedMessageId,
 										content: '',
 									}
 								: null,
-							sent: [],
+							sentAt: message.sentAt,
 							conversationId: message.conversationId,
 						}))
 						.toReversed(),
@@ -192,17 +192,25 @@ export const chatDispatch: Actions = {
 			if (conversationIndex > -1) {
 				store.conversations[conversationIndex].messages = store.conversations[conversationIndex].messages.map(
 					message => {
-						if (status === EMessageStatuses.READ && message.read.length !== numberOfParticipants) {
+						if (status === EMessageStatuses.READ && message.read.byAllAt === null) {
 							store.conversations[conversationIndex].notifications = 0;
-							message.read.push({ at: new Date(), userId });
+							message.read.users.push({ at: new Date(), userId });
+
+							if (numberOfParticipants === message.read.users.length) {
+								message.read.byAllAt = new Date();
+							}
 						}
 
 						if (status === EMessageStatuses.RECEIVED && message.id === params.messageId) {
-							message.received.push({ at: new Date(), userId });
+							message.received.users.push({ at: new Date(), userId });
+
+							if (numberOfParticipants === message.received.users.length) {
+								message.received.byAllAt = new Date();
+							}
 						}
 
 						if (status === EMessageStatuses.SENT && message.id === params.messageId) {
-							message.sent.push({ at: new Date(), userId });
+							message.sentAt = new Date();
 						}
 
 						return message;

@@ -19,13 +19,12 @@
 	const selectTimeToShow = (isMine: boolean, message: ILocalMessage) => formatter.format(new Date(message.writtenAt));
 
 	$: timeToShow = selectTimeToShow(isMine, message);
-	$: conversation = $chatState.selectedConversation;
 	$: user = $page.data.session?.user;
 	$: isMine = message.author?.id === user?.id;
 	$: status = (() => {
-		if (message.read.length !== conversation?.participants.length) return EMessageStatuses.READ;
-		if (message.received.length !== conversation?.participants.length) return EMessageStatuses.RECEIVED;
-		if (message.sent.length !== conversation?.participants.length) return EMessageStatuses.SENT;
+		if (message.read.byAllAt !== null) return EMessageStatuses.READ;
+		if (message.received.byAllAt !== null) return EMessageStatuses.RECEIVED;
+		if (message.sentAt !== null) return EMessageStatuses.SENT;
 
 		return EMessageStatuses.WROTE;
 	})();
