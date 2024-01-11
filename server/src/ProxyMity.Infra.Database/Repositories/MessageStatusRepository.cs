@@ -18,8 +18,7 @@ public class MessageStatusRepository(DbSession session) : IMessageStatusReposito
                 @readAt,
                 @receivedAt
             );
-        """
-        ;
+        """;
 
         object parameters = new
         {
@@ -110,5 +109,33 @@ public class MessageStatusRepository(DbSession session) : IMessageStatusReposito
 
         object parameters = new { userId, messageId, currentTime = DateTime.UtcNow };
         await session.Connection.QueryAsync<MessageStatus>(sql, parameters, session.Transaction);
+    }
+
+    public async Task ReceiveUnreceivedMessagesByUserIdAsync(Ulid userId)
+    {
+        const string sql = """
+            UPDATE "message_status"
+            SET "received_at" = @currentTime
+            WHERE
+        	    "user_id" = @userId AND
+                "received_at" IS NULL;
+
+            UPDATE "message"
+            SET "received_by_all_at" = @currentTime
+            FROM "conversation" c
+            WHERE "message"."conversation_id" = c."id"
+              AND c."group_id" IS NULL
+              AND "message"."received_by_all_at" IS NULL
+              AND EXISTS (
+                SELECT 1
+                FROM "participant" p
+                WHERE p."user_id" = @userId
+                  AND p."conversation_id" = c."id"
+          );
+        """;
+
+        object parameters = new { userId, currentTime = DateTime.UtcNow };
+
+        await session.Connection.QueryAsync(sql, parameters, session.Transaction);
     }
 }

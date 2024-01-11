@@ -1,4 +1,6 @@
-﻿namespace ProxyMity.Presentation.Http.Endpoints;
+﻿using ProxyMity.Application.Handlers.Messages.Commands.ReceivePendingMessages;
+
+namespace ProxyMity.Presentation.Http.Endpoints;
 
 public static class ConversationEndpoints
 {
@@ -24,7 +26,10 @@ public static class ConversationEndpoints
     public static async Task<IResult> GetUserConversations(Ulid userId, ISender sender)
     {
         GetUserConversationsQuery query = new(userId);
+        ReceivePendingMessagesCommand command = new(userId);
+
         var response = await sender.Send(query);
+        await sender.Send(command);
 
         return TypedResults.Ok(response);
     }
