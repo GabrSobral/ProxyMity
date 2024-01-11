@@ -12,12 +12,10 @@
 			const hubConnection = new HubConnectionBuilder()
 				.withUrl('http://localhost:5000/chat', {
 					accessTokenFactory: () => accessToken || '',
-					logMessageContent: true,
 					transport: HttpTransportType.WebSockets,
 					skipNegotiation: true,
 					withCredentials: true,
 				})
-				.configureLogging(LogLevel.Information)
 				.build();
 
 			connection.set(hubConnection);
@@ -26,7 +24,7 @@
 
 	afterUpdate(() => {
 		if (connection && $connection?.state === HubConnectionState.Disconnected) {
-			$connection.start().then(async () => console.log('Client connected to hub.'));
+			$connection.start().then(async () => console.log('🖥️ Client connected to hub.'));
 		}
 	});
 </script>

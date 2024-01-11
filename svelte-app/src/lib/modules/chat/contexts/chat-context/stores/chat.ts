@@ -2,6 +2,7 @@ import { writable } from 'svelte/store';
 
 import type { Actions, State } from './chat-store-types';
 import { EMessageStatuses } from '../../../../../../enums/EMessageStatuses';
+import type { TimestampWithAccount } from '../../../../../../types/message';
 
 export const chatState = writable<State>({
 	conversations: [],
@@ -15,6 +16,50 @@ export const chatDispatch: Actions = {
 			...store,
 			conversations: [newConversation, ...store.conversations],
 		}));
+	},
+
+	updateUsersFromMessageStatus({ message, users }) {
+		chatState.update(store => {
+			const index = store.conversations.findIndex(conversation => conversation.id === message.conversationId);
+
+			if (index >= 0) {
+				if (store.conversations[index].isGroup) {
+					store.conversations[index].messages = store.conversations[index].messages.map(item => {
+						if (item.id === message.id) {
+							const read: TimestampWithAccount[] = users
+								.filter(user => user.readAt)
+								.map(user => ({ at: user.readAt!, userId: user.userId }));
+							const received: TimestampWithAccount[] = users
+								.filter(user => user.receivedAt)
+								.map(user => ({ at: user.receivedAt!, userId: user.userId }));
+
+							item.read.users = read;
+							item.received.users = received;
+						}
+
+						return item;
+					});
+				} else {
+					store.conversations[index].messages = store.conversations[index].messages.map(item => {
+						if (item.id === message.id) {
+							item.read.users = store.conversations[index].participants.map(participant => ({
+								userId: participant.id,
+								at: message.read.byAllAt,
+							}));
+
+							item.received.users = store.conversations[index].participants.map(participant => ({
+								userId: participant.id,
+								at: message.received.byAllAt,
+							}));
+						}
+
+						return item;
+					});
+				}
+			}
+
+			return store;
+		});
 	},
 
 	addMessage({ message }) {

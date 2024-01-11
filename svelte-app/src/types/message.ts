@@ -1,8 +1,8 @@
 import type { User } from './user';
 import type { Conversation } from './conversation';
 
-interface TimestampWithAccount {
-	at: Date;
+export interface TimestampWithAccount {
+	at: Date | null;
 	userId: string;
 }
 

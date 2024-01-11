@@ -43,4 +43,8 @@ export type Actions = {
 	saveTypeMessageFromConversation(payload: { conversationId: string; typeMessage: string }): void;
 	setReplyMessageFromConversation(payload: { conversationId: string; message: ILocalMessage }): void;
 	removeReplyMessageFromConversation(payload: { conversationId: string }): void;
+	updateUsersFromMessageStatus(payload: {
+		message: ILocalMessage;
+		users: { readAt: Date | null; receivedAt: Date | null; userId: string }[];
+	}): void;
 };

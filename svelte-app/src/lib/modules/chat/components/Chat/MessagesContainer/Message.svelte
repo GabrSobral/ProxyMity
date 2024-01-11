@@ -5,16 +5,18 @@
 	import { Clock, Info, ShareFat } from 'phosphor-svelte';
 
 	import { chatDispatch, chatState } from '$lib/modules/chat/contexts/chat-context/stores/chat';
+	import { getStatusFromMessage } from '$lib/modules/chat/services/getStatusFromMessage';
 
 	import type { ILocalMessage } from '../../../../../../types/message';
 	import { EMessageStatuses } from '../../../../../../enums/EMessageStatuses';
 	import { changeMessageStatusAsyncDB } from '../../../../../../services/database/use-cases/change-message-status';
-	import { getStatusFromMessage } from '$lib/modules/chat/services/getStatusFromMessage';
+	import Text from '$lib/design-system/Text.svelte';
 
 	export let message: ILocalMessage;
 	export let previousMessage: ILocalMessage;
 
 	let isMessageConfigVisible = false;
+	let showMessageStatus = false;
 	const previousIsFromUser = previousMessage?.author?.id === message.author?.id;
 	const formatter = Intl.DateTimeFormat('pt-br', { hour: 'numeric', minute: 'numeric' });
 	const selectTimeToShow = (isMine: boolean, message: ILocalMessage) => formatter.format(new Date(message.writtenAt));
@@ -39,7 +41,7 @@
 		userId: string;
 	}>;
 
-	function handler(event: EventHandler) {
+	function messageStatusEventHandler(event: EventHandler) {
 		if (!event.detail) {
 			return;
 		}
@@ -54,37 +56,44 @@
 				status: messageStatus,
 				userId,
 			});
+
 			changeMessageStatusAsyncDB({ messageId: messageId, status: messageStatus });
 		}
 	}
 
+	async function handleWithUpdateOfMessageStatus() {
+		showMessageStatus = true;
+
+		if ($chatState.selectedConversation?.isGroup) {
+			const response = await getStatusFromMessage(
+				{ messageId: message.id, conversationId: message.conversationId },
+				{ accessToken: accessToken || '' }
+			);
+
+			chatDispatch.updateUsersFromMessageStatus({
+				message,
+				users: response.map(item => ({ readAt: item.readAt, receivedAt: item.receivedAt, userId: item.userId })),
+			});
+		} else {
+			chatDispatch.updateUsersFromMessageStatus({ message, users: [] });
+		}
+
+		setTimeout(() => {
+			showMessageStatus = false;
+		}, 5000);
+	}
+
 	onMount(() => {
-		addEventListener(message.id, handler);
-		return () => removeEventListener(message.id, handler);
+		addEventListener(message.id, messageStatusEventHandler);
+		return () => removeEventListener(message.id, messageStatusEventHandler);
 	});
 </script>
 
-<li
-	on:mouseover={() => {
-		isMessageConfigVisible = true;
-	}}
-	on:focus={() => {
-		isMessageConfigVisible = true;
-	}}
-	on:mouseout={() => {
-		isMessageConfigVisible = false;
-	}}
-	on:blur={() => {
-		isMessageConfigVisible = false;
-	}}
-	class="flex flex-col gap-1 rounded-[1rem] w-full"
->
+<li class="flex flex-col gap-1 rounded-[1rem] w-full">
 	<div
 		class={clsx(
 			'flex items-center gap-3 sticky dark:bg-gray-900 bg-white transition-colors p-1 px-2 rounded-full w-fit -top-3',
-			{
-				'ml-auto': isMine,
-			}
+			{ 'ml-auto': isMine }
 		)}
 	>
 		{#if !isMine && !previousIsFromUser}
@@ -118,7 +127,7 @@
 		</span>
 	</div>
 
-	<div class={clsx('flex items-center gap-2', { 'flex-row-reverse': isMine })}>
+	<div class={clsx('flex items-center gap-2 relative', { 'flex-row-reverse': isMine })}>
 		<div
 			class={clsx('w-fit rounded-[12px] text-white font-light text-sm shadow z-[13] p-1 min-w-[100px]', {
 				'bg-gray-950 rounded-tl-none': !isMine,
@@ -152,18 +161,27 @@
 			<ShareFat size={12} color="white" weight="fill" />
 		</button>
 
-		<button
-			class="p-2 bg-gray-700 shadow-lg z-10 rounded-full"
-			on:click={async () => {
-				const response = await getStatusFromMessage(
-					{ messageId: message.id, conversationId: message.conversationId },
-					{ accessToken: accessToken || '' }
-				);
-
-				console.log({ response });
-			}}
-		>
+		<button class="p-2 bg-gray-700 shadow-lg z-10 rounded-full" on:click={handleWithUpdateOfMessageStatus}>
 			<Info size={12} color="white" weight="fill" />
 		</button>
+
+		{#if showMessageStatus}
+			<div class="flex flex-col gap-3 p-2 bg-gray-800 rounded-md absolute left-0">
+				<Text size="md">Sent: {message.sentAt && formatter.format(new Date(message.sentAt))}</Text>
+
+				{#each message.read.users as status (status.userId)}
+					<Text size="md"
+						>Read: {status.userId.substring(0, 5)} {status.at ? formatter.format(new Date(status.at)) : 'Nothing'}</Text
+					>
+				{/each}
+
+				{#each message.received.users as status (status.userId)}
+					<Text size="md">
+						Received: {status.userId.substring(0, 5)}
+						{status.at ? formatter.format(new Date(status.at)) : 'Nothing'}
+					</Text>
+				{/each}
+			</div>
+		{/if}
 	</div>
 </li>
