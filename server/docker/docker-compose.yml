@@ -4,7 +4,7 @@ services:
   proxymity.server:
     image: ${DOCKER_REGISTRY-}proxymityserver
     build:
-      context: .
+      context: ../src
       dockerfile: ../src/ProxyMity.Server/Dockerfile
     ports:
       - "5000:5000"

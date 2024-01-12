@@ -4,10 +4,7 @@
 /// Chat SignalR hub, that handle with all events of real time chat.
 /// </summary>
 [Authorize]
-public sealed class ChatHub(
-    ILogger<ChatHub> logger,
-    ISender sender
-) : Hub<IChatHubServer>, IChatHubClient
+public sealed partial class ChatHub(ILogger<ChatHub> logger, ISender sender) : Hub<IChatHubServer>, IChatHubClient
 {
     /// <summary>
     /// When user connect, will be assigned to all conversations that belong, at SignalR groups.
@@ -20,8 +17,12 @@ public sealed class ChatHub(
         var getUserConversationsQuery = new GetUserConversationsQuery(userId);
         var userConversations = await sender.Send(getUserConversationsQuery);
 
-        foreach (var item in userConversations)
-            await Groups.AddToGroupAsync(Context.ConnectionId!, item.Conversation.Id.ToString());
+        foreach (var item in userConversations) 
+        {
+            string conversationId = item.Conversation.Id.ToString();
+            await Groups.AddToGroupAsync(Context.ConnectionId!, conversationId);
+            await Clients.OthersInGroup(conversationId).ReceivePendingMessages(userId);
+        }
     }
 
     /// <summary>
@@ -38,72 +39,5 @@ public sealed class ChatHub(
 
         foreach (var item in userConversations)
             await Groups.RemoveFromGroupAsync(Context.UserIdentifier!, item.Conversation.Id.ToString());
-    }
-
-    /// <summary>
-    /// WS Handler responsible to receive a client message, save at database, update the status to SENT, and redirect to destiny client.
-    /// </summary>
-    /// <param name="payload">Message that must be send to other clients</param>
-    public async Task OnSendMessage(ChatSendMessagePayload payload)
-    {
-        var message = payload.Message;
-        var hubGroupId = message.ConversationId.ToString();
-        var userId = Ulid.Parse(Context.UserIdentifier ?? "");
-
-        var saveMessageCommand = new SaveMessageCommand(message);
-        await sender.Send(saveMessageCommand);
-
-        await Clients.OthersInGroup(hubGroupId).ReceiveMessage(message);
-        await Clients.OthersInGroup(hubGroupId).ReceiveTyping(false, message.AuthorId, message.ConversationId);
-
-        var updateMessageStatusCommand = new UpdateMessageStatusCommand(
-            message.Id, payload.IsConversationGroup, message.ConversationId, EMessageStatuses.SENT, message.AuthorId);
-
-        await sender.Send(updateMessageStatusCommand);
-
-        await Clients.Clients(Context.ConnectionId).ReceiveMessageStatus(EMessageStatuses.SENT, message.Id, message.ConversationId, userId);
-    }
-
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="payload"></param>
-    /// <exception cref="NotImplementedException"></exception>
-    public async Task OnSendReadMessage(ChatSendReadMessagePayload payload)
-    {
-        var readConversationMessagesCommand = new ReadConversationMessagesCommand(payload.UserId, payload.ConversationId, payload.IsConversationGroup);
-        await sender.Send(readConversationMessagesCommand);
-
-        var hubGroupId = payload.ConversationId.ToString();
-        await Clients.OthersInGroup(hubGroupId).ReceiveReadMessage(payload.UserId, payload.ConversationId, payload.IsConversationGroup);
-    }
-
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="payload"></param>
-    public async Task OnSendReceiveMessage(ChatSendReceiveMessagePayload payload)
-    {
-        var hubGroupId = payload.ConversationId.ToString();
-        var userId = Ulid.Parse(Context.UserIdentifier ?? "");
-        var updateMessageStatusCommand = new UpdateMessageStatusCommand(
-            payload.MessageId, payload.IsConversationGroup, payload.ConversationId, EMessageStatuses.RECEIVED, payload.UserId);
-
-        await sender.Send(updateMessageStatusCommand);
-
-        await Clients.OthersInGroup(hubGroupId).ReceiveMessageStatus(EMessageStatuses.RECEIVED, payload.MessageId, payload.ConversationId, userId);
-    }
-
-    /// <summary>
-    /// WS Handler responsible to reecive the typing status, and propagate to another clients in group.
-    /// </summary>
-    /// <param name="payload">Typing status, and data to identify the conversation.</param>
-    public async Task OnSendTyping(ChatSendTypingPayload payload)
-    {
-        var hubGroupId = payload.ConversationId.ToString();
-        logger.LogInformation($"OnSendTyping: {payload.Typing}, {hubGroupId}, {payload.AuthorId}");
-
-        await Clients.OthersInGroup(hubGroupId)
-            .ReceiveTyping(payload.Typing, payload.AuthorId, payload.ConversationId);
     }
 }

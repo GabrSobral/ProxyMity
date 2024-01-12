@@ -126,6 +126,7 @@ public class MessageStatusRepository(DbSession session) : IMessageStatusReposito
             WHERE "message"."conversation_id" = c."id"
               AND c."group_id" IS NULL
               AND "message"."received_by_all_at" IS NULL
+              AND "message"."author_id" != @userId
               AND EXISTS (
                 SELECT 1
                 FROM "participant" p
