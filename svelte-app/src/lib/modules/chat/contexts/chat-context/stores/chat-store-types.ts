@@ -47,4 +47,6 @@ export type Actions = {
 		message: ILocalMessage;
 		users: { readAt: Date | null; receivedAt: Date | null; userId: string }[];
 	}): void;
+
+	markAsReceivedMessagesFromConversations(params: { userId: string }): void;
 };

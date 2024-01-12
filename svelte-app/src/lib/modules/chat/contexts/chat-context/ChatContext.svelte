@@ -214,10 +214,17 @@
 		dispatchEvent(messageStatusEvent);
 	}
 
+	function receivePendingMessagesHandler(userId: string) {
+		console.log('Receiving pending messages', { userId });
+
+		chatDispatch.markAsReceivedMessagesFromConversations({ userId });
+	}
+
 	$: if ($connection) {
 		$connection?.on('receivemessage', receiveMessageHandler);
 		$connection?.on('receivereadmessage', receiveReadMessageHandler);
 		$connection?.on('receivemessagestatus', receiveMessageStatusHandler);
+		$connection?.on('receivependingmessages', receivePendingMessagesHandler);
 	}
 </script>
 

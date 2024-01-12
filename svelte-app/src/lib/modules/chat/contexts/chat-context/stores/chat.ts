@@ -18,6 +18,29 @@ export const chatDispatch: Actions = {
 		}));
 	},
 
+	markAsReceivedMessagesFromConversations({ userId }) {
+		chatState.update(store => {	
+			store.conversations = store.conversations.map(conversation => {
+				if(conversation.participants.some(participant => participant.id === userId)) {
+					conversation.messages = conversation.messages.map(message => {
+						if(!message.received.users.some(user => user.userId === userId))
+							console.log("entrou",{message})
+							message.received.users =  [ ...message.received.users, { userId, at: new Date() }]
+
+							if(conversation.participants.length === message.received.users.filter(x => x.at).length) {
+								message.received.byAllAt = new Date();
+							}
+
+						return message;
+					})
+				}
+
+				return conversation;
+			});
+			return store;
+		});
+	},
+
 	updateUsersFromMessageStatus({ message, users }) {
 		chatState.update(store => {
 			const index = store.conversations.findIndex(conversation => conversation.id === message.conversationId);
