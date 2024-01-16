@@ -2,11 +2,11 @@ namespace ProxyMity.Unit.Conversations;
 
 public class CreatePrivateConversationServiceTests {
     private readonly ILogger<CreatePrivateConversationCommandHandler> _logger;
-    private readonly IUnitOfWork _unitOfWork;
+    private readonly DataContext _dbContext;
 
     public CreatePrivateConversationServiceTests() {
         _logger = LoggerFactory.Create(builder => { }).CreateLogger<CreatePrivateConversationCommandHandler>();
-        _unitOfWork = new UnitOfWorkTest();
+        _dbContext = new DbContextTest();
     }
 
     [Fact]
@@ -21,7 +21,7 @@ public class CreatePrivateConversationServiceTests {
           inMemoryConversationRepository,
           inMemoryParticipantRepository,
           inMemoryUserRepository,
-          _unitOfWork
+          _dbContext
         );
 
         var user1 = User.Create("Test 1", "Test1@email.com", "123");

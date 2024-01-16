@@ -1,23 +1,23 @@
 ﻿namespace ProxyMity.Unit.InMemoryRepositories;
 
 public class InMemoryConversationRepository : InMemoryRepository<Conversation>, IConversationRepository {
-    public Task CreateAsync(Conversation newConversation) {
-        Items.Add(newConversation);
-
-        return Task.CompletedTask;
+    public async Task CreateAsync(Conversation newConversation, CancellationToken cancellationToken) {
+        await Task.Run(() => { 
+            Items.Add(newConversation);
+        }, cancellationToken);
     }
 
-    public Task DisableConversationByIdAsync(Ulid conversationId) {
-        foreach (var item in Items) {
-            if (item.Id == conversationId)
-                item.DisabledAt = DateTime.UtcNow;
-        }
-
-        return Task.CompletedTask;
+    public async Task DisableConversationByIdAsync(Ulid conversationId, CancellationToken cancellationToken) {
+        await Task.Run(() => { 
+            foreach (var item in Items) {
+                if (item.Id == conversationId)
+                    item.DisabledAt = DateTime.UtcNow;
+            }
+        }, cancellationToken);
     }
 
-    public async Task<Conversation?> GetByIdAsync(Ulid conversationId) {
-        await Task.Run(() => { });
+    public async Task<Conversation?> GetByIdAsync(Ulid conversationId, CancellationToken cancellationToken) {
+        await Task.Run(() => { }, cancellationToken);
 
         return Items.SingleOrDefault(x => x.Id == conversationId);
     }

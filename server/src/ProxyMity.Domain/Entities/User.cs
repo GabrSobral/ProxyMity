@@ -27,4 +27,16 @@ public class User
     public IEnumerable<Participant> Participations { get; set; }
 
     #endregion
+
+    public static User Create(string name, string email, string password)
+    {
+        return new User
+        {
+            Id = Ulid.NewUlid(),
+            Name = name,
+            Email = email,
+            Password = password,
+            CreatedAt = DateTime.UtcNow,
+        };
+    }
 }

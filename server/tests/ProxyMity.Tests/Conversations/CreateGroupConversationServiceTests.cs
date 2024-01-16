@@ -2,11 +2,11 @@
 
 public class CreateGroupConversationServiceTests {
     private readonly ILogger<CreateGroupConversationCommandHandler> _logger;
-    private readonly IUnitOfWork _unitOfWork;
+    private readonly DataContext _dbContext;
 
     public CreateGroupConversationServiceTests() {
         _logger = LoggerFactory.Create(builder => { }).CreateLogger<CreateGroupConversationCommandHandler>();
-        _unitOfWork = new UnitOfWorkTest();
+        _dbContext = new DbContextTest();
     }
 
     private CreateGroupConversationCommandHandler CreateInstanceAndAddUsers(IEnumerable<User> users) {
@@ -25,7 +25,7 @@ public class CreateGroupConversationServiceTests {
           inMemoryParticipantRepository,
           inMemoryConversationRepository,
           inMemoryUserRepository,
-          _unitOfWork
+          _dbContext
         );
     }
 
@@ -59,7 +59,7 @@ public class CreateGroupConversationServiceTests {
 
         var validator = new CreateGroupConversationCommandValidator();
 
-        Assert.Throws<FluentValidation.ValidationException>(() => {
+        Assert.Throws<ValidationException>(() => {
             validator.ValidateAndThrow(inputModel);
         });
     }

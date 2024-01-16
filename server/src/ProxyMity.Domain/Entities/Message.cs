@@ -44,4 +44,16 @@ public class Message
     public Conversation Conversation { get; set; }
 
     #endregion
+
+    public static Message Create(string content, Ulid conversationId, Ulid authorId, DateTime? writtenAt = null)
+    {
+        return new Message()
+        {
+            Id = Ulid.NewUlid(),
+            Content = content,
+            ConversationId = conversationId,
+            AuthorId = authorId,
+            WrittenAt = writtenAt ?? DateTime.UtcNow,
+        };
+    }
 }

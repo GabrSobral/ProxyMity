@@ -1,48 +1,42 @@
 ﻿namespace ProxyMity.Unit.InMemoryRepositories;
 
-internal class InMemoryParticipantRepository : InMemoryRepository<Participant>, IParticipantRepository {
-    private IGroupRepository _groupRepository { get; set; }
-    private IUserRepository _userRepository { get; set; }
-    private IConversationRepository _conversationRepository { get; set; }
-
-    public InMemoryParticipantRepository(IGroupRepository groupRepository, IUserRepository userRepository, IConversationRepository conversationRepository) {
-        _groupRepository = groupRepository;
-        _userRepository = userRepository;
-        _conversationRepository = conversationRepository;
-    }
-
-    public Task AddAsync(Participant participant) {
+internal class InMemoryParticipantRepository(
+    IGroupRepository groupRepository,
+    IUserRepository userRepository,
+    IConversationRepository conversationRepository
+) : InMemoryRepository<Participant>, IParticipantRepository {
+    public Task AddAsync(Participant participant, CancellationToken cancellationToken) {
         Items.Add(participant);
         return Task.CompletedTask;
     }
 
-    public Task<IEnumerable<Participant>> GetByConversationIdAsync(Ulid conversationId) {
-        var participants = Items.Where(p => p.ConversationId == conversationId);
+    public Task<List<Participant>> GetByConversationIdAsync(Ulid conversationId, CancellationToken cancellationToken) {
+        var participants = Items.Where(p => p.ConversationId == conversationId).ToList();
         return Task.FromResult(participants);
     }
 
-    public async Task<Participant?> GetByIdAsync(Ulid userId, Ulid conversationId) {
+    public async Task<Participant?> GetByIdAsync(Ulid userId, Ulid conversationId, CancellationToken cancellationToken) {
         var participant = Items.SingleOrDefault(p => p.UserId == userId && p.ConversationId == conversationId);
         await Task.Run(() => { });
 
         return participant;
     }
 
-    public Task<IEnumerable<Participant>> GetByUserIdAsync(Ulid userId) {
-        var participants = Items.Where(p => p.UserId == userId);
+    public Task<List<Participant>> GetByUserIdAsync(Ulid userId, CancellationToken cancellationToken) {
+        var participants = Items.Where(p => p.UserId == userId).ToList();
 
         return Task.FromResult(participants);
     }
 
-    public async Task<IEnumerable<GetConversationsByUserIdQuery>> GetConversationsByUserIdAsync(Ulid userId) {
+    public async Task<List<GetConversationsByUserIdQuery>> GetConversationsByUserIdAsync(Ulid userId, CancellationToken cancellationToken) {
         var participationInConversations = Items.FindAll(p => p.UserId == userId);
         var conversationsWithParticipants = new List<GetConversationsByUserIdQuery>();
 
         foreach (var item in participationInConversations) {
-            var conversation = await _conversationRepository.GetByIdAsync(item.UserId)
+            var conversation = await conversationRepository.GetByIdAsync(item.UserId, cancellationToken)
                 ?? throw new Exception("Conversation not found");
 
-            var group = await _groupRepository.FindByIdAsync(item.UserId)
+            var group = await groupRepository.FindByIdAsync(item.UserId, cancellationToken)
                 ?? throw new Exception("Conversation not found");
 
             conversationsWithParticipants.Add(new GetConversationsByUserIdQuery(
@@ -57,13 +51,13 @@ internal class InMemoryParticipantRepository : InMemoryRepository<Participant>, 
         return conversationsWithParticipants;
     }
 
-    public async Task<IEnumerable<GetParticipantsByConversationIdQuery>> GetParticipantsByConversationIdAsync(Ulid conversationId) {
+    public async Task<List<GetParticipantsByConversationIdQuery>> GetParticipantsByConversationIdAsync(Ulid conversationId, CancellationToken cancellationToken) {
         var participantsOfConversation = Items.FindAll(x => x.ConversationId == conversationId);
 
         var participants = new List<GetParticipantsByConversationIdQuery>();
 
         foreach (var item in participantsOfConversation) {
-            var user = await _userRepository.FindByIdAsync(item.UserId);
+            var user = await userRepository.FindByIdAsync(item.UserId, cancellationToken);
 
             if (user is null) {
                 continue;
@@ -85,7 +79,7 @@ internal class InMemoryParticipantRepository : InMemoryRepository<Participant>, 
         return participants;
     }
 
-    public Task RemoveAsync(Participant participant) {
+    public Task Remove(Participant participant, CancellationToken cancellationToken) {
         Items.Remove(participant);
 
         return Task.CompletedTask;

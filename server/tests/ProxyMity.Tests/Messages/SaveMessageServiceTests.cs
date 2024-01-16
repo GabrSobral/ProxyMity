@@ -2,11 +2,11 @@
 
 public class SaveMessageServiceTests {
     private readonly ILogger<SaveMessageCommandHandler> _logger;
-    private readonly IUnitOfWork _unitOfWork;
+    private readonly DataContext _dbContext;
 
     public SaveMessageServiceTests() {
         _logger = LoggerFactory.Create(builder => { }).CreateLogger<SaveMessageCommandHandler>();
-        _unitOfWork = new UnitOfWorkTest();
+        _dbContext = new DbContextTest();
     }
 
     [Fact]
@@ -44,7 +44,7 @@ public class SaveMessageServiceTests {
             inMemoryMessageStatusRepository,
             inMemoryParticipantRepository,
             inMemoryConversationRepository,
-            _unitOfWork
+            _dbContext
         );
 
         await saveMessageCommandHandler.Handle(saveMessageCommand, new CancellationToken());
@@ -95,7 +95,7 @@ public class SaveMessageServiceTests {
             inMemoryMessageStatusRepository,
             inMemoryParticipantRepository,
             inMemoryConversationRepository,
-            _unitOfWork
+            _dbContext
         );
 
         await saveMessageCommandHandler.Handle(saveMessageCommand, new CancellationToken());

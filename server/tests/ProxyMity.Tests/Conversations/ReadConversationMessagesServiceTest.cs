@@ -4,12 +4,12 @@ public class ReadConversationMessagesServiceTest {
     private readonly ILogger<ReadConversationMessagesCommandHandler> _logger;
     private readonly ILogger<SaveMessageCommandHandler> _saveMessageLogger;
 
-    private readonly IUnitOfWork _unitOfWork;
+    private readonly DataContext _dbContext;
 
     public ReadConversationMessagesServiceTest() {
         _logger = LoggerFactory.Create(builder => { }).CreateLogger<ReadConversationMessagesCommandHandler>();
         _saveMessageLogger = LoggerFactory.Create(builder => { }).CreateLogger<SaveMessageCommandHandler>();
-        _unitOfWork = new UnitOfWorkTest();
+        _dbContext = new DbContextTest();
     }
 
     [Fact]
@@ -77,10 +77,10 @@ public class ReadConversationMessagesServiceTest {
         var readConversationMessagesCommand = new ReadConversationMessagesCommand(michael.Id, conversationBetweenJohnAndMichael.Id, false);
         var readConversationMessagesCommandHandler = new ReadConversationMessagesCommandHandler(
             _logger,
-            _unitOfWork,
             inMemoryMessageRepository,
             inMemoryConversationRepository,
-            inMemoryMessageStatusRepository
+            inMemoryMessageStatusRepository,
+            _dbContext
         );
 
         await readConversationMessagesCommandHandler.Handle(readConversationMessagesCommand, new CancellationToken());
@@ -153,10 +153,10 @@ public class ReadConversationMessagesServiceTest {
         var readConversationMessagesCommand = new ReadConversationMessagesCommand(john.Id, conversationBetweenJohnAndMichael.Id, false);
         var readConversationMessagesCommandHandler = new ReadConversationMessagesCommandHandler(
             _logger,
-            _unitOfWork,
             inMemoryMessageRepository,
             inMemoryConversationRepository,
-            inMemoryMessageStatusRepository
+            inMemoryMessageStatusRepository,
+            _dbContext
         );
 
         await readConversationMessagesCommandHandler.Handle(readConversationMessagesCommand, new CancellationToken());
@@ -222,7 +222,7 @@ public class ReadConversationMessagesServiceTest {
             inMemoryMessageStatusRepository,
             inMemoryParticipantRepository,
             inMemoryConversationRepository,
-            _unitOfWork
+            _dbContext
         );
 
         CancellationToken cancellationToken = new();
@@ -266,10 +266,10 @@ public class ReadConversationMessagesServiceTest {
         var readConversationMessagesCommandFromMichael = new ReadConversationMessagesCommand(michael.Id, conversationGroupWithAll.Id, true);
         var readConversationMessagesCommandHandlerFromMichael = new ReadConversationMessagesCommandHandler(
             _logger,
-            _unitOfWork,
             inMemoryMessageRepository,
             inMemoryConversationRepository,
-            inMemoryMessageStatusRepository
+            inMemoryMessageStatusRepository,
+            _dbContext
         );
 
         await readConversationMessagesCommandHandlerFromMichael
@@ -284,10 +284,10 @@ public class ReadConversationMessagesServiceTest {
         var readConversationMessagesCommandFromJohn = new ReadConversationMessagesCommand(john.Id, conversationGroupWithAll.Id, true);
         var readConversationMessagesCommandHandlerFromJohn = new ReadConversationMessagesCommandHandler(
             _logger,
-            _unitOfWork,
             inMemoryMessageRepository,
             inMemoryConversationRepository,
-            inMemoryMessageStatusRepository
+            inMemoryMessageStatusRepository,
+            _dbContext
         );
 
         await readConversationMessagesCommandHandlerFromJohn.Handle(
@@ -299,10 +299,10 @@ public class ReadConversationMessagesServiceTest {
         var readConversationMessagesCommandFromAlice = new ReadConversationMessagesCommand(alice.Id, conversationGroupWithAll.Id, true);
         var readConversationMessagesCommandHandlerFromAlice = new ReadConversationMessagesCommandHandler(
             _logger,
-            _unitOfWork,
             inMemoryMessageRepository,
             inMemoryConversationRepository,
-            inMemoryMessageStatusRepository
+            inMemoryMessageStatusRepository,
+            _dbContext
         );
 
         await readConversationMessagesCommandHandlerFromAlice.Handle(
@@ -314,10 +314,10 @@ public class ReadConversationMessagesServiceTest {
         var readConversationMessagesCommandFromGeorge = new ReadConversationMessagesCommand(george.Id, conversationGroupWithAll.Id, true);
         var readConversationMessagesCommandHandlerFromGeorge = new ReadConversationMessagesCommandHandler(
             _logger,
-            _unitOfWork,
             inMemoryMessageRepository,
             inMemoryConversationRepository,
-            inMemoryMessageStatusRepository
+            inMemoryMessageStatusRepository,
+            _dbContext
         );
 
         await readConversationMessagesCommandHandlerFromAlice.Handle(

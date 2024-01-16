@@ -1,4 +1,7 @@
-﻿namespace ProxyMity.Application.Handlers.Messages.Commands.SaveMessage;
+﻿using ProxyMity.Domain.Entities;
+using System.Threading;
+
+namespace ProxyMity.Application.Handlers.Messages.Commands.SaveMessage;
 
 public sealed class SaveMessageCommandHandler(
     ILogger<SaveMessageCommandHandler> logger,
@@ -23,21 +26,24 @@ public sealed class SaveMessageCommandHandler(
         await messageRepository.CreateAsync(message, cancellationToken);
 
         if (conversation.GroupId is Ulid)
-        {
-            var participants = await participantRepository.GetByConversationIdAsync(message.ConversationId, cancellationToken);
-
-            for (short i = 0; i < participants.Count; i++)
-            {
-                if (participants[i].UserId != message.AuthorId)
-                {
-                    await messageStatusRepository.CreateAsync(
-                        MessageStatus.Create(participants[i].UserId, message.Id, message.ConversationId), 
-                        cancellationToken
-                    );
-                }
-            }
-        }
+            await CreateMessageStatusesToParticipantsOnGroup(message, cancellationToken);
 
         await dbContext.SaveChangesAsync(cancellationToken);
+    }
+
+    private async Task CreateMessageStatusesToParticipantsOnGroup(Message message, CancellationToken cancellationToken)
+    {
+        var participants = await participantRepository.GetByConversationIdAsync(message.ConversationId, cancellationToken);
+
+        for (short i = 0; i < participants.Count; i++)
+        {
+            if (participants[i].UserId != message.AuthorId)
+            {
+                await messageStatusRepository.CreateAsync(
+                    MessageStatus.Create(participants[i].UserId, message.Id, message.ConversationId),
+                    cancellationToken
+                );
+            }
+        }
     }
 }

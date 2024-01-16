@@ -7,7 +7,6 @@ global using ProxyMity.Domain.Interfaces.Repositories.MessageRepository;
 global using ProxyMity.Domain.Interfaces.Repositories.MessageStatusRepository;
 global using ProxyMity.Domain.Interfaces.Repositories.ParticipantRepository;
 global using ProxyMity.Domain.Interfaces.Repositories.ParticipantRepository.CustomQueries;
-global using ProxyMity.Domain.Interfaces.Repositories.Shared;
 global using ProxyMity.Domain.Interfaces.Repositories.UserRepository;
 global using ProxyMity.Infra.Database.Repositories;
 global using ProxyMity.Infra.Database.Wrappers;
