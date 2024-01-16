@@ -7,7 +7,7 @@ public class CreatePrivateConversationCommandHandler(
     IParticipantRepository participantRepository,
     IUserRepository userRepository,
 
-    IUnitOfWork unitOfWork
+    DataContext dbContext
 ) : ICommandHandler<CreatePrivateConversationCommand, CreatePrivateConversationResponse>
 {
     public async Task<CreatePrivateConversationResponse> Handle(
@@ -19,21 +19,18 @@ public class CreatePrivateConversationCommandHandler(
         Ulid requesterId = command.RequesterId;
         Ulid participantId = command.ParticipantId;
 
-        unitOfWork.BeginTransaction();
-
-        _ = await userRepository.FindByIdAsync(participantId) ?? throw new UserNotFoundException(participantId);
-        _ = await userRepository.FindByIdAsync(requesterId) ?? throw new UserNotFoundException(requesterId);
+        _ = await userRepository.FindByIdAsync(participantId, cancellationToken) ?? throw new UserNotFoundException(participantId);
+        _ = await userRepository.FindByIdAsync(requesterId, cancellationToken) ?? throw new UserNotFoundException(requesterId);
 
         var conversation = Conversation.Create();
         var requesterParticipation = Participant.Create(requesterId, conversation.Id);
         var targetParticipation = Participant.Create(participantId, conversation.Id);
 
-        await conversationRepository.CreateAsync(conversation);
+        await conversationRepository.CreateAsync(conversation, cancellationToken);
+        await participantRepository.AddAsync(requesterParticipation, cancellationToken);
+        await participantRepository.AddAsync(targetParticipation, cancellationToken);
 
-        await participantRepository.AddAsync(requesterParticipation);
-        await participantRepository.AddAsync(targetParticipation);
-
-        await unitOfWork.CommitAsync(cancellationToken);
+        await dbContext.SaveChangesAsync(cancellationToken);
 
         logger.LogInformation($"A private conversation between {requesterId} and {participantId} was created successfully!");
 

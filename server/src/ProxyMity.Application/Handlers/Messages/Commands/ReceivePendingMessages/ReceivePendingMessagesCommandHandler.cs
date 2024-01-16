@@ -7,8 +7,11 @@
 /// <param name="messageStatusRepository"></param>
 public sealed class ReceivePendingMessagesCommandHandler(
     ILogger<ReceivePendingMessagesCommandHandler> logger,
+
     IMessageStatusRepository messageStatusRepository,
-    IUnitOfWork unitOfWork) : ICommandHandler<ReceivePendingMessagesCommand>
+
+    DataContext dbContext
+) : ICommandHandler<ReceivePendingMessagesCommand>
 {
     public async Task Handle(
         ReceivePendingMessagesCommand command, 
@@ -16,10 +19,7 @@ public sealed class ReceivePendingMessagesCommandHandler(
     {
         logger.LogInformation($"The user '{command.AccountRequesterId}' is receiving all pending messages.");
 
-        unitOfWork.BeginTransaction();
-
-        await messageStatusRepository.ReceiveUnreceivedMessagesByUserIdAsync(command.AccountRequesterId);
-
-        await unitOfWork.CommitAsync(cancellationToken);
+        await messageStatusRepository.ReceiveUnreceivedMessagesByUserIdAsync(command.AccountRequesterId, cancellationToken);
+        await dbContext.SaveChangesAsync(cancellationToken);
     }
 }

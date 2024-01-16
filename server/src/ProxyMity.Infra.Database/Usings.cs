@@ -1,11 +1,6 @@
-﻿global using Dapper;
-global using Microsoft.Extensions.Configuration;
-global using Microsoft.Extensions.DependencyInjection;
-global using Microsoft.Extensions.Logging;
-global using Npgsql;
+﻿global using Microsoft.Extensions.DependencyInjection;
 global using ProxyMity.Domain.Entities;
 global using ProxyMity.Domain.Enums;
-global using ProxyMity.Domain.Exceptions;
 global using ProxyMity.Domain.Interfaces.Repositories.ConversationRepository;
 global using ProxyMity.Domain.Interfaces.Repositories.GroupRepository;
 global using ProxyMity.Domain.Interfaces.Repositories.MessageRepository;
@@ -14,9 +9,10 @@ global using ProxyMity.Domain.Interfaces.Repositories.ParticipantRepository;
 global using ProxyMity.Domain.Interfaces.Repositories.ParticipantRepository.CustomQueries;
 global using ProxyMity.Domain.Interfaces.Repositories.Shared;
 global using ProxyMity.Domain.Interfaces.Repositories.UserRepository;
-global using ProxyMity.Infra.Database.Migrations;
-global using ProxyMity.Infra.Database.Migrations.Commands;
 global using ProxyMity.Infra.Database.Repositories;
-global using ProxyMity.Infra.Database.Repositories.Shared;
 global using ProxyMity.Infra.Database.Wrappers;
-global using System.Data;
+global using Microsoft.EntityFrameworkCore;
+global using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+global using ProxyMity.Infra.Database.Contexts;
+
+

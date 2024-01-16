@@ -10,7 +10,7 @@ public sealed class GetStatusFromMessageQueryHandler(
         CancellationToken cancellationToken)
     {
         IEnumerable<MessageStatus> statuses = await messageStatusRepository
-            .GetMessagesStatusByMessageIdAsync(query.MessageId, query.ConversationId);
+            .GetMessagesStatusByMessageIdAsync(query.MessageId, query.ConversationId, cancellationToken);
 
         return statuses.Select(status => new GetStatusFromMessageResponse(
             MessageId: status.MessageId,

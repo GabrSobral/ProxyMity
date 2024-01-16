@@ -2,6 +2,6 @@
 
 public interface IGroupRepository
 {
-    public Task CreateAsync(Group newGroup);
-    public Task<Group?> FindByIdAsync(Ulid groupId);
+    public Task CreateAsync(Group newGroup, CancellationToken cancellationToken);
+    public Task<Group?> FindByIdAsync(Ulid groupId, CancellationToken cancellationToken);
 }

@@ -1,6 +1,4 @@
-﻿using ProxyMity.Application.Handlers.Messages.Commands.ReceivePendingMessages;
-
-namespace ProxyMity.Presentation.Http.Endpoints;
+﻿namespace ProxyMity.Presentation.Http.Endpoints;
 
 public static class ConversationEndpoints
 {
@@ -41,7 +39,7 @@ public static class ConversationEndpoints
     {
         CreatePrivateConversationCommand command = new (
             RequesterId: HttpUserClaims.GetId(httpContext), 
-            ParticipantId: model.ParticipantId
+            ParticipantId: Ulid.Parse(model.ParticipantId)
         );
 
         var response = await sender.Send(command);
@@ -58,7 +56,8 @@ public static class ConversationEndpoints
             Name: model.Name,
             Description: model.Description,
             CreatorId: HttpUserClaims.GetId(httpContext),
-            Participants: model.Participants);
+            Participants: model.Participants.Select(Ulid.Parse)
+        );
 
         var response = await sender.Send(command);
 

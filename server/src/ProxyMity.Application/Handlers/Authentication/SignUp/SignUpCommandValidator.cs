@@ -13,8 +13,8 @@ internal sealed class SignUpCommandValidator : AbstractValidator<SignUpCommand>
             .EmailAddress().WithMessage("Email address must be a valid email");
 
         RuleFor(x => x.Email)
-            .MustAsync(async (email, _) => {
-                var existantUser = await userRepository.FindByEmailAsync(email.ToLower());
+            .MustAsync(async (email, cancellationToken) => {
+                var existantUser = await userRepository.FindByEmailAsync(email.ToLower(), cancellationToken);
 
                 if (existantUser is not null)
                     throw new UserAlreadyExistException();

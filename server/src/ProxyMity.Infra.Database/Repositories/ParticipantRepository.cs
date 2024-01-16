@@ -1,122 +1,62 @@
 ﻿namespace ProxyMity.Infra.Database.Repositories;
 
-public class ParticipantRepository(DbSession session) : IParticipantRepository
+public sealed class ParticipantRepository(DataContext dbContext) : IParticipantRepository
 {
-    public async Task AddAsync(Participant participant)
+    public async Task AddAsync(Participant participant, CancellationToken cancellationToken)
     {
-        const string sql = """
-            INSERT INTO "participant" (user_id, conversation_id, created_at)
-            VALUES (@user_id, @conversation_id, @created_at);
-        """;
-
-        object parameters = new
-        {
-            user_id = participant.UserId,
-            conversation_id = participant.ConversationId,
-            created_at = participant.CreatedAt,
-        };
-
-        await session.Connection.ExecuteAsync(sql, parameters, session.Transaction);
+        await dbContext.Participants.AddAsync(participant, cancellationToken);
     }
 
-    public async Task<IEnumerable<Participant>> GetByConversationIdAsync(Ulid conversationId)
+    public async Task<List<Participant>> GetByConversationIdAsync(Ulid conversationId, CancellationToken cancellationToken)
+        => await dbContext.Participants
+            .AsNoTracking()
+            .Where(x => x.ConversationId == conversationId)
+            .ToListAsync(cancellationToken);
+
+    public async Task<Participant?> GetByIdAsync(Ulid userId, Ulid conversationId, CancellationToken cancellationToken)
+        => await dbContext.Participants
+            .AsNoTracking()
+            .SingleOrDefaultAsync(x => x.UserId == userId && x.ConversationId == conversationId, cancellationToken: cancellationToken);
+
+    public async Task<List<Participant>> GetByUserIdAsync(Ulid userId, CancellationToken cancellationToken)
+        => await dbContext.Participants
+            .AsNoTracking()
+            .Where(x => x.UserId == userId)
+            .ToListAsync(cancellationToken);
+
+    public async Task<List<GetConversationsByUserIdQuery>> GetConversationsByUserIdAsync(Ulid userId, CancellationToken cancellationToken)
+        => await dbContext.Participants
+            .AsNoTracking()
+            .Include(x => x.Conversation)
+                .ThenInclude(x => x.Group)
+            .Where(x => x.UserId == userId)
+            .Select(x => new GetConversationsByUserIdQuery(
+                x.ConversationId,
+                x.CreatedAt,
+                x.Conversation.Group.Name,
+                x.Conversation.Group.Description,
+                x.Conversation.GroupId
+            ))
+            .ToListAsync(cancellationToken);
+
+    public async Task<List<GetParticipantsByConversationIdQuery>> GetParticipantsByConversationIdAsync(Ulid conversationId, CancellationToken cancellationToken)
+        => await dbContext.Participants
+            .AsNoTracking()
+            .Include(x => x.User)
+            .Where(x => x.ConversationId == conversationId)
+            .Select(x => new GetParticipantsByConversationIdQuery(
+                x.UserId,
+                x.User.Name,
+                x.User.Email,
+                x.User.PhotoUrl,
+                x.User.LastOnline,
+                x.CreatedAt,
+                x.RemovedAt
+            ))
+            .ToListAsync(cancellationToken);
+
+    public async Task Remove(Participant participant, CancellationToken cancellationToken)
     {
-        const string sql = """
-            SELECT 
-                user_id as "UserId", 
-                conversation_id as "ConversationId", 
-                created_at as "CreatedAt"
-            FROM "participant"
-            WHERE conversation_id = @conversationId
-        """;
-
-        object parameters = new { conversationId };
-        return await session.Connection.QueryAsync<Participant>(sql, parameters);
-    }
-
-    public async Task<IEnumerable<GetConversationsByUserIdQuery>> GetConversationsByUserIdAsync(Ulid userId)
-    {
-        const string sql = """
-            SELECT 
-              "conversation"."id" AS "Id", 
-              "conversation"."created_at" AS "CreatedAt",
-              "group"."name" AS "GroupName",
-              "group"."description" AS "GroupDescription",
-              "conversation"."group_id" AS "GroupId"
-            FROM "participant"
-            INNER JOIN "conversation" ON "conversation"."id" = "participant"."conversation_id"
-            LEFT JOIN "group" ON "conversation"."group_id" = "group"."id"
-            WHERE "participant"."user_id" = @userId 
-        """;
-
-        object parameters = new { userId };
-        return await session.Connection.QueryAsync<GetConversationsByUserIdQuery>(sql, parameters);
-    }
-
-    public async Task<IEnumerable<Participant>> GetByUserIdAsync(Ulid userId)
-    {
-        const string sql = """
-            SELECT 
-                user_id as "UserId", 
-                conversation_id as "ConversationId", 
-                created_at as "CreatedAt"
-            FROM "participant"
-            WHERE user_id = @userId
-        """;
-
-        object parameters = new { userId };
-        return await session.Connection.QueryAsync<Participant>(sql, parameters);
-    }
-
-    public async Task<IEnumerable<GetParticipantsByConversationIdQuery>> GetParticipantsByConversationIdAsync(Ulid conversationId)
-    {
-        const string sql = """
-            SELECT 
-              "user"."id" AS "Id",
-              "user"."name" AS "Name",
-              "user"."email" AS "Email",
-              "user"."photo_url" as "PhotoUrl",
-              "user"."last_online" as "LastOnline",
-              "participant"."created_at" AS "CreatedAt",
-              "participant"."removed_at" AS "RemovedAt"
-            FROM "participant"
-            INNER JOIN "user" ON "user"."id" = "participant"."user_id"
-            WHERE "participant"."conversation_id" = @conversationId 
-        """
-        ;
-
-        object parameters = new { conversationId };
-        return await session.Connection.QueryAsync<GetParticipantsByConversationIdQuery>(sql, parameters);
-    }
-
-    public async Task RemoveAsync(Participant participant)
-    {
-        const string sql = """
-            DELETE FROM participant 
-            WHERE 
-                user_id = @userId AND
-                conversation_id = @conversationId
-        """
-;
-        object parameters = new { userId = participant.UserId, conversationId = participant.ConversationId };
-        await session.Connection.ExecuteAsync(sql, parameters, session.Transaction);
-    }
-
-    public async Task<Participant?> GetByIdAsync(Ulid userId, Ulid conversationId)
-    {
-        const string sql = """
-            SELECT
-                "user_id",
-                "conversation_id",
-                "created_at",
-                "removed_at"
-            FROM participant 
-            WHERE 
-                user_id = @userId AND
-                conversation_id = @conversationId
-        """;
-
-        object parameters = new { userId, conversationId };
-        return await session.Connection.QueryFirstOrDefaultAsync<Participant>(sql, parameters);
+        dbContext.Participants.Remove(participant);
     }
 }

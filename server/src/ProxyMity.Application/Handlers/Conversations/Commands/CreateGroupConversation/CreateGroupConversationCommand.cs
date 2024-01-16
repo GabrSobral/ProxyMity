@@ -10,7 +10,7 @@ public record CreateGroupConversationCommand(
 public record CreateGroupConversationRequest(
     string Name,
     string? Description,
-    IEnumerable<Ulid> Participants
+    IEnumerable<string> Participants
 );
 
 public record CreateGroupConversationResponse

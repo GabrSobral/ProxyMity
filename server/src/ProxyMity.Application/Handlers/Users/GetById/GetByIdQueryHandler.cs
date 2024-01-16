@@ -11,9 +11,9 @@ public class GetByIdQueryHandler(
 
         logger.LogInformation($"Searching for user ID: {userId}");
 
-        var user = await userRepository.FindByIdAsync(userId)
+        var user = await userRepository.FindByIdAsync(userId, cancellationToken)
             ?? throw new UserNotFoundException(userId);
 
-        return new GetByIdResponse(user); ;
+        return new GetByIdResponse(user);
     }
 }

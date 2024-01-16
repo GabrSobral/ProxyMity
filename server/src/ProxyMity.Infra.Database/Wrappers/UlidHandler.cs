@@ -1,28 +1,22 @@
-﻿using static Dapper.SqlMapper;
+﻿namespace ProxyMity.Infra.Database.Wrappers;
 
-namespace ProxyMity.Infra.Database.Wrappers;
-
-internal class BinaryUlidHandler : TypeHandler<Ulid>
+public class UlidToBytesConverter(ConverterMappingHints mappingHints = null) : ValueConverter<Ulid, byte[]>(
+    convertToProviderExpression: x => x.ToByteArray(),
+    convertFromProviderExpression: x => new Ulid(x),
+    mappingHints: defaultHints.With(mappingHints))
 {
-    public override Ulid Parse(object value) => new Ulid((byte[]) value);
+    private static readonly ConverterMappingHints defaultHints = new(size: 16);
 
-    public override void SetValue(IDbDataParameter parameter, Ulid value)
-    {
-        parameter.DbType = DbType.Binary;
-        parameter.Size = 16;
-        parameter.Value = value.ToByteArray();
-    }
+    public UlidToBytesConverter() : this(null) { }
 }
 
-internal class StringUlidHandler : TypeHandler<Ulid>
+public class UlidToStringConverter(ConverterMappingHints mappingHints = null) : ValueConverter<Ulid, string>(
+    convertToProviderExpression: x => x.ToString(),
+    convertFromProviderExpression: x => Ulid.Parse(x),
+    mappingHints: defaultHints.With(mappingHints))
 {
-    public override Ulid Parse(object value) => Ulid.Parse((string)value);
+    private static readonly ConverterMappingHints defaultHints = new(size: 26);
 
-    public override void SetValue(IDbDataParameter parameter, Ulid value)
-    {
-        parameter.DbType = DbType.StringFixedLength;
-        parameter.Size = 26;
-        parameter.Value = value.ToString();
-    }
+    public UlidToStringConverter() : this(null) { }
 }
 

@@ -9,7 +9,7 @@ public sealed class GetConversationMessagesQueryHandler(
         GetConversationMessagesQuery query, 
         CancellationToken cancellationToken)
     {
-        IEnumerable<Message> messages = await messageRepository.GetMessagesFromConversationAsync(query.ConversationId, 100);
+        IEnumerable<Message> messages = await messageRepository.GetMessagesFromConversationAsync(query.ConversationId, 100, cancellationToken);
 
         return messages;
     }

@@ -1,14 +1,11 @@
-﻿namespace ProxyMity.Infra.Database;
+﻿using Microsoft.Extensions.Configuration;
+
+namespace ProxyMity.Infra.Database;
 
 public static class DependenyInjection
 {
-    public static IServiceCollection AddInfraDatabase(this IServiceCollection services)
+    public static IServiceCollection AddInfraDatabase(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddScoped<DbSession>();
-        services.AddScoped<MigrationManager>();
-
-        services.AddScoped<IUnitOfWork, UnitOfWork>();
-
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IGroupRepository, GroupRepository>();
         services.AddScoped<IMessageRepository, MessageRepository>();
@@ -16,7 +13,10 @@ public static class DependenyInjection
         services.AddScoped<IConversationRepository, ConversationRepository>();
         services.AddScoped<IMessageStatusRepository, MessageStatusRepository>();
 
-        SqlMapper.AddTypeHandler(new BinaryUlidHandler());
+        string connectionString = configuration.GetConnectionString("PostgreSql")!;
+
+        services.AddDbContext<DataContext>(options =>
+            options.UseNpgsql(connectionString));
 
         return services;
     }

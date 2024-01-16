@@ -6,15 +6,13 @@ internal class Program
 
         builder.Services
             .AddApplication()
-            .AddInfraDatabase()
+            .AddInfraDatabase(builder.Configuration)
             .AddPresentation()
             .ConfigureCors()
             .ConfigureAuthentication()
             .ConfigureApiDocumentation();
 
         var app = builder.Build();
-
-        app.ExecuteMigration();
 
         app.ConfigureApiDocumentationUI(app.Environment.IsDevelopment());
 

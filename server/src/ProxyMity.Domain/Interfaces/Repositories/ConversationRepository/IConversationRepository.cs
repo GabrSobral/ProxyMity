@@ -2,6 +2,6 @@
 
 public interface IConversationRepository
 {
-    public Task CreateAsync(Conversation newConversation);
-    public Task<Conversation?> GetByIdAsync(Ulid conversationId);
+    public Task CreateAsync(Conversation conversation, CancellationToken cancellationToken);
+    public Task<Conversation?> GetByIdAsync(Ulid conversationId, CancellationToken cancellationToken);
 }

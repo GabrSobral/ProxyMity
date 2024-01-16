@@ -1,5 +1,6 @@
 ﻿namespace ProxyMity.Domain.Entities;
 
+[Table("participant")]
 public class Participant
 {
     public required Ulid UserId { get; set; }
@@ -12,13 +13,23 @@ public class Participant
 
     public DateTime? UpdatedAt { get; set; }
 
+    #region Foreign Keys
+
+    [ForeignKey(nameof(UserId))]
+    public User User { get; set; }
+
+    [ForeignKey(nameof(ConversationId))]
+    public Conversation Conversation { get; set; }
+
+    #endregion
+
     public static Participant Create(Ulid userId, Ulid conversationId)
     {
-        return new Participant()
+        return new Participant
         {
-            ConversationId = conversationId,
             UserId = userId,
-            CreatedAt = DateTime.UtcNow,
+            ConversationId = conversationId,
+            CreatedAt = DateTime.UtcNow
         };
     }
 }

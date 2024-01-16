@@ -8,7 +8,7 @@ public sealed class SaveMessageCommandHandler(
     IParticipantRepository participantRepository,
     IConversationRepository conversationRepository,
 
-    IUnitOfWork unitOfWork
+    DataContext dbContext
 ) : ICommandHandler<SaveMessageCommand>
 {
     public async Task Handle(SaveMessageCommand command, CancellationToken cancellationToken)
@@ -17,36 +17,27 @@ public sealed class SaveMessageCommandHandler(
 
         logger.LogInformation($"Creating the {message.Id} message, from {message.AuthorId}");
 
-        var conversation = await conversationRepository.GetByIdAsync(message.ConversationId)
+        var conversation = await conversationRepository.GetByIdAsync(message.ConversationId, cancellationToken)
             ?? throw new ConversationNotFoundException();
 
-        unitOfWork.BeginTransaction();
-
-        await messageRepository.CreateAsync(message);
+        await messageRepository.CreateAsync(message, cancellationToken);
 
         if (conversation.GroupId is Ulid)
         {
-            var participants = await participantRepository.GetByConversationIdAsync(message.ConversationId);
+            var participants = await participantRepository.GetByConversationIdAsync(message.ConversationId, cancellationToken);
 
-            Task[] tasks = new Task[participants.Count() - 1]; // Participants - Author
-            short taskIndex = 0;
-
-            for (short i = 0; i < participants.Count(); i++)
+            for (short i = 0; i < participants.Count; i++)
             {
-                var currentParticipant = participants.ElementAt(i);
-
-                if (currentParticipant.UserId != message.AuthorId)
+                if (participants[i].UserId != message.AuthorId)
                 {
-                    tasks[taskIndex] = messageStatusRepository.CreateAsync(
-                        MessageStatus.Create(currentParticipant.UserId, message.Id, message.ConversationId));
-
-                    taskIndex++;
+                    await messageStatusRepository.CreateAsync(
+                        MessageStatus.Create(participants[i].UserId, message.Id, message.ConversationId), 
+                        cancellationToken
+                    );
                 }
             }
-
-            await Task.WhenAll(tasks);
         }
 
-        await unitOfWork.CommitAsync(cancellationToken);
+        await dbContext.SaveChangesAsync(cancellationToken);
     }
 }

@@ -5,13 +5,13 @@ public class GetByEmailQueryHandler(
     IUserRepository userRepository
 ) : IQueryHandler<GetByEmailQuery, GetByEmailResponse>
 {
-    public async Task<GetByEmailResponse> Handle(GetByEmailQuery request, CancellationToken cancellationToken)
+    public async Task<GetByEmailResponse> Handle(GetByEmailQuery query, CancellationToken cancellationToken)
     {
-        var userEmail = request.Email;
+        var userEmail = query.Email;
 
         logger.LogInformation($"Searching for user e-mail: {userEmail}");
 
-        var user = await userRepository.FindByEmailAsync(userEmail)
+        var user = await userRepository.FindByEmailAsync(userEmail, cancellationToken)
             ?? throw new UserNotFoundException(userEmail);
 
         return new GetByEmailResponse(user);

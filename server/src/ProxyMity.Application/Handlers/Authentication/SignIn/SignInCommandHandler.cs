@@ -2,23 +2,25 @@
 
 public class SignInCommandHandler(
     ILogger<SignInCommandHandler> logger,
+
     IJsonWebToken jsonWebToken,
     IUserRepository userRepository,
-    IPasswordEncrypter passwordEncrypter) : ICommandHandler<SignInCommand, SignInResponse>
+    IPasswordEncrypter passwordEncrypter
+) : ICommandHandler<SignInCommand, SignInResponse>
 {
     public async Task<SignInResponse> Handle(SignInCommand command, CancellationToken cancellationToken)
     {
-        var user = await userRepository.FindByEmailAsync(command.Email.ToLower())
+        var user = await userRepository.FindByEmailAsync(command.Email.ToLower(), cancellationToken)
             ?? throw new EmailOrPasswordInvalidException();
 
-        var isPasswordCorrect = passwordEncrypter.Compare(user.Password, command.Password, user.Id);
+        bool isPasswordCorrect = passwordEncrypter.Compare(user.Password, command.Password, user.Id);
 
         if (!isPasswordCorrect)
             throw new EmailOrPasswordInvalidException();
 
         logger.LogInformation($"An user was logged at application: {user.Email}");
 
-        var token = jsonWebToken.Sign(user);
+        string token = jsonWebToken.Sign(user);
 
         return new SignInResponse(user, token);
     }

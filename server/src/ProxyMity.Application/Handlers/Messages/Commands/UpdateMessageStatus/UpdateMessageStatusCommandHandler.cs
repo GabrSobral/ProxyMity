@@ -6,61 +6,59 @@ public sealed class UpdateMessageStatusCommandHandler(
     IMessageRepository messageRepository,
     IMessageStatusRepository messageStatusRepository,
 
-    IUnitOfWork unitOfWork
+    DataContext dbContext
 ) : ICommandHandler<UpdateMessageStatusCommand>
 {
     public async Task Handle(UpdateMessageStatusCommand command, CancellationToken cancellationToken)
     {
-        unitOfWork.BeginTransaction();
-
         logger.LogInformation($"Updating status from message '{command.MessageId}', to '{command.Status}' status");
 
         if (command.IsConversationGroup)
-            await UpdateGroupMessage(command.MessageId, command.Status, command.UserId, command.ConversationId);
+            await UpdateGroupMessage(command.MessageId, command.Status, command.UserId, command.ConversationId, cancellationToken);
         else
-            await UpdatePrivateMessage(command.MessageId, command.Status);
+            await UpdatePrivateMessage(command.MessageId, command.Status, cancellationToken);
 
-        await unitOfWork.CommitAsync(cancellationToken);
+        await dbContext.SaveChangesAsync(cancellationToken);
     }
 
-    private async Task UpdatePrivateMessage(Ulid messageId, EMessageStatuses messageStatus)
+    private async Task UpdatePrivateMessage(Ulid messageId, EMessageStatuses messageStatus, CancellationToken cancellationToken)
     {
-        await messageRepository.UpdateStatusAsync(messageId, messageStatus);
+        await messageRepository.UpdateStatusAsync(messageId, messageStatus, cancellationToken);
     }
 
-    private async Task UpdateGroupMessage(Ulid messageId, EMessageStatuses messageStatus, Ulid userId, Ulid conversationId)
+    private async Task UpdateGroupMessage(Ulid messageId, EMessageStatuses messageStatus, Ulid userId, Ulid conversationId, CancellationToken cancellationToken)
     {
         switch (messageStatus)
         {
             case EMessageStatuses.SENT:
-                {
-                    await messageRepository.UpdateStatusAsync(messageId, EMessageStatuses.SENT);
-                    break;
-                }
+            {
+                await messageRepository.UpdateStatusAsync(messageId, EMessageStatuses.SENT, cancellationToken);
+                break;
+            }
 
             case EMessageStatuses.READ:
-                {
-                    await messageStatusRepository.ReceiveAsync(messageId, userId);
-                    var allMessageStatusFromMessage = await messageStatusRepository.GetMessagesStatusByMessageIdAsync(messageId, conversationId);
+            {
+                await messageStatusRepository.ReadAsync(messageId, userId, conversationId, cancellationToken);
+                var allMessageStatusFromMessage = await messageStatusRepository.GetMessagesStatusByMessageIdAsync(messageId, conversationId, cancellationToken);
 
-                    var allParticipantsReadTheMessage = allMessageStatusFromMessage.All(item => item.ReadAt is not null);
+                var allParticipantsReadTheMessage = allMessageStatusFromMessage.All(item => item.ReadAt is not null);
 
-                    if (allParticipantsReadTheMessage)
-                        await messageRepository.UpdateStatusAsync(messageId, EMessageStatuses.READ);
-                    break;
-                }
+                if (allParticipantsReadTheMessage)
+                    await messageRepository.UpdateStatusAsync(messageId, EMessageStatuses.READ, cancellationToken);
+                break;
+            }
 
             case EMessageStatuses.RECEIVED:
-                {
-                    await messageStatusRepository.ReceiveAsync(messageId, userId);
-                    var allMessageStatusFromMessage = await messageStatusRepository.GetMessagesStatusByMessageIdAsync(messageId, conversationId);
+            {
+                await messageStatusRepository.ReceiveAsync(messageId, userId, conversationId, cancellationToken);
+                var allMessageStatusFromMessage = await messageStatusRepository.GetMessagesStatusByMessageIdAsync(messageId, conversationId, cancellationToken);
 
-                    var allParticipantsReceiveTheMessage = allMessageStatusFromMessage.All(item => item.ReceivedAt is not null);
+                var allParticipantsReceiveTheMessage = allMessageStatusFromMessage.All(item => item.ReceivedAt is not null);
 
-                    if (allParticipantsReceiveTheMessage)
-                        await messageRepository.UpdateStatusAsync(messageId, EMessageStatuses.RECEIVED);
-                    break;
-                }
+                if (allParticipantsReceiveTheMessage)
+                    await messageRepository.UpdateStatusAsync(messageId, EMessageStatuses.RECEIVED, cancellationToken);
+                break;
+            }
         }
     }
 }

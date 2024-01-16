@@ -3,8 +3,10 @@
 /// <summary>
 /// The user entity, this entity represents each user at application.
 /// </summary>
+[Table("user")]
 public class User
 {
+    [Key]
     public required Ulid Id { get; set; }
 
     public required string Name { get; set; }
@@ -19,16 +21,10 @@ public class User
 
     public string? PhotoUrl { get; set; }
 
-    public static User Create(string name, string email, string password, string? photoUrl = null)
-    {
-        return new User()
-        {
-            Id = Ulid.NewUlid(),
-            Name = name,
-            Email = email,
-            Password = password,
-            CreatedAt = DateTime.UtcNow,
-            PhotoUrl = photoUrl
-        };
-    }
+    #region Foreign Keys
+
+    public IEnumerable<Message> Messages { get; set; }
+    public IEnumerable<Participant> Participations { get; set; }
+
+    #endregion
 }

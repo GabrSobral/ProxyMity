@@ -10,6 +10,7 @@ public partial class ChatHub
     {
         var hubGroupId = payload.ConversationId.ToString();
         var userId = Ulid.Parse(Context.UserIdentifier ?? "");
+
         var updateMessageStatusCommand = new UpdateMessageStatusCommand(
             payload.MessageId, payload.IsConversationGroup, payload.ConversationId, EMessageStatuses.RECEIVED, payload.UserId);
 

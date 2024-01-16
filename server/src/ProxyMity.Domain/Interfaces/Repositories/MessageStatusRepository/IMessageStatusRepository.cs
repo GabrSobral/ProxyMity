@@ -2,12 +2,12 @@
 
 public interface IMessageStatusRepository
 {
-    public Task CreateAsync(MessageStatus messageStatus);
-    public Task ReceiveAsync(Ulid userId, Ulid messageId);
-    public Task ReadAsync(Ulid userId, Ulid messageId);
-    public Task ReceiveUnreceivedMessagesByUserIdAsync(Ulid userId);
-    public Task ReadUnreadMessagesByUserIdAsync(Ulid userId, Ulid conversationId);
-    public Task<IEnumerable<MessageStatus>> GetUnreadMessagesStatusFromConversationByIdAsync(Ulid conversationId);
-    public Task<int> GetUnreadMessagesStatusCountByUserIdAsync(Ulid userId, Ulid conversationId);
-    public Task<IEnumerable<MessageStatus>> GetMessagesStatusByMessageIdAsync(Ulid messageId, Ulid conversationId);
+    public Task CreateAsync(MessageStatus messageStatus, CancellationToken cancellationToken);
+    public Task ReceiveAsync(Ulid userId, Ulid messageId, Ulid conversationId, CancellationToken cancellationToken);
+    public Task ReadAsync(Ulid userId, Ulid messageId, Ulid conversationId, CancellationToken cancellationToken);
+    public Task ReceiveUnreceivedMessagesByUserIdAsync(Ulid userId, CancellationToken cancellationToken);
+    public Task ReadUnreadMessagesByUserIdAsync(Ulid userId, Ulid conversationId, CancellationToken cancellationToken);
+    public Task<IEnumerable<MessageStatus>> GetUnreadMessagesStatusFromConversationByIdAsync(Ulid conversationId, CancellationToken cancellationToken);
+    public Task<int> GetUnreadMessagesStatusCountByUserIdAsync(Ulid userId, Ulid conversationId, CancellationToken cancellationToken);
+    public Task<IEnumerable<MessageStatus>> GetMessagesStatusByMessageIdAsync(Ulid messageId, Ulid conversationId, CancellationToken cancellationToken);
 }

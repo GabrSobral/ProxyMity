@@ -8,7 +8,7 @@ public class CreateGroupConversationCommandHandler(
     IConversationRepository conversationRepository,
     IUserRepository userRepository,
 
-    IUnitOfWork unitOfWork
+    DataContext dbContext
 ) : ICommandHandler<CreateGroupConversationCommand, CreateGroupConversationResponse>
 {
     public async Task<CreateGroupConversationResponse> Handle(
@@ -22,28 +22,28 @@ public class CreateGroupConversationCommandHandler(
         var group = Group.Create(command.CreatorId, command.Name, command.Description);
         var conversation = Conversation.Create(group.Id);
 
-        unitOfWork.BeginTransaction();
-
-        await groupRepository.CreateAsync(group);
-        await conversationRepository.CreateAsync(conversation);
+        await Task.WhenAll([
+            groupRepository.CreateAsync(group, cancellationToken),
+            conversationRepository.CreateAsync(conversation, cancellationToken)
+        ]);
 
         for (int i = 0; i < participantsCount; i++)
         {
             var participantId = command.Participants.ElementAt(i);
 
-            _ = await userRepository.FindByIdAsync(participantId) ?? throw new UserNotFoundException(participantId);
-            var existentParticipation = await participantRepository.GetByIdAsync(participantId, conversation.Id);
+            _ = await userRepository.FindByIdAsync(participantId, cancellationToken) ?? throw new UserNotFoundException(participantId);
+            var existentParticipation = await participantRepository.GetByIdAsync(participantId, conversation.Id, cancellationToken);
 
             if (existentParticipation is null)
             {
                 var participant = Participant.Create(participantId, conversation.Id);
-                await participantRepository.AddAsync(participant);
+                await participantRepository.AddAsync(participant, cancellationToken);
 
                 logger.LogInformation($"🟢 Creating the parcipation of {participantId} at {conversation.Id} conversation...");
             }
         }
 
-        await unitOfWork.CommitAsync(cancellationToken);
+        await dbContext.SaveChangesAsync(cancellationToken);
 
         logger.LogInformation("🟢 A group conversation was created successfully!");
 

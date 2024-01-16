@@ -29,5 +29,6 @@ global using ProxyMity.Presentation.WebSocket.Hubs.Payloads;
 global using System.Reflection;
 global using System.Security.Claims;
 global using ProxyMity.Application.Handlers.Messages.Queries.GetStatusFromMessage;
+global using ProxyMity.Application.Handlers.Messages.Commands.ReceivePendingMessages;
 
 

@@ -6,7 +6,7 @@ public record CreatePrivateConversationCommand(
 ) : ICommand<CreatePrivateConversationResponse>;
 
 public record CreatePrivateConversationRequest(
-    Ulid ParticipantId
+    string ParticipantId
 );
 
 public record CreatePrivateConversationResponse

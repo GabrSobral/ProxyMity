@@ -2,10 +2,13 @@
 
 public sealed class SignUpCommandHandler(
     ILogger<SignUpCommandHandler> logger,
-    IJsonWebToken jsonWebToken,
     IUserRepository userRepository,
+
+    IJsonWebToken jsonWebToken,
     IPasswordEncrypter passwordEncrypter,
-    IUnitOfWork unitOfWork) : ICommandHandler<SignUpCommand, SignInResponse>
+
+    DataContext dbContext
+) : ICommandHandler<SignUpCommand, SignInResponse>
 {
     public async Task<SignInResponse> Handle(SignUpCommand command, CancellationToken cancellationToken)
     {
@@ -21,12 +24,10 @@ public sealed class SignUpCommandHandler(
             LastOnline = null
         };
 
-        unitOfWork.BeginTransaction();
+        await userRepository.CreateAsync(newUser, cancellationToken);
+        await dbContext.SaveChangesAsync(cancellationToken);
 
-        await userRepository.CreateAsync(newUser);
-        await unitOfWork.CommitAsync(cancellationToken);
-
-        logger.LogInformation($"An user was screated at application: {newUser.Email}");
+        logger.LogInformation($"An user was created at application: {newUser.Email}");
 
         var token = jsonWebToken.Sign(newUser);
 

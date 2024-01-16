@@ -31,7 +31,6 @@ global using ProxyMity.Application;
 #endregion
 
 #region Infraestruture Data
-global using ProxyMity.Infra.Database.Migrations;
 global using ProxyMity.Infra.Database;
 #endregion
 
