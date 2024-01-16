@@ -1,19 +1,32 @@
 <script lang="ts">
 	import clsx from 'clsx';
 	import { page } from '$app/stores';
-	import { User } from 'phosphor-svelte';
+	import { Clock, User } from 'phosphor-svelte';
 	import { twMerge } from 'tailwind-merge';
 
 	import { chatState } from '$lib/modules/chat/contexts/chat-context/stores/chat';
 	import { connection } from '$lib/modules/chat/contexts/websocket-context/stores/connection';
 	import { getChatContext } from '$lib/modules/chat/contexts/chat-context/ChatContext.svelte';
 	import type { ConversationState } from '$lib/modules/chat/contexts/chat-context/stores/chat-store-types';
+	import { EMessageStatuses } from '../../../../../../enums/EMessageStatuses';
 
 	export let conversation: ConversationState;
 
 	$: user = $page.data.session?.user;
 	$: lastMessage = conversation.messages?.at(-1);
 	$: isSelectedContact = $chatState.selectedConversation?.id === conversation.id;
+	$: isMine = lastMessage?.author?.id === user?.id;
+	$: status = (() => {
+		if (!lastMessage) {
+			return;
+		}
+
+		if (lastMessage.read.byAllAt !== null) return EMessageStatuses.READ;
+		if (lastMessage.received.byAllAt !== null) return EMessageStatuses.RECEIVED;
+		if (lastMessage.sentAt !== null) return EMessageStatuses.SENT;
+
+		return EMessageStatuses.WROTE;
+	})();
 
 	$connection?.on('receiveTyping', (typingWs, authorId, conversationId) => {
 		if (conversationId === conversation.id) {
@@ -63,12 +76,14 @@
 				(You)
 			{/if}
 
-			<span
-				class="text-[12px] dark:text-gray-200 transition-colors text-gray-700 ml-auto data-[is-selected=true]:text-gray-100"
-				data-is-selected={isSelectedContact}
-			>
-				{formatLastMessageDate.format(new Date())}
-			</span>
+			{#if lastMessage}
+				<span
+					class="text-[12px] dark:text-gray-200 transition-colors text-gray-700 ml-auto data-[is-selected=true]:text-gray-100"
+					data-is-selected={isSelectedContact}
+				>
+					{formatLastMessageDate.format(new Date(lastMessage.writtenAt))}
+				</span>
+			{/if}
 		</span>
 
 		<div
@@ -82,7 +97,26 @@
 			{#if typing}
 				<span>Typing...</span>
 			{:else if lastMessage}
-				<span>{lastMessage.content}</span>
+				<span class="flex gap-4 w-full">
+					{lastMessage.content}
+
+					<span class="flex items-center gap-2 ml-auto">
+						{#if isMine && status === EMessageStatuses.WROTE}
+							<Clock size={13} class="dark:text-gray-100 text-gray-600 transition-colors" />
+						{:else if isMine}
+							<div
+								title={status?.toString()}
+								class={clsx('w-6 h-3 rounded-full flex items-center p-[2px] transition-all', {
+									'justify-end bg-transparent': status === EMessageStatuses.SENT,
+									'justify-end dark:bg-gray-600 bg-gray-300': status === EMessageStatuses.RECEIVED,
+									'justify-start bg-purple-500': status === EMessageStatuses.READ,
+								})}
+							>
+								<div class="rounded-full w-2 h-2 bg-white transition-all" />
+							</div>
+						{/if}
+					</span>
+				</span>
 			{:else}
 				<span>Start the conversation...</span>
 			{/if}
