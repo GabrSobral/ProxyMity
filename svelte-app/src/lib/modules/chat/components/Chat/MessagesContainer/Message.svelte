@@ -49,6 +49,8 @@
 		const { messageId, messageStatus, conversationId, userId } = event.detail;
 
 		if (messageStatus && messageId && conversationId) {
+			console.log({ messageStatus, messageId, conversationId, userId })
+
 			status = messageStatus;
 			chatDispatch.updateConversationMessageStatus({
 				conversationId,
@@ -129,7 +131,7 @@
 
 	<div class={clsx('flex items-center gap-2 relative', { 'flex-row-reverse': isMine })}>
 		<div
-			class={clsx('w-fit rounded-[12px] text-white font-light text-sm shadow z-[13] p-1 min-w-[100px]', {
+			class={clsx('w-fit rounded-[6px] text-white font-light text-sm shadow z-[13] p-1 min-w-[100px]', {
 				'bg-gray-950 rounded-tl-none': !isMine,
 				'bg-purple-500 rounded-tr-none': isMine,
 			})}
