@@ -19,9 +19,9 @@
    <div class="flex gap-3">
       <div class="relative min-w-[40px] min-h-[40px] max-w-[40px] max-h-[40px]">
          <div
-            class="min-w-[40px] min-h-[40px] max-w-[40px] max-h-[40px] rounded-full z-0 shadow-xl flex items-center justify-center bg-gray-700"
+            class="min-w-[40px] min-h-[40px] max-w-[40px] max-h-[40px] rounded-full z-0 shadow-xl flex items-center justify-center dark:bg-white bg-black"
          >
-            <User size={20} class="text-white" />
+            <User size={20} class="text-white dark:text-black" />
          </div>
       </div>
 

@@ -17,7 +17,7 @@
 </script>
 
 <section
-   class="flex flex-col dark:bg-gray-950 bg-white transition-colors rounded-[10px] p-3 relative overflow-hidden flex-1"
+   class="flex flex-col dark:bg-black border border-gray-900 bg-white transition-all rounded-[10px] p-3 relative overflow-hidden flex-1"
 >
    <div class="flex gap-4 justify-between">
       <Heading size="md" className="flex gap-3 items-center">
