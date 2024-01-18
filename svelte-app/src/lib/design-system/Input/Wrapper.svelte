@@ -1,9 +1,9 @@
 <script>
-	import { twMerge } from "tailwind-merge";
+   import { twMerge } from 'tailwind-merge';
 
-    export let className = "";
+   export let className = '';
 </script>
 
 <div class={twMerge('relative w-fit', className)}>
-    <slot />
+   <slot />
 </div>
