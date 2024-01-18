@@ -10,21 +10,21 @@ const localStorageKeyName = '@proxymity_theme';
 export const appTheme: Writable<ITheme> = writable('system');
 
 appTheme.subscribe(value => {
-	if (browser) {
-		localStorage.setItem(localStorageKeyName, value);
+   if (browser) {
+      localStorage.setItem(localStorageKeyName, value);
 
-		if (value === 'system') {
-			const darkThemeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+      if (value === 'system') {
+         const darkThemeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
 
-			if (darkThemeMediaQuery.matches) {
-				return document.documentElement.setAttribute('class', 'dark');
-			} else {
-				return document.documentElement.setAttribute('class', 'light');
-			}
-		}
+         if (darkThemeMediaQuery.matches) {
+            return document.documentElement.setAttribute('class', 'dark');
+         } else {
+            return document.documentElement.setAttribute('class', 'light');
+         }
+      }
 
-		document.documentElement.setAttribute('class', value);
-	}
+      document.documentElement.setAttribute('class', value);
+   }
 });
 
 export const setAppThemeContext = () => setContext<Writable<ITheme>>(contextName, appTheme);

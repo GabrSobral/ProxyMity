@@ -6,15 +6,15 @@ import type { Message } from '../../types/message';
 import type { Conversation } from '../../types/conversation';
 
 export class DexieDatabase extends Dexie {
-	conversations!: Table<Conversation>;
-	me!: Table<User>;
-	user!: Table<User>;
-	messages!: Table<Message>;
+   conversations!: Table<Conversation>;
+   me!: Table<User>;
+   user!: Table<User>;
+   messages!: Table<Message>;
 
-	constructor() {
-		super('proxymity-chats');
-		this.version(1).stores({
-			me: `
+   constructor() {
+      super('proxymity-chats');
+      this.version(1).stores({
+         me: `
 				id,
 				name, 
 				email, 
@@ -22,7 +22,7 @@ export class DexieDatabase extends Dexie {
 				createdAt,
 				photoUrl
 			`,
-			users: `
+         users: `
 				id,
 				name, 
 				email, 
@@ -30,7 +30,7 @@ export class DexieDatabase extends Dexie {
 				createdAt,
 				photoUrl
 			`,
-			conversations: `
+         conversations: `
 				id,
 				isGroup,
 				order,
@@ -40,7 +40,7 @@ export class DexieDatabase extends Dexie {
 				groupDescription,
 				participants
       		`,
-			messages: `
+         messages: `
 				++dbId,
 				id,
 				content,
@@ -56,8 +56,8 @@ export class DexieDatabase extends Dexie {
 
 				[contactRef+readAt+authorId]
 			`,
-		});
-	}
+      });
+   }
 }
 
 export const database = new DexieDatabase();

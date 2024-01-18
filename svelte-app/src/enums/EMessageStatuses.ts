@@ -1,7 +1,7 @@
 export enum EMessageStatuses {
-	READ,
-	RECEIVED,
-	SENT,
+   READ,
+   RECEIVED,
+   SENT,
 
-	WROTE,
+   WROTE,
 }

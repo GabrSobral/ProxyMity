@@ -1,3 +1,3 @@
 export interface IServiceOptions {
-	accessToken: string;
+   accessToken: string;
 }

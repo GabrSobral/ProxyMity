@@ -1,32 +1,32 @@
 <script lang="ts">
-	import { page } from '$app/stores';
-	import { afterUpdate } from 'svelte';
-	import { HttpTransportType, HubConnectionBuilder, HubConnectionState, LogLevel } from '@microsoft/signalr';
+   import { page } from '$app/stores';
+   import { afterUpdate } from 'svelte';
+   import { HttpTransportType, HubConnectionBuilder, HubConnectionState, LogLevel } from '@microsoft/signalr';
 
-	import { connection } from './stores/connection';
+   import { connection } from './stores/connection';
 
-	$: accessToken = $page.data.session?.accessToken;
+   $: accessToken = $page.data.session?.accessToken;
 
-	afterUpdate(() => {
-		if (accessToken) {
-			const hubConnection = new HubConnectionBuilder()
-				.withUrl('http://localhost:5000/chat', {
-					accessTokenFactory: () => accessToken || '',
-					transport: HttpTransportType.WebSockets,
-					skipNegotiation: true,
-					withCredentials: true,
-				})
-				.build();
+   afterUpdate(() => {
+      if (accessToken) {
+         const hubConnection = new HubConnectionBuilder()
+            .withUrl('http://localhost:5000/chat', {
+               accessTokenFactory: () => accessToken || '',
+               transport: HttpTransportType.WebSockets,
+               skipNegotiation: true,
+               withCredentials: true,
+            })
+            .build();
 
-			connection.set(hubConnection);
-		}
-	});
+         connection.set(hubConnection);
+      }
+   });
 
-	afterUpdate(() => {
-		if (connection && $connection?.state === HubConnectionState.Disconnected) {
-			$connection.start().then(async () => console.log('🖥️ Client connected to hub.'));
-		}
-	});
+   afterUpdate(() => {
+      if (connection && $connection?.state === HubConnectionState.Disconnected) {
+         $connection.start().then(async () => console.log('🖥️ Client connected to hub.'));
+      }
+   });
 </script>
 
 <slot><!-- optional fallback --></slot>

@@ -4,7 +4,7 @@ import { database } from '../db';
 import type { ILocalMessage } from '../../../types/message';
 
 export async function addMessageAsyncDB(message: ILocalMessage): Promise<IndexableType> {
-	const id = await database.messages.add(message);
+   const id = await database.messages.add(message);
 
-	return id;
+   return id;
 }

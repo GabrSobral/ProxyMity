@@ -1,189 +1,189 @@
 <script lang="ts">
-	import clsx from 'clsx';
-	import { onMount } from 'svelte';
-	import { page } from '$app/stores';
-	import { Clock, Info, ShareFat } from 'phosphor-svelte';
+   import clsx from 'clsx';
+   import { onMount } from 'svelte';
+   import { page } from '$app/stores';
+   import { Clock, Info, Share } from 'lucide-svelte';
 
-	import { chatDispatch, chatState } from '$lib/modules/chat/contexts/chat-context/stores/chat';
-	import { getStatusFromMessage } from '$lib/modules/chat/services/getStatusFromMessage';
+   import { chatDispatch, chatState } from '$lib/modules/chat/contexts/chat-context/stores/chat';
+   import { getStatusFromMessage } from '$lib/modules/chat/services/getStatusFromMessage';
 
-	import type { ILocalMessage } from '../../../../../../types/message';
-	import { EMessageStatuses } from '../../../../../../enums/EMessageStatuses';
-	import { changeMessageStatusAsyncDB } from '../../../../../../services/database/use-cases/change-message-status';
-	import Text from '$lib/design-system/Text.svelte';
+   import type { ILocalMessage } from '../../../../../../types/message';
+   import { EMessageStatuses } from '../../../../../../enums/EMessageStatuses';
+   import { changeMessageStatusAsyncDB } from '../../../../../../services/database/use-cases/change-message-status';
+   import Text from '$lib/design-system/Text.svelte';
 
-	export let message: ILocalMessage;
-	export let previousMessage: ILocalMessage;
+   export let message: ILocalMessage;
+   export let previousMessage: ILocalMessage;
 
-	let isMessageConfigVisible = false;
-	let showMessageStatus = false;
-	const previousIsFromUser = previousMessage?.author?.id === message.author?.id;
-	const formatter = Intl.DateTimeFormat('pt-br', { hour: 'numeric', minute: 'numeric' });
-	const selectTimeToShow = (isMine: boolean, message: ILocalMessage) => formatter.format(new Date(message.writtenAt));
+   let isMessageConfigVisible = false;
+   let showMessageStatus = false;
+   const previousIsFromUser = previousMessage?.author?.id === message.author?.id;
+   const formatter = Intl.DateTimeFormat('pt-br', { hour: 'numeric', minute: 'numeric' });
+   const selectTimeToShow = (isMine: boolean, message: ILocalMessage) => formatter.format(new Date(message.writtenAt));
 
-	$: accessToken = $page.data.session?.accessToken;
+   $: accessToken = $page.data.session?.accessToken;
 
-	$: timeToShow = selectTimeToShow(isMine, message);
-	$: user = $page.data.session?.user;
-	$: isMine = message.author?.id === user?.id;
-	$: status = (() => {
-		if (message.read.byAllAt !== null) return EMessageStatuses.READ;
-		if (message.received.byAllAt !== null) return EMessageStatuses.RECEIVED;
-		if (message.sentAt !== null) return EMessageStatuses.SENT;
+   $: timeToShow = selectTimeToShow(isMine, message);
+   $: user = $page.data.session?.user;
+   $: isMine = message.author?.id === user?.id;
+   $: status = (() => {
+      if (message.read.byAllAt !== null) return EMessageStatuses.READ;
+      if (message.received.byAllAt !== null) return EMessageStatuses.RECEIVED;
+      if (message.sentAt !== null) return EMessageStatuses.SENT;
 
-		return EMessageStatuses.WROTE;
-	})();
+      return EMessageStatuses.WROTE;
+   })();
 
-	type EventHandler = CustomEventInit<{
-		messageStatus: EMessageStatuses.SENT | EMessageStatuses.RECEIVED;
-		messageId: string;
-		conversationId: string;
-		userId: string;
-	}>;
+   type EventHandler = CustomEventInit<{
+      messageStatus: EMessageStatuses.SENT | EMessageStatuses.RECEIVED;
+      messageId: string;
+      conversationId: string;
+      userId: string;
+   }>;
 
-	function messageStatusEventHandler(event: EventHandler) {
-		if (!event.detail) {
-			return;
-		}
+   function messageStatusEventHandler(event: EventHandler) {
+      if (!event.detail) {
+         return;
+      }
 
-		const { messageId, messageStatus, conversationId, userId } = event.detail;
+      const { messageId, messageStatus, conversationId, userId } = event.detail;
 
-		if (messageStatus && messageId && conversationId) {
-			console.log({ messageStatus, messageId, conversationId, userId })
+      if (messageStatus && messageId && conversationId) {
+         status = messageStatus;
+         chatDispatch.updateConversationMessageStatus({
+            conversationId,
+            messageId: message.id,
+            status: messageStatus,
+            userId,
+         });
 
-			status = messageStatus;
-			chatDispatch.updateConversationMessageStatus({
-				conversationId,
-				messageId: message.id,
-				status: messageStatus,
-				userId,
-			});
+         changeMessageStatusAsyncDB({ messageId: messageId, status: messageStatus });
+      }
+   }
 
-			changeMessageStatusAsyncDB({ messageId: messageId, status: messageStatus });
-		}
-	}
+   async function handleWithUpdateOfMessageStatus() {
+      showMessageStatus = true;
 
-	async function handleWithUpdateOfMessageStatus() {
-		showMessageStatus = true;
+      if ($chatState.selectedConversation?.isGroup) {
+         const response = await getStatusFromMessage(
+            { messageId: message.id, conversationId: message.conversationId },
+            { accessToken: accessToken || '' }
+         );
 
-		if ($chatState.selectedConversation?.isGroup) {
-			const response = await getStatusFromMessage(
-				{ messageId: message.id, conversationId: message.conversationId },
-				{ accessToken: accessToken || '' }
-			);
+         chatDispatch.updateUsersFromMessageStatus({
+            message,
+            users: response.map(item => ({ readAt: item.readAt, receivedAt: item.receivedAt, userId: item.userId })),
+         });
+      } else {
+         chatDispatch.updateUsersFromMessageStatus({ message, users: [] });
+      }
 
-			chatDispatch.updateUsersFromMessageStatus({
-				message,
-				users: response.map(item => ({ readAt: item.readAt, receivedAt: item.receivedAt, userId: item.userId })),
-			});
-		} else {
-			chatDispatch.updateUsersFromMessageStatus({ message, users: [] });
-		}
+      setTimeout(() => {
+         showMessageStatus = false;
+      }, 5000);
+   }
 
-		setTimeout(() => {
-			showMessageStatus = false;
-		}, 5000);
-	}
-
-	onMount(() => {
-		addEventListener(message.id, messageStatusEventHandler);
-		return () => removeEventListener(message.id, messageStatusEventHandler);
-	});
+   onMount(() => {
+      addEventListener(message.id, messageStatusEventHandler);
+      return () => removeEventListener(message.id, messageStatusEventHandler);
+   });
 </script>
 
 <li class="flex flex-col gap-1 rounded-[1rem] w-full">
-	<div
-		class={clsx(
-			'flex items-center gap-3 sticky dark:bg-gray-900 bg-white transition-colors p-1 px-2 rounded-full w-fit -top-3',
-			{ 'ml-auto': isMine }
-		)}
-	>
-		{#if !isMine && !previousIsFromUser}
-			<img
-				src="https://github.com/diego3g.png"
-				alt="User"
-				width={30}
-				height={30}
-				class="min-w-[30px] min-h-[30px] rounded-full z-0 shadow-xl"
-			/>
-			<span class="dark:text-gray-200 text-gray-700 transition-colors text-xs">{message.author.name}</span>
-		{/if}
+   <div
+      class={clsx(
+         'flex items-center gap-3 sticky dark:bg-gray-900 bg-white transition-colors p-1 px-2 rounded-full w-fit -top-3',
+         { 'ml-auto': isMine }
+      )}
+   >
+      {#if !isMine && !previousIsFromUser}
+         <img
+            src="https://github.com/diego3g.png"
+            alt="User"
+            width={30}
+            height={30}
+            class="min-w-[30px] min-h-[30px] rounded-full z-0 shadow-xl"
+         />
 
-		<span class="dark:text-gray-300 text-gray-700 transition-colors text-xs ml-2 flex items-center gap-2">
-			{#if isMine && status === EMessageStatuses.WROTE}
-				<Clock size={13} class="dark:text-gray-100 text-gray-600 transition-colors" />
-			{:else if isMine}
-				<div
-					title={status.toString()}
-					class={clsx('w-6 h-3 rounded-full flex items-center p-[2px] transition-all', {
-						'justify-end bg-transparent': status === EMessageStatuses.SENT,
-						'justify-end dark:bg-gray-600 bg-gray-300': status === EMessageStatuses.RECEIVED,
-						'justify-start bg-purple-500': status === EMessageStatuses.READ,
-					})}
-				>
-					<div class="rounded-full w-2 h-2 bg-white transition-all" />
-				</div>
-			{/if}
+         <span class="dark:text-gray-200 text-gray-700 transition-colors text-xs">{message.author.name}</span>
+      {/if}
 
-			{timeToShow}
-		</span>
-	</div>
+      <span class="dark:text-gray-300 text-gray-700 transition-colors text-xs ml-2 flex items-center gap-2">
+         {#if isMine && status === EMessageStatuses.WROTE}
+            <Clock size={13} class="dark:text-gray-100 text-gray-600 transition-colors" />
+         {:else if isMine}
+            <div
+               title={status.toString()}
+               class={clsx('w-6 h-3 rounded-full flex items-center p-[2px] transition-all', {
+                  'justify-end bg-transparent': status === EMessageStatuses.SENT,
+                  'justify-end dark:bg-gray-600 bg-gray-300': status === EMessageStatuses.RECEIVED,
+                  'justify-start bg-purple-500': status === EMessageStatuses.READ,
+               })}
+            >
+               <div class="rounded-full w-2 h-2 bg-white transition-all" />
+            </div>
+         {/if}
 
-	<div class={clsx('flex items-center gap-2 relative', { 'flex-row-reverse': isMine })}>
-		<div
-			class={clsx('w-fit rounded-[6px] text-white font-light text-sm shadow z-[13] p-1 min-w-[100px]', {
-				'bg-gray-950 rounded-tl-none': !isMine,
-				'bg-purple-500 rounded-tr-none': isMine,
-			})}
-		>
-			{#if message.repliedMessage}
-				<div
-					class={clsx('dark:bg-black bg-white transition-colors p-2 rounded-[8px] w-full flex flex-col', {
-						'ml-auto': isMine,
-					})}
-				>
-					<span class="text-purple-300 text-xs">
-						{message.repliedMessage.id}
-					</span>
+         {timeToShow}
+      </span>
+   </div>
 
-					<span class="text-gray-200 text-sm">
-						{message.repliedMessage.content}
-					</span>
-				</div>
-			{/if}
-			<p class="p-1">{message.content}</p>
-		</div>
+   <div class={clsx('flex items-center gap-2 relative', { 'flex-row-reverse': isMine })}>
+      <div
+         class={clsx('w-fit rounded-[6px] text-white font-light text-sm shadow z-[13] p-1 min-w-[100px]', {
+            'bg-gray-950 rounded-tl-none': !isMine,
+            'bg-purple-500 rounded-tr-none': isMine,
+         })}
+      >
+         {#if message.repliedMessage}
+            <div
+               class={clsx('dark:bg-black bg-white transition-colors p-2 rounded-[8px] w-full flex flex-col', {
+                  'ml-auto': isMine,
+               })}
+            >
+               <span class="text-purple-300 text-xs">
+                  {message.repliedMessage.id}
+               </span>
 
-		<button
-			class="p-2 bg-gray-700 shadow-lg z-10 rounded-full"
-			on:click={() => {
-				chatDispatch.setReplyMessageFromConversation({ conversationId: message.conversationId, message });
-			}}
-		>
-			<ShareFat size={12} color="white" weight="fill" />
-		</button>
+               <span class="text-gray-200 text-sm">
+                  {message.repliedMessage.content}
+               </span>
+            </div>
+         {/if}
+         <p class="p-1">{message.content}</p>
+      </div>
 
-		<button class="p-2 bg-gray-700 shadow-lg z-10 rounded-full" on:click={handleWithUpdateOfMessageStatus}>
-			<Info size={12} color="white" weight="fill" />
-		</button>
+      <button
+         class="p-2 bg-gray-700 shadow-lg z-10 rounded-full"
+         on:click={() => {
+            chatDispatch.setReplyMessageFromConversation({ conversationId: message.conversationId, message });
+         }}
+      >
+         <Share size={12} color="white" />
+      </button>
 
-		{#if showMessageStatus}
-			<div class="flex flex-col gap-3 p-2 bg-gray-800 rounded-md absolute left-0">
-				<Text size="md">Sent: {message.sentAt && formatter.format(new Date(message.sentAt))}</Text>
+      <button class="p-2 bg-gray-700 shadow-lg z-10 rounded-full" on:click={handleWithUpdateOfMessageStatus}>
+         <Info size={12} color="white" />
+      </button>
 
-				{#each message.read.users as status (status.userId)}
-					<Text size="md"
-						>Read: {status.userId.substring(0, 5)} {status.at ? formatter.format(new Date(status.at)) : 'Nothing'}</Text
-					>
-				{/each}
+      {#if showMessageStatus}
+         <div class="flex flex-col gap-3 p-2 bg-gray-800 rounded-md absolute left-0">
+            <Text size="md">Sent: {message.sentAt && formatter.format(new Date(message.sentAt))}</Text>
 
-				{#each message.received.users as status (status.userId)}
-					<Text size="md">
-						Received: {status.userId.substring(0, 5)}
-						{status.at ? formatter.format(new Date(status.at)) : 'Nothing'}
-					</Text>
-				{/each}
-			</div>
-		{/if}
-	</div>
+            {#each message.read.users as status (status.userId)}
+               <Text size="md"
+                  >Read: {status.userId.substring(0, 5)}
+                  {status.at ? formatter.format(new Date(status.at)) : 'Nothing'}</Text
+               >
+            {/each}
+
+            {#each message.received.users as status (status.userId)}
+               <Text size="md">
+                  Received: {status.userId.substring(0, 5)}
+                  {status.at ? formatter.format(new Date(status.at)) : 'Nothing'}
+               </Text>
+            {/each}
+         </div>
+      {/if}
+   </div>
 </li>

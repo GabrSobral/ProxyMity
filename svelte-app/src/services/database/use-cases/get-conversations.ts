@@ -1,7 +1,7 @@
 import { database } from '../db';
 
 export async function getConversationsAsyncDB() {
-	const conversations = await database.conversations.toArray();
+   const conversations = await database.conversations.toArray();
 
-	return conversations;
+   return conversations;
 }
