@@ -2,14 +2,14 @@ import Dexie from 'dexie';
 import type { Table } from 'dexie';
 
 import type { User } from '../../types/user';
-import type { Message } from '../../types/message';
+import type { ILocalMessage } from '../../types/message';
 import type { Conversation } from '../../types/conversation';
 
 export class DexieDatabase extends Dexie {
    conversations!: Table<Conversation>;
    me!: Table<User>;
    user!: Table<User>;
-   messages!: Table<Message>;
+   messages!: Table<ILocalMessage>;
 
    constructor() {
       super('proxymity-chats');

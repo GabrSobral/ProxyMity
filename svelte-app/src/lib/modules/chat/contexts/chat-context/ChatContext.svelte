@@ -11,9 +11,7 @@
       chatStateModule = value;
    });
 
-   connection.subscribe(value => {
-      connectionModule = value;
-   });
+   connection.subscribe(value => { connectionModule = value });
 
    if (browser) {
       page.subscribe(value => {
@@ -41,25 +39,23 @@
          typeMessage: typebarRefModule?.value || '',
          currentUserId: userModule.id,
       });
-      // readConversationMessagesAsyncDB({
-      // 	conversationId: conversation.id,
-      // 	whoRead: userModule.id,
-      // 	myId: userModule.id,
-      // 	isConversationGroup: conversation.isGroup,
-      // });
+
+      readConversationMessagesAsyncDB({
+      	conversationId: conversation.id,
+      	whoRead: userModule.id,
+      	myId: userModule.id,
+      	isConversationGroup: conversation.isGroup,
+      });
 
       if (!conversation.hasMessagesFetched) {
          try {
             const { messages } = await APIGetConversationMessages({ conversationId: conversation.id }, { accessToken });
-            chatDispatch.setConversationMessages({
-               conversationId: conversation.id,
-               messages: messages,
-            });
+            chatDispatch.setConversationMessages({ conversationId: conversation.id, messages: messages });
          } catch (error) {
             console.error('Error fetching conversations, data will be taken from the cache', error);
 
-            // const messages = await getConversationsMessagesAsyncDB(conversation.id);
-            // chatDispatch.setConversationMessages({ conversationId: conversation.id, messages: messages.toReversed() });
+            const messages = await getConversationsMessagesAsyncDB(conversation.id);
+            chatDispatch.setConversationMessages({ conversationId: conversation.id, messages: messages.toReversed() });
          }
       }
    }
@@ -93,11 +89,11 @@
    import { APIGetUserConversations } from '../../../../../services/api/get-user-conversations';
    import { APIGetConversationMessages } from '../../../../../services/api/get-conversation-messages';
 
-   // import { addMessageAsyncDB } from '../../../../../services/database/use-cases/add-message';
-   // import { saveConversationsAsyncDB } from '../../../../../services/database/use-cases/save-conversations';
-   // import { getConversationCacheAsyncDB } from '../../../../../services/database/use-cases/get-conversations-state';
-   // import { getConversationsMessagesAsyncDB } from '../../../../../services/database/use-cases/get-conversations-messages';
-   // import { readConversationMessagesAsyncDB } from '../../../../../services/database/use-cases/read-conversation-messages';
+   import { addMessageAsyncDB } from '../../../../../services/database/use-cases/add-message';
+   import { saveConversationsAsyncDB } from '../../../../../services/database/use-cases/save-conversations';
+   import { getConversationCacheAsyncDB } from '../../../../../services/database/use-cases/get-conversations-state';
+   import { getConversationsMessagesAsyncDB } from '../../../../../services/database/use-cases/get-conversations-messages';
+   import { readConversationMessagesAsyncDB } from '../../../../../services/database/use-cases/read-conversation-messages';
 
    import { connection } from '../websocket-context/stores/connection';
    import { sendReadMessageWebSocketEvent } from '../websocket-context/emmiters/sendReadMessage';
@@ -105,6 +101,7 @@
 
    import type { ILocalMessage, IServerMessage } from '../../../../../types/message';
    import { EMessageStatuses } from '../../../../../enums/EMessageStatuses';
+   import { getMessageByIdAsyncDB } from '../../../../../services/database/use-cases/get-message-by-id';
 
    setChatContext();
 
@@ -127,11 +124,11 @@
 
                chatDispatch.setConversationInitialState({ conversationsData: filteredData });
 
-               // saveConversationsAsyncDB(filteredData)
-               // 	.then(() => console.log('🟢 Local database was successfully synchronized with API data.'))
-               // 	.catch(error =>
-               // 		console.error('🔴 Error on try to synchronize API data with local database', error.message)
-               // 	);
+               saveConversationsAsyncDB(filteredData)
+               	.then(() => console.log('🟢 Local database was successfully synchronized with API data.'))
+               	.catch(error =>
+               		console.error('🔴 Error on try to synchronize API data with local database', error.message)
+               	);
             })
             .catch(error => {
                console.error(
@@ -139,14 +136,14 @@
                   error.message
                );
 
-               // getConversationCacheAsyncDB({ userId: user.id })
-               // 	.then(conversationsData => chatDispatch.setConversationInitialState({ conversationsData, userId: user.id }))
-               // 	.catch(console.error);
+               getConversationCacheAsyncDB({ userId: user.id })
+               	.then(conversationsData => chatDispatch.setConversationInitialState({ conversationsData, userId: user.id }))
+               	.catch(console.error);
             }).finally(() => chatDispatch.setIsFetchingConversations(false));
       }
    });
 
-   function receiveMessageHandler(message: IServerMessage) {
+   async function receiveMessageHandler(message: IServerMessage) {
       if (!message || !session?.user || !$connection) {
          return;
       }
@@ -185,7 +182,7 @@
             });
       }
 
-      const payload: ILocalMessage = {
+      const payload: ILocalMessage = await (async () => ({
          id: message.id,
          content: message.content,
          conversationId: message.conversationId,
@@ -197,26 +194,29 @@
          repliedMessage: message.repliedMessageId
             ? {
                  id: message.repliedMessageId,
-                 content: 'replied message',
+                 content: await (async () => {
+                     const repliedMessage = await getMessageByIdAsyncDB(message.repliedMessageId!);
+                     return repliedMessage?.content || "";
+                 })(),
               }
             : null,
          received: { byAllAt: message.receivedByAllAt, users: [] },
          sentAt: message.sentAt,
          read: { byAllAt: message.readByAllAt, users: [] },
          // readByAllAt: $chatState.selectedConversation?.id === message.conversationId ? new Date() : null,
-      };
+      }))();
 
       chatDispatch.addMessage({ message: payload });
       chatDispatch.bringToTop(message.conversationId);
 
-      // addMessageAsyncDB(payload);
+      addMessageAsyncDB(payload);
    }
 
    async function receiveReadMessageHandler(userId: string, conversationId: string, isConversationGroup: boolean) {
       if (!session?.user) return;
 
       chatDispatch.updateConversationMessageStatus({ conversationId, status: EMessageStatuses.READ, userId });
-      // readConversationMessagesAsyncDB({ conversationId, myId: session?.user?.id, whoRead: userId, isConversationGroup });
+      readConversationMessagesAsyncDB({ conversationId, myId: session?.user?.id, whoRead: userId, isConversationGroup });
    }
 
    function receiveMessageStatusHandler(
