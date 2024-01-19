@@ -1,9 +1,7 @@
 <script lang="ts">
    import { goto } from '$app/navigation';
    import { signIn } from '@auth/sveltekit/client';
-   import Eye from 'phosphor-svelte/lib/Eye';
-   import SignIn from 'phosphor-svelte/lib/SignIn';
-   import EyeClosed from 'phosphor-svelte/lib/EyeClosed';
+   import { Eye, LogIn, EyeOff } from "lucide-svelte"
 
    import WarningAlert from '../components/WarningAlert.svelte';
 
@@ -93,7 +91,7 @@
             title={showPassword ? 'Hide password' : 'Show Password'}
          >
             {#if showPassword}
-               <EyeClosed class="dark:text-gray-200 text-gray-100" size={24} />
+               <EyeOff class="dark:text-gray-200 text-gray-100" size={24} />
             {:else}
                <Eye class="dark:text-gray-200 text-gray-100" size={24} />
             {/if}
@@ -111,7 +109,7 @@
       {#if isLoading}
          <LoadingSpinning size={32} lineSize={2} color="white" />
       {:else}
-         <SignIn size={32} class="text-white" weight="light" />
+         <LogIn size={32} class="text-white" />
          Sign In
       {/if}
    </Button>

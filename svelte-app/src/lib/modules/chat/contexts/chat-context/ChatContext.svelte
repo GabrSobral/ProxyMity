@@ -1,7 +1,7 @@
 <script lang="ts" context="module">
    export let typebarRef = writable<HTMLInputElement | null>(null);
 
-   let chatStateModule: State;
+   let chatStateModule: ChatState;
    let connectionModule: HubConnection | null;
    let userModule: Session['user'] | undefined;
    let accessToken: string;
@@ -28,8 +28,6 @@
 
    async function selectedConversationAsync(conversation: ConversationState) {
       if (conversation === chatStateModule.selectedConversation || !userModule) return;
-
-      console.log({ conversation });
 
       if (conversation.notifications > 0 && connectionModule)
          sendReadMessageWebSocketEvent(connectionModule, {
@@ -81,6 +79,7 @@
 
 <script lang="ts">
    import { page } from '$app/stores';
+   import { toast } from "svelte-sonner";
    import { browser } from '$app/environment';
    import { chatDispatch } from './stores/chat';
    import type { Session } from '@auth/sveltekit';
@@ -89,7 +88,7 @@
    import { setContext, getContext, onMount } from 'svelte';
 
    import { chatState } from './stores/chat';
-   import type { ConversationState, State } from './stores/chat-store-types';
+   import type { ConversationState, ChatState } from './stores/chat-store-types';
 
    import { APIGetUserConversations } from '../../../../../services/api/get-user-conversations';
    import { APIGetConversationMessages } from '../../../../../services/api/get-conversation-messages';
@@ -164,6 +163,20 @@
          sendReadMessageWebSocketEvent($connection, webSocketsPayload);
       } else {
          const messageConversation = $chatState.conversations.find(item => item.id === message.conversationId);
+
+         toast.message("New message", {
+            description: message.content,
+            action: {
+               label: "Open",
+               onClick: () => {
+                  const conversation = $chatState.conversations.find(item => item.id === message.conversationId);
+
+                  if(conversation){
+                     selectedConversationAsync(conversation);
+                  }
+               }
+            }
+         })
 
          if (messageConversation && $connection)
             sendReceiveMessageWebSocketEvent($connection, {

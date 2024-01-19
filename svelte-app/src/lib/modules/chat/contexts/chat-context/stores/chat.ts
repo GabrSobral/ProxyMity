@@ -1,14 +1,18 @@
 import { writable } from 'svelte/store';
 
-import type { Actions, State } from './chat-store-types';
+import type { Actions, ChatState, NotificationState } from './chat-store-types';
 import { EMessageStatuses } from '../../../../../../enums/EMessageStatuses';
 import type { TimestampWithAccount } from '../../../../../../types/message';
 
-export const chatState = writable<State>({
+export const chatState = writable<ChatState>({
    conversations: [],
    isFetchingConversations: true,
    selectedConversation: null,
    showConversationDetail: false,
+});
+
+export const notificationsState = writable<NotificationState>({
+   notifications: []
 });
 
 export const chatDispatch: Actions = {
@@ -30,7 +34,6 @@ export const chatDispatch: Actions = {
          store.conversations = store.conversations.map(conversation => {
             if (conversation.participants.some(participant => participant.id === userId)) {
                conversation.messages = conversation.messages.map(message => {
-                  if (!message.received.users.some(user => user.userId === userId)) console.log('entrou', { message });
                   message.received.users = [...message.received.users, { userId, at: new Date() }];
 
                   if (conversation.participants.length === message.received.users.filter(x => x.at).length) {

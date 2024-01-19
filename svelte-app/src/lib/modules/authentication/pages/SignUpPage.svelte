@@ -1,9 +1,7 @@
 <script lang="ts">
    import { goto } from '$app/navigation';
    import { signIn } from '@auth/sveltekit/client';
-   import Eye from 'phosphor-svelte/lib/Eye';
-   import UserPlus from 'phosphor-svelte/lib/UserPlus';
-   import EyeClosed from 'phosphor-svelte/lib/EyeClosed';
+   import { Eye, UserPlus, EyeOff } from "lucide-svelte"
 
    import Button from '$lib/design-system/Button.svelte';
    import InputGroup from '$lib/design-system/Input/InputGroup.svelte';
@@ -109,34 +107,17 @@
             title={showPassword ? 'Hide password' : 'Show Password'}
          >
             {#if showPassword}
-               <EyeClosed class="dark:text-gray-200 text-white" size={24} />
+               <EyeOff class="dark:text-gray-200 text-white" size={24} />
             {:else}
                <Eye class="dark:text-gray-200 text-white" size={24} />
             {/if}
          </button>
       </Wrapper>
 
-      <button
-         tabindex={5}
-         type="button"
-         class="text-purple-300 text-sm hover:underline underline-offset-2"
-         on:click={() => {
-            isStrongPasswordModalVisible = true;
-         }}
-      >
-         Generate a strong password
-      </button>
+      <StrongPasswordModal setPasswordValue={newPassword => { password = newPassword; }}/>
    </InputGroup>
 
-   <StrongPasswordModal
-      isVisible={isStrongPasswordModalVisible}
-      closeModal={() => {
-         isStrongPasswordModalVisible = false;
-      }}
-      setPasswordValue={newPassword => {
-         password = newPassword;
-      }}
-   />
+   
 
    <Button
       tabIndex={6}
@@ -148,7 +129,7 @@
       {#if isLoading}
          <LoadingSpinning size={32} lineSize={2} color="white" />
       {:else}
-         <UserPlus size={32} class="text-white" weight="light" />
+         <UserPlus size={32} class="text-white" />
          Create Account
       {/if}
    </Button>

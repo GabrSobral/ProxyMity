@@ -1,7 +1,7 @@
 <script lang="ts">
    import { page } from '$app/stores';
    import { afterUpdate } from 'svelte';
-   import { Laptop, Moon, Sun } from 'phosphor-svelte';
+   import { Laptop, Moon, Sun } from 'lucide-svelte';
 
    import LoadingSpinning from '$lib/design-system/LoadingSpinning.svelte';
 
@@ -27,7 +27,7 @@
          data-is-active={$appTheme === 'light'}
          class="data-[is-active=true]:ring-purple-500 ring-0 data-[is-active=true]:ring-2 rounded-full p-3 bg-white w-[46px] h-[46px] min-w-[46px] min-h-[46px] transition-all hover:brightness-75 flex items-center justify-center shadow-lg"
       >
-         <Sun class="text-gray-700" size={24} weight="fill" />
+         <Sun class="text-gray-700" size={24} />
       </button>
 
       <button
@@ -39,7 +39,7 @@
          data-is-active={$appTheme === 'dark'}
          class="data-[is-active=true]:ring-purple-500 ring-0 data-[is-active=true]:ring-2 rounded-full p-3 bg-gray-800 w-[46px] h-[46px] min-w-[46px] min-h-[46px] transition-all hover:brightness-75 flex items-center justify-center shadow-lg"
       >
-         <Moon class="text-white" size={24} weight="fill" />
+         <Moon class="text-white" size={24} />
       </button>
 
       <button
@@ -51,7 +51,7 @@
          data-is-active={$appTheme === 'system'}
          class="data-[is-active=true]:ring-purple-500 ring-0 data-[is-active=true]:ring-2 dark:border-gray-700 rounded-full p-3 bg-transparent w-[46px] h-[46px] min-w-[46px] min-h-[46px] transition-all hover:brightness-75 flex items-center justify-center shadow-lg"
       >
-         <Laptop class="text-white transition-colors" size={24} weight="fill" />
+         <Laptop class="text-white transition-colors" size={24} />
       </button>
    </div>
 

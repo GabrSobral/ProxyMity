@@ -2,6 +2,7 @@ import type { ILocalMessage, IServerMessage } from '../../../../../../types/mess
 import type { Conversation } from '../../../../../../types/conversation';
 import type { GetUserConversationsResponse } from '../../../../../../services/api/get-user-conversations';
 import type { EMessageStatuses } from '../../../../../../enums/EMessageStatuses';
+import type { INotification } from '../../../../../../types/notification';
 
 export interface ConversationState extends Conversation {
    messages: ILocalMessage[];
@@ -11,12 +12,16 @@ export interface ConversationState extends Conversation {
    hasMessagesFetched: boolean;
 }
 
-export type State = {
+export type ChatState = {
    conversations: ConversationState[];
    isFetchingConversations: boolean;
    selectedConversation: ConversationState | null;
    showConversationDetail: boolean;
 };
+
+export type NotificationState = {
+   notifications: INotification[];
+}
 
 export type Actions = {
    addConversation(Conversation: ConversationState): void;
