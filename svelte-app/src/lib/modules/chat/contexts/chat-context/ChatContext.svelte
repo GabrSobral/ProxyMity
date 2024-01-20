@@ -6,10 +6,10 @@
    let userModule: Session['user'] | undefined;
    let accessToken: string;
    let typebarRefModule: HTMLInputElement | null;
-   let webSocketEmmiterModule: WebSocketEmmiter;
+   let webSocketEmitterModule: WebSocketEmitter;
 
-   webSocketEmmiter.subscribe(value => {
-      webSocketEmmiterModule = value;
+   webSocketEmitter.subscribe(value => {
+      webSocketEmitterModule = value;
    });
 
    chatState.subscribe(value => {
@@ -35,7 +35,7 @@
       if (conversation === chatStateModule.selectedConversation || !userModule) return;
 
       if (conversation.notifications > 0 && connectionModule)
-         webSocketEmmiterModule.sendReadMessage({
+         webSocketEmitterModule.sendReadMessage({
             userId: userModule.id,
             conversationId: conversation.id,
             isConversationGroup: conversation.isGroup,
@@ -57,12 +57,12 @@
       if (!conversation.hasMessagesFetched) {
          try {
             const { messages } = await APIGetConversationMessages({ conversationId: conversation.id }, { accessToken });
-            chatDispatch.setConversationMessages({ conversationId: conversation.id, messages: messages });
+            chatDispatch.setConversationMessages({ conversationId: conversation.id, messages: messages, fromServer: true });
          } catch (error) {
-            console.error('Error fetching conversations, data will be taken from the cache', error);
+            console.error('🔴 \u001b[31m Error fetching conversations, data will be taken from the cache', error);
 
             const messages = await getConversationsMessagesAsyncDB(conversation.id);
-            chatDispatch.setConversationMessages({ conversationId: conversation.id, messages: messages.toReversed() });
+            chatDispatch.setConversationMessages({ conversationId: conversation.id, messages, fromServer: false });
          }
       }
    }
@@ -103,8 +103,8 @@
    import { serverToLocalMessage } from './functions/parse-server-message';
    import { WorkerMethods } from '../../workers/db-worker/method-types';
    import { chatWorker } from '../../workers/db-worker/initializer';
-   import { connection, webSocketEmmiter } from '../websocket-context/stores/connection';
-   import type { WebSocketEmmiter } from '../websocket-context/WebSocketEmitter';
+   import { connection, webSocketEmitter } from '../websocket-context/stores/connection';
+   import type { WebSocketEmitter } from '../websocket-context/WebSocketEmitter';
 
    setChatContext();
 
@@ -118,7 +118,7 @@
 
          APIGetUserConversations({ id: user.id }, { accessToken: session.accessToken })
             .then(conversationsData => {
-               console.log('🟢 Fetching conversations data was successfully.');
+               console.log('🟢 \u001b[32m Fetching conversations data was successfully.');
 
                const filteredData = conversationsData.map(data => ({
                   ...data,
@@ -130,13 +130,13 @@
             })
             .catch(error => {
                console.error(
-                  '🔴 Error on trying to fetch conversations, data will be taken from the cache',
+                  '🔴 \u001b[31m Error on trying to fetch conversations, data will be taken from the cache',
                   error.message
                );
 
                getConversationCacheAsyncDB({ userId: user.id })
                   .then(conversationsData =>
-                     chatDispatch.setConversationInitialState({ conversationsData, userId: user.id })
+                     chatDispatch.setConversationInitialState({ conversationsData })
                   )
                   .catch(console.error);
             })
@@ -144,31 +144,29 @@
       }
    });
 
-   async function receiveMessageHandler(message: IServerMessage) {
-      if (!message || !session?.user) return;
+   async function receiveMessageHandler(serverMessage: IServerMessage) {
+      if (!serverMessage || !session?.user) return;
 
       const webSocketsPayload = {
          userId: session?.user.id,
-         conversationId: message.conversationId,
-         messageId: message.id,
+         conversationId: serverMessage.conversationId,
+         messageId: serverMessage.id,
          isConversationGroup: $chatState.selectedConversation?.isGroup || false,
       };
 
-      if ($chatState.selectedConversation && $chatState.selectedConversation?.id === message.conversationId) {
-         $webSocketEmmiter.sendReceiveMessage(webSocketsPayload);
-         $webSocketEmmiter.sendReadMessage(webSocketsPayload);
-         // sendReceiveMessageWebSocketEvent($connection, webSocketsPayload);
-         // sendReadMessageWebSocketEvent($connection, webSocketsPayload);
+      if ($chatState.selectedConversation && $chatState.selectedConversation?.id === serverMessage.conversationId) {
+         $webSocketEmitter.sendReceiveMessage(webSocketsPayload);
+         $webSocketEmitter.sendReadMessage(webSocketsPayload);
       } else {
-         const messageConversation = $chatState.conversations.find(item => item.id === message.conversationId);
+         const messageConversation = $chatState.conversations.find(item => item.id === serverMessage.conversationId);
 
          toast.message('New message', {
-            description: message.content,
-            id: message.id,
+            description: serverMessage.content,
+            id: serverMessage.id,
             action: {
                label: 'Open',
                onClick: () => {
-                  const conversation = $chatState.conversations.find(item => item.id === message.conversationId);
+                  const conversation = $chatState.conversations.find(item => item.id === serverMessage.conversationId);
 
                   if (conversation) {
                      selectedConversationAsync(conversation);
@@ -178,20 +176,16 @@
          });
 
          if (messageConversation)
-            $webSocketEmmiter.sendReceiveMessage({
+            $webSocketEmitter.sendReceiveMessage({
                ...webSocketsPayload,
                isConversationGroup: messageConversation?.isGroup,
             });
-         // sendReceiveMessageWebSocketEvent($connection, {
-         //    ...webSocketsPayload,
-         //    isConversationGroup: messageConversation?.isGroup,
-         // });
       }
 
-      const localMessage = await serverToLocalMessage(message);
+      const localMessage = await serverToLocalMessage(serverMessage);
 
       chatDispatch.addMessage({ message: localMessage });
-      chatDispatch.bringToTop(message.conversationId);
+      chatDispatch.bringToTop(serverMessage.conversationId);
 
       $chatWorker?.postMessage({ type: WorkerMethods.ADD_MESSAGE, payload: { message: localMessage } });
    }
@@ -228,11 +222,13 @@
       chatDispatch.markAsReceivedMessagesFromConversations({ userId });
    }
 
-   $: if ($connection) {
+   $: if ($connection) {      
       $connection?.on('receivemessage', receiveMessageHandler);
       $connection?.on('receivereadmessage', receiveReadMessageHandler);
       $connection?.on('receivemessagestatus', receiveMessageStatusHandler);
       $connection?.on('receivependingmessages', receivePendingMessagesHandler);
+
+      console.log("🟢 \u001b[32m  Connection events created.");
    }
 </script>
 

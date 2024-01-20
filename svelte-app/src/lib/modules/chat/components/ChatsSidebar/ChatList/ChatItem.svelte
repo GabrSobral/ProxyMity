@@ -16,6 +16,7 @@
    $: lastMessage = conversation.messages?.at(-1);
    $: isSelectedContact = $chatState.selectedConversation?.id === conversation.id;
    $: isMine = lastMessage?.author?.id === user?.id;
+   $: draft = conversation.typeMessage;
    $: status = (() => {
       if (!lastMessage) {
          return;
@@ -96,7 +97,7 @@
       >
          {#if typing}
             <span>Typing...</span>
-         {:else if lastMessage}
+         {:else if lastMessage && !draft}
             <span class="flex gap-4 w-full">
                {lastMessage.content}
 
@@ -117,6 +118,8 @@
                   {/if}
                </span>
             </span>
+         {:else if draft && !isSelectedContact}
+            <span class="text-gray-300 truncate" title={draft}>Draft: {draft}</span>
          {:else}
             <span>Start the conversation...</span>
          {/if}

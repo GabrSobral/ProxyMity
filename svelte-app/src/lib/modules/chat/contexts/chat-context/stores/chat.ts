@@ -221,47 +221,53 @@ export const chatDispatch: Actions = {
       });
    },
 
-   setConversationMessages({ conversationId, messages }) {
+   setConversationMessages({ conversationId, messages, fromServer }) {
       chatState.update(store => {
          const index = store.conversations.findIndex(conversation => conversation.id === conversationId);
          const participants = store.conversations[index].participants;
 
          if (index >= 0) {
-            store.conversations[index].messages = messages
-               .map(message => ({
-                  id: message.id,
-                  content: message.content,
-                  author: {
-                     id: message.authorId,
-                     name: participants.find(user => user.id === message.authorId)?.name || 'You',
-                  },
-                  writtenAt: message.writtenAt,
-                  read: {
-                     byAllAt: message.readByAllAt,
-                     users: store.conversations[index].isGroup
-                        ? []
-                        : message.readByAllAt
-                          ? participants.map(user => ({ at: message.readByAllAt!, userId: user.id }))
-                          : [],
-                  },
-                  received: {
-                     byAllAt: message.receivedByAllAt,
-                     users: store.conversations[index].isGroup
-                        ? []
-                        : message.receivedByAllAt
-                          ? participants.map(user => ({ at: message.receivedByAllAt!, userId: user.id }))
-                          : [],
-                  },
-                  repliedMessage: message.repliedMessageId
-                     ? {
-                          id: message.repliedMessageId,
-                          content: '',
-                       }
-                     : null,
-                  sentAt: message.sentAt,
-                  conversationId: message.conversationId,
-               }))
-               .toReversed();
+            if(fromServer) {
+               store.conversations[index].messages = messages
+                  .map(message => ({
+                     id: message.id,
+                     content: message.content,
+                     author: {
+                        id: message.authorId,
+                        name: participants.find(user => user.id === message.authorId)?.name || 'You',
+                     },
+                     writtenAt: message.writtenAt,
+                     read: {
+                        byAllAt: message.readByAllAt,
+                        users: store.conversations[index].isGroup
+                           ? []
+                           : message.readByAllAt
+                             ? participants.map(user => ({ at: message.readByAllAt!, userId: user.id }))
+                             : [],
+                     },
+                     received: {
+                        byAllAt: message.receivedByAllAt,
+                        users: store.conversations[index].isGroup
+                           ? []
+                           : message.receivedByAllAt
+                             ? participants.map(user => ({ at: message.receivedByAllAt!, userId: user.id }))
+                             : [],
+                     },
+                     repliedMessage: message.repliedMessageId
+                        ? {
+                             id: message.repliedMessageId,
+                             content: '',
+                          }
+                        : null,
+                     sentAt: message.sentAt,
+                     conversationId: message.conversationId,
+                  }))
+                  .toReversed();
+
+            } else {
+               store.conversations[index].messages = messages.toReversed();
+            }
+
 
             store.conversations[index].hasMessagesFetched = true;
          }

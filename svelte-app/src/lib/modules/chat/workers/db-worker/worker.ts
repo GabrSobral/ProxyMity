@@ -18,9 +18,9 @@ export type Command =
 
 self.onmessage = async ({ data }: { data: Command }) => {
    const operations = new DbOperations(database);
-   const response = await operations[data.type](data?.payload);
+   const response = await operations[data.type](data?.payload as any);
 
-   console.log('⚙️ Database Worker thread:', { response });
+   console.log('⚙️ Database Worker thread: \u001b[35m' + data.type);
 
    self.postMessage(response);
 };

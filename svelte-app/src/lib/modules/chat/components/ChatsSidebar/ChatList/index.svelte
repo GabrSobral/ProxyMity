@@ -1,6 +1,6 @@
 <script lang="ts">
-   import autoAnimate from '@formkit/auto-animate';
    import { UserPlus } from 'lucide-svelte';
+   import autoAnimate from '@formkit/auto-animate';
 
    import Heading from '$lib/design-system/Heading.svelte';
 
@@ -13,7 +13,10 @@
 
    let isNewContactModalOpened = false;
 
-   let allNotificationsCount = $chatState.conversations.filter(item => item.notifications > 0).length;
+   $: allNotificationsCount = $chatState.conversations.reduce(
+      (accumulator, curr) => accumulator + curr.notifications,
+      0
+   );
 </script>
 
 <section
@@ -45,7 +48,7 @@
 
    <div class="flex flex-col gap-[2px] mt-4 overflow-auto rounded-md h-full" role="list" use:autoAnimate>
       {#if $chatState.isFetchingConversations}
-         {#each [0, 1, 2, 3] as item}
+         {#each [0, 1, 2, 3] as _}
             <ChatItemSkeleton />
          {/each}
       {:else}
@@ -53,7 +56,6 @@
             <ChatItem {conversation} />
          {/each}
       {/if}
-
    </div>
 
    <div

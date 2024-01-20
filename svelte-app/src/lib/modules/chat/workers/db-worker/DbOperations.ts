@@ -56,8 +56,8 @@ export class DbOperations implements IDbOperations {
 
       this.database.conversations
          .bulkPut(indexedConversation)
-         .then(() => console.log('🟢 Local database was successfully synchronized with API data.'))
-         .catch(error => console.error('🔴 Error on try to synchronize API data with local database', error.message));
+         .then(() => console.log('🟢 \u001b[32m Local database was successfully synchronized with API data.'))
+         .catch(error => console.error('🔴 \u001b[31m Error on try to synchronize API data with local database', error.message));
    }
 
    async saveUser(payload: User): Promise<IndexableType> {
@@ -69,8 +69,9 @@ export class DbOperations implements IDbOperations {
          await this.database.messages
             .where({ id: messageId })
             .modify({ receivedByAllAt: new Date() })
+            .then(() => console.log(`🟢 \u001b[32m The message status was updated on local database: ${messageId}`))
             .catch(error => {
-               console.error(`Error on trying to update the "${messageId}" message status at Indexed DB`, error);
+               console.error(`🔴 \u001b[31m Error on trying to update the "${messageId}" message status at Indexed DB`, error);
             });
       }
 

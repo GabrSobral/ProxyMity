@@ -3,8 +3,8 @@ import type { ILocalMessage, IServerMessage } from "../../../../../../types/mess
 
 import { chatDispatch } from '../stores/chat';
 import type { ChatState } from "../stores/chat-store-types";
-import { sendReceiveMessageWebSocketEvent } from "../../websocket-context/emmiters/sendReceiveMessage";
-import { sendReadMessageWebSocketEvent } from "../../websocket-context/emmiters/sendReadMessage";
+import { sendReceiveMessageWebSocketEvent } from "../../websocket-context/Emitters/sendReceiveMessage";
+import { sendReadMessageWebSocketEvent } from "../../websocket-context/Emitters/sendReadMessage";
 import { toast } from "svelte-sonner";
 import { getChatContext } from "../ChatContext.svelte";
 

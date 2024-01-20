@@ -26,13 +26,13 @@ interface ISendMessageWebSocketPayload {
     authorId: string;
  }
 
-export class WebSocketEmmiter {
+export class WebSocketEmitter {
     constructor(
         private connection: HubConnection | null
     ) {}
 
     async sendMessage({ isConversationGroup, message }: ISendMessageWebSocketPayload): Promise<void> {
-        const serverMessage = localToServerMessage(message);
+        const serverMessage = await localToServerMessage(message);
         this.connection?.invoke('onSendMessage', { message: serverMessage, isConversationGroup });
     }
 

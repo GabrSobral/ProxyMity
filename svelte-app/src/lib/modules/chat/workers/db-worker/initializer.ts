@@ -10,5 +10,5 @@ export const loadWorker = async () => {
 
 if(browser) {
     loadWorker();
-    console.log("⚙️ Web Worker was initialized.");
+    console.log("⚙️ \u001b[32m Web Worker was initialized.");
 }

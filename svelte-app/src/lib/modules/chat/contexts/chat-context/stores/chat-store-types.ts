@@ -21,7 +21,7 @@ export type ChatState = {
 
 export type NotificationState = {
    notifications: INotification[];
-}
+};
 
 export type Actions = {
    addConversation(Conversation: ConversationState): void;
@@ -34,7 +34,11 @@ export type Actions = {
    handleShowConversationDetail(): void;
    setIsFetchingConversations(value: boolean): void;
    addMessage(payload: { message: ILocalMessage }): void;
-   setConversationMessages(payload: { conversationId: string; messages: IServerMessage[] }): void;
+   setConversationMessages(
+      payload:
+         | { conversationId: string; messages: IServerMessage[]; fromServer: true }
+         | { conversationId: string; messages: ILocalMessage[]; fromServer: false }
+   ): void;
    updateConversationMessageStatus(
       payload:
          | {

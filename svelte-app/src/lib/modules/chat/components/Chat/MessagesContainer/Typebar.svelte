@@ -6,21 +6,22 @@
 
    import Button from '$lib/design-system/Button.svelte';
    import InputGroup from '$lib/design-system/Input/InputGroup.svelte';
-   
+
    import { chatWorker } from '$lib/modules/chat/workers/db-worker/initializer';
    import { WorkerMethods } from '$lib/modules/chat/workers/db-worker/method-types';
    import { getChatContext } from '$lib/modules/chat/contexts/chat-context/ChatContext.svelte';
    import { chatDispatch, chatState } from '$lib/modules/chat/contexts/chat-context/stores/chat';
-   import { webSocketEmmiter } from '$lib/modules/chat/contexts/websocket-context/stores/connection';
+   import { webSocketEmitter } from '$lib/modules/chat/contexts/websocket-context/stores/connection';
 
    import type { ILocalMessage } from '../../../../../../types/message';
    import { EMessageStatuses } from '../../../../../../enums/EMessageStatuses';
 
    $: user = $page.data.session?.user;
+   $: conversationId = $chatState.selectedConversation?.id || '';
    $: if ($chatState.selectedConversation && $typebarRef) {
       $typebarRef.value = $chatState.selectedConversation?.typeMessage;
    }
-   
+
    let typeValueManaged = '';
    let { typebarRef } = getChatContext();
 
@@ -30,18 +31,12 @@
       const message: ILocalMessage = {
          id: ulid(),
          content: $typebarRef?.value.trim(),
-
          writtenAt: new Date(),
          sentAt: null,
          received: { byAllAt: null, users: [] },
          read: { byAllAt: null, users: [] },
-
-         conversationId: $chatState.selectedConversation?.id,
-         author: {
-            id: user.id,
-            name: user.name,
-         },
-
+         conversationId,
+         author: { id: user.id, name: user.name },
          repliedMessage: $chatState.selectedConversation.replyMessage
             ? {
                  id: $chatState.selectedConversation.replyMessage.id,
@@ -55,20 +50,14 @@
       chatDispatch.addMessage({ message });
       chatDispatch.bringToTop(message.conversationId);
 
-      $webSocketEmmiter.sendMessage({
-         message: message,
-         isConversationGroup: $chatState.selectedConversation.isGroup,
-      });
+      $webSocketEmitter.sendMessage({ message, isConversationGroup: $chatState.selectedConversation.isGroup });
 
       $chatWorker?.postMessage({
          type: WorkerMethods.CHANGE_MESSAGE_STATUS,
          payload: { messageId: message.id, status: EMessageStatuses.SENT },
       });
 
-      chatDispatch.saveTypeMessageFromConversation({
-         conversationId: $chatState.selectedConversation.id,
-         typeMessage: '',
-      });
+      chatDispatch.saveTypeMessageFromConversation({ conversationId, typeMessage: '' });
 
       $typebarRef.value = '';
       typeValueManaged = '';
@@ -77,11 +66,7 @@
    }
 
    function handleSpreadTypingStatusToConversation(typing: boolean) {
-      $webSocketEmmiter.sendTyping({
-         typing,
-         conversationId: $chatState.selectedConversation?.id || '',
-         authorId: user?.id || '',
-      });
+      $webSocketEmitter.sendTyping({ conversationId, typing, authorId: user?.id || '' });
    }
 
    onMount(() => {
@@ -117,10 +102,7 @@
          <button
             type="button"
             title="Cancel reply message"
-            on:click={() =>
-               chatDispatch.removeReplyMessageFromConversation({
-                  conversationId: $chatState.selectedConversation?.id || '',
-               })}
+            on:click={() => chatDispatch.removeReplyMessageFromConversation({ conversationId })}
             class="ml-auto bg-gray-900 hover:brightness-125 flex items-center justify-center rounded-full max-w-[2.5rem] min-w-[2.5rem] max-h-[2.5rem] min-h-[2.5rem]"
          >
             <X size={24} color="white" />
