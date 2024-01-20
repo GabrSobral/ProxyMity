@@ -6,12 +6,19 @@
    let userModule: Session['user'] | undefined;
    let accessToken: string;
    let typebarRefModule: HTMLInputElement | null;
+   let webSocketEmmiterModule: WebSocketEmmiter;
+
+   webSocketEmmiter.subscribe(value => {
+      webSocketEmmiterModule = value;
+   });
 
    chatState.subscribe(value => {
       chatStateModule = value;
    });
 
-   connection.subscribe(value => { connectionModule = value });
+   connection.subscribe(value => {
+      connectionModule = value;
+   });
 
    if (browser) {
       page.subscribe(value => {
@@ -28,7 +35,7 @@
       if (conversation === chatStateModule.selectedConversation || !userModule) return;
 
       if (conversation.notifications > 0 && connectionModule)
-         sendReadMessageWebSocketEvent(connectionModule, {
+         webSocketEmmiterModule.sendReadMessage({
             userId: userModule.id,
             conversationId: conversation.id,
             isConversationGroup: conversation.isGroup,
@@ -41,10 +48,10 @@
       });
 
       readConversationMessagesAsyncDB({
-      	conversationId: conversation.id,
-      	whoRead: userModule.id,
-      	myId: userModule.id,
-      	isConversationGroup: conversation.isGroup,
+         conversationId: conversation.id,
+         whoRead: userModule.id,
+         myId: userModule.id,
+         isConversationGroup: conversation.isGroup,
       });
 
       if (!conversation.hasMessagesFetched) {
@@ -67,15 +74,12 @@
 
    export const getChatContext = () => getContext<ChatContextProps>('chat-context');
    export const setChatContext = () =>
-      setContext<ChatContextProps>('chat-context', {
-         typebarRef,
-         selectedConversationAsync,
-      });
+      setContext<ChatContextProps>('chat-context', { typebarRef, selectedConversationAsync });
 </script>
 
 <script lang="ts">
    import { page } from '$app/stores';
-   import { toast } from "svelte-sonner";
+   import { toast } from 'svelte-sonner';
    import { browser } from '$app/environment';
    import { chatDispatch } from './stores/chat';
    import type { Session } from '@auth/sveltekit';
@@ -89,19 +93,18 @@
    import { APIGetUserConversations } from '../../../../../services/api/get-user-conversations';
    import { APIGetConversationMessages } from '../../../../../services/api/get-conversation-messages';
 
-   import { addMessageAsyncDB } from '../../../../../services/database/use-cases/add-message';
-   import { saveConversationsAsyncDB } from '../../../../../services/database/use-cases/save-conversations';
    import { getConversationCacheAsyncDB } from '../../../../../services/database/use-cases/get-conversations-state';
    import { getConversationsMessagesAsyncDB } from '../../../../../services/database/use-cases/get-conversations-messages';
    import { readConversationMessagesAsyncDB } from '../../../../../services/database/use-cases/read-conversation-messages';
 
-   import { connection } from '../websocket-context/stores/connection';
-   import { sendReadMessageWebSocketEvent } from '../websocket-context/emmiters/sendReadMessage';
-   import { sendReceiveMessageWebSocketEvent } from '../websocket-context/emmiters/sendReceiveMessage';
-
-   import type { ILocalMessage, IServerMessage } from '../../../../../types/message';
    import { EMessageStatuses } from '../../../../../enums/EMessageStatuses';
-   import { getMessageByIdAsyncDB } from '../../../../../services/database/use-cases/get-message-by-id';
+   import type { IServerMessage } from '../../../../../types/message';
+
+   import { serverToLocalMessage } from './functions/parse-server-message';
+   import { WorkerMethods } from '../../workers/db-worker/method-types';
+   import { chatWorker } from '../../workers/db-worker/initializer';
+   import { connection, webSocketEmmiter } from '../websocket-context/stores/connection';
+   import type { WebSocketEmmiter } from '../websocket-context/WebSocketEmitter';
 
    setChatContext();
 
@@ -123,12 +126,7 @@
                }));
 
                chatDispatch.setConversationInitialState({ conversationsData: filteredData });
-
-               saveConversationsAsyncDB(filteredData)
-               	.then(() => console.log('🟢 Local database was successfully synchronized with API data.'))
-               	.catch(error =>
-               		console.error('🔴 Error on try to synchronize API data with local database', error.message)
-               	);
+               $chatWorker?.postMessage({ type: WorkerMethods.SAVE_CONVERSATIONS, payload: filteredData });
             })
             .catch(error => {
                console.error(
@@ -137,16 +135,17 @@
                );
 
                getConversationCacheAsyncDB({ userId: user.id })
-               	.then(conversationsData => chatDispatch.setConversationInitialState({ conversationsData, userId: user.id }))
-               	.catch(console.error);
-            }).finally(() => chatDispatch.setIsFetchingConversations(false));
+                  .then(conversationsData =>
+                     chatDispatch.setConversationInitialState({ conversationsData, userId: user.id })
+                  )
+                  .catch(console.error);
+            })
+            .finally(() => chatDispatch.setIsFetchingConversations(false));
       }
    });
 
    async function receiveMessageHandler(message: IServerMessage) {
-      if (!message || !session?.user || !$connection) {
-         return;
-      }
+      if (!message || !session?.user) return;
 
       const webSocketsPayload = {
          userId: session?.user.id,
@@ -156,67 +155,60 @@
       };
 
       if ($chatState.selectedConversation && $chatState.selectedConversation?.id === message.conversationId) {
-         sendReceiveMessageWebSocketEvent($connection, webSocketsPayload);
-         sendReadMessageWebSocketEvent($connection, webSocketsPayload);
+         $webSocketEmmiter.sendReceiveMessage(webSocketsPayload);
+         $webSocketEmmiter.sendReadMessage(webSocketsPayload);
+         // sendReceiveMessageWebSocketEvent($connection, webSocketsPayload);
+         // sendReadMessageWebSocketEvent($connection, webSocketsPayload);
       } else {
          const messageConversation = $chatState.conversations.find(item => item.id === message.conversationId);
 
-         toast.message("New message", {
+         toast.message('New message', {
             description: message.content,
+            id: message.id,
             action: {
-               label: "Open",
+               label: 'Open',
                onClick: () => {
                   const conversation = $chatState.conversations.find(item => item.id === message.conversationId);
 
-                  if(conversation){
+                  if (conversation) {
                      selectedConversationAsync(conversation);
                   }
-               }
-            }
-         })
+               },
+            },
+         });
 
-         if (messageConversation && $connection)
-            sendReceiveMessageWebSocketEvent($connection, {
+         if (messageConversation)
+            $webSocketEmmiter.sendReceiveMessage({
                ...webSocketsPayload,
                isConversationGroup: messageConversation?.isGroup,
             });
+         // sendReceiveMessageWebSocketEvent($connection, {
+         //    ...webSocketsPayload,
+         //    isConversationGroup: messageConversation?.isGroup,
+         // });
       }
 
-      const payload: ILocalMessage = await (async () => ({
-         id: message.id,
-         content: message.content,
-         conversationId: message.conversationId,
-         writtenAt: message.writtenAt,
-         author: {
-            id: message.authorId,
-            name: 'name',
-         },
-         repliedMessage: message.repliedMessageId
-            ? {
-                 id: message.repliedMessageId,
-                 content: await (async () => {
-                     const repliedMessage = await getMessageByIdAsyncDB(message.repliedMessageId!);
-                     return repliedMessage?.content || "";
-                 })(),
-              }
-            : null,
-         received: { byAllAt: message.receivedByAllAt, users: [] },
-         sentAt: message.sentAt,
-         read: { byAllAt: message.readByAllAt, users: [] },
-         // readByAllAt: $chatState.selectedConversation?.id === message.conversationId ? new Date() : null,
-      }))();
+      const localMessage = await serverToLocalMessage(message);
 
-      chatDispatch.addMessage({ message: payload });
+      chatDispatch.addMessage({ message: localMessage });
       chatDispatch.bringToTop(message.conversationId);
 
-      addMessageAsyncDB(payload);
+      $chatWorker?.postMessage({ type: WorkerMethods.ADD_MESSAGE, payload: { message: localMessage } });
    }
 
    async function receiveReadMessageHandler(userId: string, conversationId: string, isConversationGroup: boolean) {
       if (!session?.user) return;
 
       chatDispatch.updateConversationMessageStatus({ conversationId, status: EMessageStatuses.READ, userId });
-      readConversationMessagesAsyncDB({ conversationId, myId: session?.user?.id, whoRead: userId, isConversationGroup });
+      $chatWorker?.postMessage({
+         type: WorkerMethods.READ_CONVERSATION_MESSAGES,
+         payload: {
+            conversationId,
+            myId: session?.user?.id,
+            whoRead: userId,
+            isConversationGroup,
+         },
+      });
    }
 
    function receiveMessageStatusHandler(
@@ -233,8 +225,6 @@
    }
 
    function receivePendingMessagesHandler(userId: string) {
-      console.log('Receiving pending messages', { userId });
-
       chatDispatch.markAsReceivedMessagesFromConversations({ userId });
    }
 

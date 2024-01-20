@@ -6,28 +6,23 @@
 
    import Button from '$lib/design-system/Button.svelte';
    import InputGroup from '$lib/design-system/Input/InputGroup.svelte';
-
-   import { connection } from '$lib/modules/chat/contexts/websocket-context/stores/connection';
+   
+   import { chatWorker } from '$lib/modules/chat/workers/db-worker/initializer';
+   import { WorkerMethods } from '$lib/modules/chat/workers/db-worker/method-types';
    import { getChatContext } from '$lib/modules/chat/contexts/chat-context/ChatContext.svelte';
    import { chatDispatch, chatState } from '$lib/modules/chat/contexts/chat-context/stores/chat';
-   import { sendTypingWebSocketEvent } from '$lib/modules/chat/contexts/websocket-context/emmiters/sendTyping';
-   import { sendMessageWebSocketEvent } from '$lib/modules/chat/contexts/websocket-context/emmiters/sendMessage';
-
-   // import { addMessageAsyncDB } from '../../../../../../services/database/use-cases/add-message';
-   // import { changeMessageStatusAsyncDB } from '../../../../../../services/database/use-cases/change-message-status';
+   import { webSocketEmmiter } from '$lib/modules/chat/contexts/websocket-context/stores/connection';
 
    import type { ILocalMessage } from '../../../../../../types/message';
    import { EMessageStatuses } from '../../../../../../enums/EMessageStatuses';
 
-   let typeValueManaged = '';
-
+   $: user = $page.data.session?.user;
    $: if ($chatState.selectedConversation && $typebarRef) {
       $typebarRef.value = $chatState.selectedConversation?.typeMessage;
    }
-
+   
+   let typeValueManaged = '';
    let { typebarRef } = getChatContext();
-
-   $: user = $page.data.session?.user;
 
    async function sendMessage() {
       if (!user || !$chatState.selectedConversation || !$typebarRef?.value.trim()) return;
@@ -55,25 +50,20 @@
             : null,
       };
 
-      // addMessageAsyncDB(message).catch(error => {
-      // 	console.error(`Error on trying to add the "${message.id}" message at Indexed DB`, error);
-      // });
+      $chatWorker?.postMessage({ type: WorkerMethods.ADD_MESSAGE, payload: { message } });
 
       chatDispatch.addMessage({ message });
       chatDispatch.bringToTop(message.conversationId);
 
-      if ($connection) {
-         sendMessageWebSocketEvent($connection, {
-            message: message,
-            isConversationGroup: $chatState.selectedConversation.isGroup,
-         });
+      $webSocketEmmiter.sendMessage({
+         message: message,
+         isConversationGroup: $chatState.selectedConversation.isGroup,
+      });
 
-         // changeMessageStatusAsyncDB({ messageId: message.id, status: EMessageStatuses.SENT }).catch(error => {
-         // 	console.error(`Error on trying to update the "${message.id}" message status at Indexed DB`, error);
-         // });
-      } else {
-         console.error('Connection not established!');
-      }
+      $chatWorker?.postMessage({
+         type: WorkerMethods.CHANGE_MESSAGE_STATUS,
+         payload: { messageId: message.id, status: EMessageStatuses.SENT },
+      });
 
       chatDispatch.saveTypeMessageFromConversation({
          conversationId: $chatState.selectedConversation.id,
@@ -87,15 +77,11 @@
    }
 
    function handleSpreadTypingStatusToConversation(typing: boolean) {
-      if ($connection) {
-         sendTypingWebSocketEvent($connection, {
-            typing,
-            conversationId: $chatState.selectedConversation?.id || '',
-            authorId: user?.id || '',
-         });
-      } else {
-         console.error('Connection not established!');
-      }
+      $webSocketEmmiter.sendTyping({
+         typing,
+         conversationId: $chatState.selectedConversation?.id || '',
+         authorId: user?.id || '',
+      });
    }
 
    onMount(() => {
