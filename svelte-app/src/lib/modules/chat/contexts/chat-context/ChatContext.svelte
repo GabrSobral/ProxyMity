@@ -57,7 +57,11 @@
       if (!conversation.hasMessagesFetched) {
          try {
             const { messages } = await APIGetConversationMessages({ conversationId: conversation.id }, { accessToken });
-            chatDispatch.setConversationMessages({ conversationId: conversation.id, messages: messages, fromServer: true });
+            chatDispatch.setConversationMessages({
+               conversationId: conversation.id,
+               messages: messages,
+               fromServer: true,
+            });
          } catch (error) {
             console.error('🔴 \u001b[31m Error fetching conversations, data will be taken from the cache', error);
 
@@ -100,15 +104,24 @@
    import { EMessageStatuses } from '../../../../../enums/EMessageStatuses';
    import type { IServerMessage } from '../../../../../types/message';
 
-   import { serverToLocalMessage } from './functions/parse-server-message';
-   import { WorkerMethods } from '../../workers/db-worker/method-types';
    import { chatWorker } from '../../workers/db-worker/initializer';
-   import { connection, webSocketEmitter } from '../websocket-context/stores/connection';
+   import { WorkerMethods } from '../../workers/db-worker/method-types';
+
+   import { serverToLocalMessage } from './functions/parse-server-message';
    import type { WebSocketEmitter } from '../websocket-context/WebSocketEmitter';
+   import { connection, webSocketEmitter } from '../websocket-context/stores/connection';
+   import type { Command } from '../../workers/db-worker/worker';
 
    setChatContext();
 
    $: session = $page.data.session;
+
+   $: if ($chatWorker) {
+      $chatWorker.onmessage = ({ data }: MessageEvent<{ command: Command, response: any}>) => {
+         console.log('⚙️ Main thread: \u001b[35m' + data.command.type);
+         console.log(data);
+      };
+   }
 
    onMount(() => {
       if (session?.user && session?.accessToken) {
@@ -125,6 +138,8 @@
                   participants: data.participants.filter(item => item.id !== user.id),
                }));
 
+               console.log({ filteredData })
+
                chatDispatch.setConversationInitialState({ conversationsData: filteredData });
                $chatWorker?.postMessage({ type: WorkerMethods.SAVE_CONVERSATIONS, payload: filteredData });
             })
@@ -135,9 +150,7 @@
                );
 
                getConversationCacheAsyncDB({ userId: user.id })
-                  .then(conversationsData =>
-                     chatDispatch.setConversationInitialState({ conversationsData })
-                  )
+                  .then(conversationsData => chatDispatch.setConversationInitialState({ conversationsData }))
                   .catch(console.error);
             })
             .finally(() => chatDispatch.setIsFetchingConversations(false));
@@ -205,12 +218,9 @@
       });
    }
 
-   function receiveMessageStatusHandler(
-      messageStatus: string,
-      messageId: string,
-      conversationId: string,
-      userId: string
-   ) {
+   function receiveMessageStatusHandler(...args: [ string, string, string, string ]) {
+      const [messageStatus, messageId, conversationId, userId] = args;
+      
       const messageStatusEvent = new CustomEvent(messageId, {
          detail: { messageStatus, messageId, conversationId, userId },
       });
@@ -222,13 +232,13 @@
       chatDispatch.markAsReceivedMessagesFromConversations({ userId });
    }
 
-   $: if ($connection) {      
+   $: if ($connection) {
       $connection?.on('receivemessage', receiveMessageHandler);
       $connection?.on('receivereadmessage', receiveReadMessageHandler);
       $connection?.on('receivemessagestatus', receiveMessageStatusHandler);
       $connection?.on('receivependingmessages', receivePendingMessagesHandler);
 
-      console.log("🟢 \u001b[32m  Connection events created.");
+      console.log('🟢 \u001b[32m  Connection events created.');
    }
 </script>
 

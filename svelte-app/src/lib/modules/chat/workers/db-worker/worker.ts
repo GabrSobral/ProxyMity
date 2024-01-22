@@ -22,5 +22,5 @@ self.onmessage = async ({ data }: { data: Command }) => {
 
    console.log('⚙️ Database Worker thread: \u001b[35m' + data.type);
 
-   self.postMessage(response);
+   self.postMessage({ command: data, response });
 };
