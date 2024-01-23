@@ -2,15 +2,17 @@
    import clsx from 'clsx';
    import { onMount } from 'svelte';
    import { page } from '$app/stores';
-   import { Clock, Info, Share } from 'lucide-svelte';
+   import { Clock, Info, Share, User } from 'lucide-svelte';
 
    import Text from '$lib/design-system/Text.svelte';
+
+   import { chatWorker } from '$lib/modules/chat/workers/db-worker/initializer';
+   import { WorkerMethods } from '$lib/modules/chat/workers/db-worker/method-types';
    import { getStatusFromMessage } from '$lib/modules/chat/services/getStatusFromMessage';
    import { chatDispatch, chatState } from '$lib/modules/chat/contexts/chat-context/stores/chat';
 
    import type { ILocalMessage } from '../../../../../../types/message';
    import { EMessageStatuses } from '../../../../../../enums/EMessageStatuses';
-   import { changeMessageStatusAsyncDB } from '../../../../../../services/database/use-cases/change-message-status';
 
    export let message: ILocalMessage;
    export let previousMessage: ILocalMessage;
@@ -22,11 +24,9 @@
    let showMessageStatus = false;
    const previousIsFromUser = previousMessage?.author?.id === message.author?.id;
    const formatter = Intl.DateTimeFormat('pt-br', { hour: 'numeric', minute: 'numeric' });
-   const selectTimeToShow = (isMine: boolean, message: ILocalMessage) => formatter.format(new Date(message.writtenAt));
 
    $: accessToken = $page.data.session?.accessToken;
-
-   $: timeToShow = selectTimeToShow(isMine, message);
+   $: timeToShow = formatter.format(new Date(message.writtenAt));
    $: user = $page.data.session?.user;
    $: isMine = message.author?.id === user?.id;
    $: status = (() => {
@@ -61,13 +61,16 @@
             status = messageStatus;
 
             chatDispatch.updateConversationMessageStatus({ conversationId, messageId, status: messageStatus, userId });
-            changeMessageStatusAsyncDB({ messageId: messageId, status: messageStatus });
+            $chatWorker?.postMessage({
+               type: WorkerMethods.CHANGE_MESSAGE_STATUS,
+               payload: { messageId: messageId, status: messageStatus },
+            });
          }
       }
 
       if (event.detail.type === 'highlight') {
          isHighlighting = true;
-      
+
          setTimeout(() => {
             isHighlighting = false;
          }, 2000);
@@ -103,6 +106,7 @@
          const messageEvent = new CustomEvent(message.repliedMessage.id, {
             detail: { type: 'highlight', messageId: message.id },
          });
+
          dispatchEvent(messageEvent);
       }
    }
@@ -116,8 +120,20 @@
 <li
    class="flex flex-col gap-1 rounded-[1rem] w-full data-[highlight=true]:animate-pulse data-[highlight=true]:bg-gray-800 data-[highlight=true]:p-3 transition-all"
    id={message.id}
-   bind:this={messageRef}
    data-highlight={isHighlighting}
+   bind:this={messageRef}
+   on:focus={() => {
+      isMessageConfigVisible = true;
+   }}
+   on:blur={() => {
+      isMessageConfigVisible = true;
+   }}
+   on:mouseover={() => {
+      isMessageConfigVisible = true;
+   }}
+   on:mouseout={() => {
+      isMessageConfigVisible = false;
+   }}
 >
    <div
       class={clsx(
@@ -126,13 +142,13 @@
       )}
    >
       {#if !isMine && !previousIsFromUser}
-         <img
-            src="https://github.com/diego3g.png"
-            alt="User"
-            width={30}
-            height={30}
-            class="min-w-[30px] min-h-[30px] rounded-full z-0 shadow-xl"
-         />
+         <div class="relative min-w-[30px] min-h-[30px] max-w-[30px] max-h-[30px]">
+            <div
+               class="min-w-[30px] min-h-[30px] max-w-[30px] max-h-[30px] rounded-full z-0 shadow-xl flex items-center justify-center dark:bg-white bg-black transition-colors"
+            >
+               <User size={20} class="dark:text-black text-white transition-colors" />
+            </div>
+         </div>
 
          <span class="dark:text-gray-200 text-gray-700 transition-colors text-xs">{message.author.name}</span>
       {/if}
@@ -188,28 +204,29 @@
          <p class="p-1">{message.content}</p>
       </div>
 
-      <button
-         class="p-2 bg-gray-700 shadow-lg z-10 rounded-full"
-         on:click={() => {
-            chatDispatch.setReplyMessageFromConversation({ conversationId: message.conversationId, message });
-         }}
-      >
-         <Share size={12} color="white" />
-      </button>
-
-      <button class="p-2 bg-gray-700 shadow-lg z-10 rounded-full" on:click={handleWithUpdateOfMessageStatus}>
-         <Info size={12} color="white" />
-      </button>
+      {#if isMessageConfigVisible}
+         <button
+            type="button"
+            class="p-2 bg-gray-700 shadow-lg z-10 rounded-full"
+            on:click={() => {
+               chatDispatch.setReplyMessageFromConversation({ conversationId: message.conversationId, message });
+            }}
+         >
+            <Share size={12} color="white" />
+         </button>
+      {/if}
 
       {#if showMessageStatus}
          <div class="flex flex-col gap-3 p-2 bg-gray-800 rounded-md absolute left-0">
-            <Text size="md">Sent: {message.sentAt && formatter.format(new Date(message.sentAt))}</Text>
+            <Text size="md">
+               Sent: {message.sentAt && formatter.format(new Date(message.sentAt))}
+            </Text>
 
             {#each message.read.users as status (status.userId)}
-               <Text size="md"
-                  >Read: {status.userId.substring(0, 5)}
-                  {status.at ? formatter.format(new Date(status.at)) : 'Nothing'}</Text
-               >
+               <Text size="md">
+                  Read: {status.userId.substring(0, 5)}
+                  {status.at ? formatter.format(new Date(status.at)) : 'Nothing'}
+               </Text>
             {/each}
 
             {#each message.received.users as status (status.userId)}
