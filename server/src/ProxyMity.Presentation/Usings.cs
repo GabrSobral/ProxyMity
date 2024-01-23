@@ -31,4 +31,5 @@ global using System.Security.Claims;
 global using ProxyMity.Application.Handlers.Messages.Queries.GetStatusFromMessage;
 global using ProxyMity.Application.Handlers.Messages.Commands.ReceivePendingMessages;
 
+global using ProxyMity.Application.Handlers.Messages.Queries.GetMessageById;
 

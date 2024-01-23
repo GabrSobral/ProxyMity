@@ -1,16 +1,22 @@
-﻿using ProxyMity.Domain.Entities;
-
-namespace ProxyMity.Infra.Database.Repositories;
+﻿namespace ProxyMity.Infra.Database.Repositories;
 
 public sealed class MessageRepository(DataContext dbContext) : IMessageRepository
 {
     public async Task CreateAsync(Message message, CancellationToken cancellationToken)
         => await dbContext.Messages.AddAsync(message, cancellationToken);
 
+    public async Task<Message?> GetById(Ulid messageId, CancellationToken cancellationToken)
+    {
+        return await dbContext.Messages
+            .AsNoTracking()
+            .FirstOrDefaultAsync(x => x.Id == messageId, cancellationToken);
+    }
+
     public async Task<IEnumerable<Message>> GetMessagesFromConversationAsync(Ulid conversationId, int quantity, CancellationToken cancellationToken)
         => await dbContext.Messages
             .AsNoTracking()
             .Where(x => x.ConversationId == conversationId)
+            .Include(x => x.RepliedMessage)
             .OrderByDescending(x => x.Id)
             .Take(quantity)
             .ToListAsync(cancellationToken);

@@ -1,7 +1,4 @@
-﻿using ProxyMity.Domain.Entities;
-using System.Threading;
-
-namespace ProxyMity.Application.Handlers.Messages.Commands.SaveMessage;
+﻿namespace ProxyMity.Application.Handlers.Messages.Commands.SaveMessage;
 
 public sealed class SaveMessageCommandHandler(
     ILogger<SaveMessageCommandHandler> logger,

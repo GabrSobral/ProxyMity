@@ -25,6 +25,7 @@ public class User
 
     public IEnumerable<Message> Messages { get; set; }
     public IEnumerable<Participant> Participations { get; set; }
+    public IEnumerable<Notification> Notifications { get; set; }
 
     #endregion
 

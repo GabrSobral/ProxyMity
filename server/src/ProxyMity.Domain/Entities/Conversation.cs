@@ -29,4 +29,5 @@ public class Conversation
     public Group? Group { get; set; }
 
     public IEnumerable<Participant> Participants { get; set; }
+    public IEnumerable<Notification> Notifications { get; set; }
 }

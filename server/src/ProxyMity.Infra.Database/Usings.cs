@@ -13,5 +13,5 @@ global using ProxyMity.Infra.Database.Wrappers;
 global using Microsoft.EntityFrameworkCore;
 global using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 global using ProxyMity.Infra.Database.Contexts;
-
+global using ProxyMity.Domain.Exceptions;
 
