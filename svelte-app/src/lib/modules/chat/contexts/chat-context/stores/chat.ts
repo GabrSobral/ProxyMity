@@ -194,18 +194,13 @@ export const chatDispatch: Actions = {
                      content: message.content,
                      author: {
                         id: message.authorId,
-                        name: '',
+                        name: conversation.participants.find(item => item.id === message.authorId)?.name || "",
                      },
                      writtenAt: message.writtenAt,
-                     read: { users: [], byAllAt: message.readByAllAt },
-                     received: { users: [], byAllAt: message.receivedByAllAt },
-                     repliedMessage: message.repliedMessageId
-                        ? {
-                             id: message.repliedMessageId,
-                             content: '',
-                          }
-                        : null,
                      sentAt: message.sentAt,
+                     received: { users: [], byAllAt: message.receivedByAllAt },
+                     read: { users: [], byAllAt: message.readByAllAt },
+                     repliedMessage: message.repliedMessage,
                      conversationId: message.conversationId,
                   }))
                   .toReversed(),
@@ -253,12 +248,7 @@ export const chatDispatch: Actions = {
                              ? participants.map(user => ({ at: message.receivedByAllAt!, userId: user.id }))
                              : [],
                      },
-                     repliedMessage: message.repliedMessageId
-                        ? {
-                             id: message.repliedMessageId,
-                             content: '',
-                          }
-                        : null,
+                     repliedMessage: message.repliedMessage,
                      sentAt: message.sentAt,
                      conversationId: message.conversationId,
                   }))
@@ -267,7 +257,6 @@ export const chatDispatch: Actions = {
             } else {
                store.conversations[index].messages = messages.toReversed();
             }
-
 
             store.conversations[index].hasMessagesFetched = true;
          }

@@ -48,6 +48,7 @@ export interface IServerMessage {
    conversationId: Conversation['id'];
 
    repliedMessageId: IServerMessage['id'] | null;
+   repliedMessage: IServerMessage | null;
 
    authorId: User['id'];
 }

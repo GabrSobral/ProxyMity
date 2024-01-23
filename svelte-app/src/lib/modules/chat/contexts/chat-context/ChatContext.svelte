@@ -34,12 +34,10 @@
    async function selectedConversationAsync(conversation: ConversationState) {
       if (conversation === chatStateModule.selectedConversation || !userModule) return;
 
+      const { id: conversationId, isGroup: isConversationGroup } = conversation;
+
       if (conversation.notifications > 0 && connectionModule)
-         webSocketEmitterModule.sendReadMessage({
-            userId: userModule.id,
-            conversationId: conversation.id,
-            isConversationGroup: conversation.isGroup,
-         });
+         webSocketEmitterModule.sendReadMessage({ userId: userModule.id, conversationId, isConversationGroup });
 
       chatDispatch.selectConversation({
          conversation,
@@ -48,25 +46,21 @@
       });
 
       readConversationMessagesAsyncDB({
-         conversationId: conversation.id,
+         conversationId,
          whoRead: userModule.id,
          myId: userModule.id,
-         isConversationGroup: conversation.isGroup,
+         isConversationGroup,
       });
 
       if (!conversation.hasMessagesFetched) {
          try {
-            const { messages } = await APIGetConversationMessages({ conversationId: conversation.id }, { accessToken });
-            chatDispatch.setConversationMessages({
-               conversationId: conversation.id,
-               messages: messages,
-               fromServer: true,
-            });
+            const { messages } = await APIGetConversationMessages({ conversationId }, { accessToken });
+            chatDispatch.setConversationMessages({ conversationId, messages, fromServer: true });
          } catch (error) {
             console.error('🔴 \u001b[31m Error fetching conversations, data will be taken from the cache', error);
 
-            const messages = await getConversationsMessagesAsyncDB(conversation.id);
-            chatDispatch.setConversationMessages({ conversationId: conversation.id, messages, fromServer: false });
+            const messages = await getConversationsMessagesAsyncDB(conversationId);
+            chatDispatch.setConversationMessages({ conversationId, messages, fromServer: false });
          }
       }
    }
@@ -104,20 +98,20 @@
    import { EMessageStatuses } from '../../../../../enums/EMessageStatuses';
    import type { IServerMessage } from '../../../../../types/message';
 
+   import type { Command } from '../../workers/db-worker/worker';
    import { chatWorker } from '../../workers/db-worker/initializer';
    import { WorkerMethods } from '../../workers/db-worker/method-types';
 
    import { serverToLocalMessage } from './functions/parse-server-message';
    import type { WebSocketEmitter } from '../websocket-context/WebSocketEmitter';
    import { connection, webSocketEmitter } from '../websocket-context/stores/connection';
-   import type { Command } from '../../workers/db-worker/worker';
 
    setChatContext();
 
    $: session = $page.data.session;
 
    $: if ($chatWorker) {
-      $chatWorker.onmessage = ({ data }: MessageEvent<{ command: Command, response: any}>) => {
+      $chatWorker.onmessage = ({ data }: MessageEvent<{ command: Command; response: any }>) => {
          console.log('⚙️ Main thread: \u001b[35m' + data.command.type);
          console.log(data);
       };
@@ -138,7 +132,7 @@
                   participants: data.participants.filter(item => item.id !== user.id),
                }));
 
-               console.log({ filteredData })
+               console.log({ filteredData });
 
                chatDispatch.setConversationInitialState({ conversationsData: filteredData });
                $chatWorker?.postMessage({ type: WorkerMethods.SAVE_CONVERSATIONS, payload: filteredData });
@@ -174,8 +168,8 @@
          const messageConversation = $chatState.conversations.find(item => item.id === serverMessage.conversationId);
 
          toast.message('New message', {
-            description: serverMessage.content,
             id: serverMessage.id,
+            description: serverMessage.content,
             action: {
                label: 'Open',
                onClick: () => {
@@ -209,20 +203,15 @@
       chatDispatch.updateConversationMessageStatus({ conversationId, status: EMessageStatuses.READ, userId });
       $chatWorker?.postMessage({
          type: WorkerMethods.READ_CONVERSATION_MESSAGES,
-         payload: {
-            conversationId,
-            myId: session?.user?.id,
-            whoRead: userId,
-            isConversationGroup,
-         },
+         payload: { conversationId, myId: session?.user?.id, whoRead: userId, isConversationGroup },
       });
    }
 
-   function receiveMessageStatusHandler(...args: [ string, string, string, string ]) {
+   function receiveMessageStatusHandler(...args: [string, string, string, string]) {
       const [messageStatus, messageId, conversationId, userId] = args;
-      
+
       const messageStatusEvent = new CustomEvent(messageId, {
-         detail: { messageStatus, messageId, conversationId, userId },
+         detail: { messageStatus, messageId, conversationId, userId, type: "message_status" },
       });
 
       dispatchEvent(messageStatusEvent);

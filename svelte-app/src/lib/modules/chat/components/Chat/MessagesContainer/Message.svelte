@@ -4,18 +4,21 @@
    import { page } from '$app/stores';
    import { Clock, Info, Share } from 'lucide-svelte';
 
-   import { chatDispatch, chatState } from '$lib/modules/chat/contexts/chat-context/stores/chat';
+   import Text from '$lib/design-system/Text.svelte';
    import { getStatusFromMessage } from '$lib/modules/chat/services/getStatusFromMessage';
+   import { chatDispatch, chatState } from '$lib/modules/chat/contexts/chat-context/stores/chat';
 
    import type { ILocalMessage } from '../../../../../../types/message';
    import { EMessageStatuses } from '../../../../../../enums/EMessageStatuses';
    import { changeMessageStatusAsyncDB } from '../../../../../../services/database/use-cases/change-message-status';
-   import Text from '$lib/design-system/Text.svelte';
 
    export let message: ILocalMessage;
    export let previousMessage: ILocalMessage;
 
+   let messageRef: HTMLLIElement;
+
    let isMessageConfigVisible = false;
+   let isHighlighting = false;
    let showMessageStatus = false;
    const previousIsFromUser = previousMessage?.author?.id === message.author?.id;
    const formatter = Intl.DateTimeFormat('pt-br', { hour: 'numeric', minute: 'numeric' });
@@ -34,30 +37,40 @@
       return EMessageStatuses.WROTE;
    })();
 
-   type EventHandler = CustomEventInit<{
-      messageStatus: EMessageStatuses.SENT | EMessageStatuses.RECEIVED;
-      messageId: string;
-      conversationId: string;
-      userId: string;
-   }>;
+   type EventHandler = CustomEventInit<
+      | {
+           messageStatus: EMessageStatuses.SENT | EMessageStatuses.RECEIVED;
+           messageId: string;
+           conversationId: string;
+           userId: string;
+           type: 'message_status';
+        }
+      | {
+           type: 'highlight';
+           messageId: string;
+        }
+   >;
 
-   function messageStatusEventHandler(event: EventHandler) {
-      if (!event.detail) {
-         return;
+   function messageEventHandler(event: EventHandler) {
+      if (!event.detail) return;
+
+      if (event.detail.type === 'message_status') {
+         const { messageId, messageStatus, conversationId, userId } = event.detail;
+
+         if (messageStatus && messageId && conversationId) {
+            status = messageStatus;
+
+            chatDispatch.updateConversationMessageStatus({ conversationId, messageId, status: messageStatus, userId });
+            changeMessageStatusAsyncDB({ messageId: messageId, status: messageStatus });
+         }
       }
 
-      const { messageId, messageStatus, conversationId, userId } = event.detail;
-
-      if (messageStatus && messageId && conversationId) {
-         status = messageStatus;
-         chatDispatch.updateConversationMessageStatus({
-            conversationId,
-            messageId: message.id,
-            status: messageStatus,
-            userId,
-         });
-
-         changeMessageStatusAsyncDB({ messageId: messageId, status: messageStatus });
+      if (event.detail.type === 'highlight') {
+         isHighlighting = true;
+         console.log('highlight', { message });
+         setTimeout(() => {
+            isHighlighting = false;
+         }, 1500);
       }
    }
 
@@ -83,13 +96,29 @@
       }, 5000);
    }
 
+   function scrollToRepliedMessage() {
+      if (message.repliedMessage) {
+         document.getElementById(message.repliedMessage.id)?.scrollIntoView({ block: 'nearest' });
+
+         const messageEvent = new CustomEvent(message.repliedMessage.id, {
+            detail: { type: 'highlight', messageId: message.id },
+         });
+         dispatchEvent(messageEvent);
+      }
+   }
+
    onMount(() => {
-      addEventListener(message.id, messageStatusEventHandler);
-      return () => removeEventListener(message.id, messageStatusEventHandler);
+      addEventListener(message.id, messageEventHandler);
+      return () => removeEventListener(message.id, messageEventHandler);
    });
 </script>
 
-<li class="flex flex-col gap-1 rounded-[1rem] w-full">
+<li
+   class="flex flex-col gap-1 rounded-[1rem] w-full data-[highlight=true]:animate-bounce transition-colors"
+   id={message.id}
+   bind:this={messageRef}
+   data-highlight={isHighlighting}
+>
    <div
       class={clsx(
          'flex items-center gap-3 sticky dark:bg-gray-900 bg-white transition-colors p-1 px-2 rounded-full w-fit -top-3',
@@ -136,19 +165,25 @@
          })}
       >
          {#if message.repliedMessage}
-            <div
-               class={clsx('dark:bg-black bg-white transition-colors p-2 rounded-[8px] w-full flex flex-col', {
-                  'ml-auto': isMine,
-               })}
+            <button
+               type="button"
+               title="Show replied message on chat"
+               on:click={scrollToRepliedMessage}
+               class={clsx(
+                  'dark:bg-black bg-white cursor-pointer transition-colors p-2 rounded-[8px] w-full flex flex-col',
+                  {
+                     'ml-auto': isMine,
+                  }
+               )}
             >
                <span class="text-purple-300 text-xs">
-                  {message.repliedMessage.id}
+                  {message.author.name}
                </span>
 
                <span class="text-gray-200 text-sm">
                   {message.repliedMessage.content}
                </span>
-            </div>
+            </button>
          {/if}
          <p class="p-1">{message.content}</p>
       </div>
