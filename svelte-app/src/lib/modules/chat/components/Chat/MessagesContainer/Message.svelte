@@ -67,10 +67,10 @@
 
       if (event.detail.type === 'highlight') {
          isHighlighting = true;
-         console.log('highlight', { message });
+      
          setTimeout(() => {
             isHighlighting = false;
-         }, 1500);
+         }, 2000);
       }
    }
 
@@ -98,7 +98,7 @@
 
    function scrollToRepliedMessage() {
       if (message.repliedMessage) {
-         document.getElementById(message.repliedMessage.id)?.scrollIntoView({ block: 'nearest' });
+         document.getElementById(message.repliedMessage.id)?.scrollIntoView({ block: 'center' });
 
          const messageEvent = new CustomEvent(message.repliedMessage.id, {
             detail: { type: 'highlight', messageId: message.id },
@@ -114,7 +114,7 @@
 </script>
 
 <li
-   class="flex flex-col gap-1 rounded-[1rem] w-full data-[highlight=true]:animate-bounce transition-colors"
+   class="flex flex-col gap-1 rounded-[1rem] w-full data-[highlight=true]:animate-pulse data-[highlight=true]:bg-gray-800 data-[highlight=true]:p-3 transition-all"
    id={message.id}
    bind:this={messageRef}
    data-highlight={isHighlighting}
@@ -137,7 +137,7 @@
          <span class="dark:text-gray-200 text-gray-700 transition-colors text-xs">{message.author.name}</span>
       {/if}
 
-      <span class="dark:text-gray-300 text-gray-700 transition-colors text-xs ml-2 flex items-center gap-2">
+      <span class="dark:text-gray-300 text-gray-700 transition-colors text-xs flex items-center gap-2">
          {#if isMine && status === EMessageStatuses.WROTE}
             <Clock size={13} class="dark:text-gray-100 text-gray-600 transition-colors" />
          {:else if isMine}
