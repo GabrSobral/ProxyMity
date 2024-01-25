@@ -285,7 +285,7 @@ export const chatDispatch: Actions = {
             store.conversations[conversationIndex].typeMessage = typeMessage;
          }
 
-         return { ...store };
+         return store;
       });
    },
 

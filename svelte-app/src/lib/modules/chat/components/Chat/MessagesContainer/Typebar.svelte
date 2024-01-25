@@ -18,9 +18,6 @@
 
    $: user = $page.data.session?.user;
    $: conversationId = $chatState.selectedConversation?.id || '';
-   $: if ($chatState.selectedConversation && $typebarRef) {
-      $typebarRef.value = $chatState.selectedConversation?.typeMessage;
-   }
 
    let typeValueManaged = '';
    let { typebarRef } = getChatContext();
@@ -115,12 +112,12 @@
 
       <Wrapper className="w-full h-fit">
          <input
+            id="typebar-input-id"
             bind:this={$typebarRef}
             type="text"
             class="max-h-[20rem] min-h-[3.5rem] resize-none flex flex-1 py-3 focus:outline-none outline-none hover:ring-1 transition-all dark:ring-gray-700 ring-gray-100 rounded-md dark:bg-gray-900 bg-white dark:text-gray-200 text-gray-700 focus:outline-purple-500 focus:ring-0 dark:placeholder:text-gray-400 placeholder:text-gray-600 w-full px-4"
             placeholder="Type your message"
             autoComplete="off"
-            id="typebar-input-id"
          />
 
          <Button

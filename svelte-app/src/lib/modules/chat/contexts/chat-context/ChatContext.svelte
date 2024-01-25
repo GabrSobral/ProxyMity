@@ -45,6 +45,10 @@
          currentUserId: userModule.id,
       });
 
+      if(typebarRefModule) {
+         typebarRefModule.value = conversation.typeMessage;
+      }
+
       readConversationMessagesAsyncDB({
          conversationId,
          whoRead: userModule.id,
