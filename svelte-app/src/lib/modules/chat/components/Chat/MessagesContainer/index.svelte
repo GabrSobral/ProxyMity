@@ -47,6 +47,7 @@
       {/if}
    </ul>
 
-   <ScrollToBottomButton container={messagesContainer} />
    <Typebar />
 </div>
+
+<ScrollToBottomButton container={messagesContainer} />
