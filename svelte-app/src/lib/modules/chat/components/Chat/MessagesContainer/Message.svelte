@@ -13,6 +13,7 @@
 
    import type { ILocalMessage } from '../../../../../../types/message';
    import { EMessageStatuses } from '../../../../../../enums/EMessageStatuses';
+   import { fly, scale } from 'svelte/transition';
 
    export let message: ILocalMessage;
    export let previousMessage: ILocalMessage;
@@ -118,20 +119,20 @@
 </script>
 
 <li
-   class="flex flex-col gap-1 rounded-[1rem] w-full data-[highlight=true]:animate-pulse data-[highlight=true]:bg-gray-800 data-[highlight=true]:p-3 transition-all"
    id={message.id}
    data-highlight={isHighlighting}
+   class="flex flex-col gap-1 rounded-[1rem] w-full data-[highlight=true]:animate-pulse data-[highlight=true]:bg-gray-800 data-[highlight=true]:p-3 transition-all"
    bind:this={messageRef}
    on:focus={() => {
       isMessageConfigVisible = true;
    }}
    on:blur={() => {
-      isMessageConfigVisible = true;
+      isMessageConfigVisible = false;
    }}
    on:mouseover={() => {
       isMessageConfigVisible = true;
    }}
-   on:mouseout={() => {
+   on:mouseleave={() => {
       isMessageConfigVisible = false;
    }}
 >
@@ -192,22 +193,19 @@
                   }
                )}
             >
-               <span class="text-purple-300 text-xs">
-                  {message.author.name}
-               </span>
-
-               <span class="text-gray-200 text-sm">
-                  {message.repliedMessage.content}
-               </span>
+               <span class="text-purple-300 text-xs">{message.author.name}</span>
+               <span class="text-gray-200 text-sm">{message.repliedMessage.content}</span>
             </button>
          {/if}
+
          <p class="p-1">{message.content}</p>
       </div>
 
       {#if isMessageConfigVisible}
          <button
             type="button"
-            class="p-2 bg-gray-700 shadow-lg z-10 rounded-full"
+            transition:fly={{ duration: 300, x: isMine ? 30 : -30, opacity: 0.3 }}
+            class="p-2 bg-gray-700 shadow-lg z-10 rounded-full active:scale-95 transition-all hover:brightness-90"
             on:click={() => {
                chatDispatch.setReplyMessageFromConversation({ conversationId: message.conversationId, message });
             }}
