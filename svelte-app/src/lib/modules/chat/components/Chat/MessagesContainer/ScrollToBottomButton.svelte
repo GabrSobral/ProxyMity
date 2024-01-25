@@ -1,6 +1,7 @@
 <script lang="ts">
    import { afterUpdate, onMount } from 'svelte';
    import { ChevronDown } from 'lucide-svelte';
+   import { scale } from 'svelte/transition';
 
    export let container: HTMLUListElement;
 
@@ -24,10 +25,11 @@
 
 {#if isVisible}
    <button
+      transition:scale={{ duration: 300, start: 0, opacity: 0.5 }}
       type="button"
       title="Scroll to bottom"
       on:click|stopPropagation={scrollToBottom}
-      class="absolute bottom-24 right-8 z-20 flex items-center justify-center bg-purple-400 outline-none focus:outline-purple-500 focus:ring-0 rounded-full min-w-[2rem] min-h-[2rem] max-w-[2rem] max-h-[2rem] mt-auto ml-auto p-2"
+      class="absolute bottom-24 right-8 z-20 flex items-center justify-center bg-purple-400 outline-none focus:outline-purple-500 focus:ring-0 rounded-full min-w-[1.75rem] min-h-[1.75rem] max-w-[1.75rem] max-h-[1.75rem] mt-auto ml-auto p-1"
    >
       <ChevronDown class="text-white" />
    </button>
