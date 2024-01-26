@@ -15,6 +15,7 @@
 
    import type { ILocalMessage } from '../../../../../../types/message';
    import { EMessageStatuses } from '../../../../../../enums/EMessageStatuses';
+   import { fly } from 'svelte/transition';
 
    $: user = $page.data.session?.user;
    $: conversationId = $chatState.selectedConversation?.id || '';

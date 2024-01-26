@@ -1,4 +1,5 @@
 <script lang="ts">
+   import { page } from '$app/stores';
    import { afterUpdate } from 'svelte';
 
    import Text from '$lib/design-system/Text.svelte';
@@ -12,6 +13,7 @@
    let messagesContainer: HTMLUListElement;
 
    $: isFirstAccess = true;
+   $: userId = $page.data.session?.user.id;
    $: selectedConversationId = $chatState.selectedConversation?.id;
    $: conversationMessages = $chatState.selectedConversation?.messages || [];
 
@@ -37,11 +39,15 @@
 
       {#if $chatState.selectedConversation?.messages.length === 0}
          <div class="flex-1 flex items-center justify-center flex-col gap-3 pointer-events-none">
-            <img src="/no-messages.svg" alt="No message" class="w-[25rem]" />
-            <Heading size="sm" className="opacity-80">No messages have been sent yet...</Heading>
+            <img src="/no-messages.svg" alt="No message" class="w-[15rem]" />
+            <Heading size="md" className="opacity-80">No messages have been sent yet...</Heading>
          </div>
       {:else if $chatState.selectedConversation?.messages}
          {#each conversationMessages as message, i (message.id)}
+            <!-- {#if firstUnreadMessage?.id === message.id && message.author.id !== userId}
+               <div class="w-full h-[1px] bg-red-500 flex justify-center">Unread messages</div>
+            {/if} -->
+
             <Message {message} previousMessage={conversationMessages?.[i - 1]} />
          {/each}
       {/if}

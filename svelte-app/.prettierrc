@@ -12,5 +12,5 @@
    "arrowParens": "avoid",
    "bracketSpacing": true,
    "bracketSameLine": false,
-   "printWidth": 120
+   "printWidth": 130
 }

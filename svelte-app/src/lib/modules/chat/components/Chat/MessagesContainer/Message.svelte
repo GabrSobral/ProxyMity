@@ -138,7 +138,7 @@
 >
    <div
       class={clsx(
-         'flex items-center gap-3 sticky dark:bg-gray-900 bg-white transition-colors p-1 px-2 rounded-full w-fit -top-3',
+         'flex items-center gap-3 sticky z-20 dark:bg-gray-900 bg-white transition-colors p-1 px-2 rounded-full w-fit -top-3',
          { 'ml-auto': isMine }
       )}
    >
@@ -204,7 +204,7 @@
       {#if isMessageConfigVisible}
          <button
             type="button"
-            transition:fly={{ duration: 300, x: isMine ? 30 : -30, opacity: 0.3 }}
+            transition:fly={{ duration: 300, x: isMine ? 30 : -30, opacity: 0 }}
             class="p-2 bg-gray-700 shadow-lg z-10 rounded-full active:scale-95 transition-all hover:brightness-90"
             on:click={() => {
                chatDispatch.setReplyMessageFromConversation({ conversationId: message.conversationId, message });
@@ -212,15 +212,29 @@
          >
             <Share size={12} color="white" />
          </button>
+
+         <button
+            type="button"
+            transition:fly={{ duration: 300, x: isMine ? 30 : -30, opacity: 0 }}
+            on:click={handleWithUpdateOfMessageStatus}
+            class="p-2 bg-gray-700 shadow-lg z-10 rounded-full active:scale-95 transition-all hover:brightness-90"
+         >
+            <Info size={12} color="white" />
+         </button>
       {/if}
 
       {#if showMessageStatus}
-         <div class="flex flex-col gap-3 p-2 bg-gray-800 rounded-md absolute left-0">
+         <div
+            class={clsx('flex flex-col gap-3 p-2 bg-gray-800 rounded-md absolute', {
+               'left-0': isMine,
+               'right-0': !isMine,
+            })}
+         >
             <Text size="md">
                Sent: {message.sentAt && formatter.format(new Date(message.sentAt))}
             </Text>
 
-            {#each message.read.users as status (status.userId)}
+            {#each message.read.users as status ((status.userId, status.at))}
                <Text size="md">
                   Read: {status.userId.substring(0, 5)}
                   {status.at ? formatter.format(new Date(status.at)) : 'Nothing'}
