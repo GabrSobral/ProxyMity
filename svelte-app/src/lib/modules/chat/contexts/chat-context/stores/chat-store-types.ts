@@ -36,8 +36,8 @@ export type Actions = {
    addMessage(payload: { message: ILocalMessage }): void;
    setConversationMessages(
       payload:
-         | { conversationId: string; messages: IServerMessage[]; fromServer: true }
-         | { conversationId: string; messages: ILocalMessage[]; fromServer: false }
+         | { conversationId: string; messages: IServerMessage[]; fromServer: true; currentUserId: string }
+         | { conversationId: string; messages: ILocalMessage[]; fromServer: false; currentUserId: string }
    ): void;
    updateConversationMessageStatus(
       payload:
@@ -49,7 +49,10 @@ export type Actions = {
            }
          | { conversationId: string; status: EMessageStatuses.READ; userId: string }
    ): void;
-   setConversationInitialState(payload: { conversationsData: GetUserConversationsResponse }): void;
+   setConversationInitialState(payload: {
+      conversationsData: GetUserConversationsResponse;
+      currentUserId: string;
+   }): void;
    saveTypeMessageFromConversation(payload: { conversationId: string; typeMessage: string }): void;
    setReplyMessageFromConversation(payload: { conversationId: string; message: ILocalMessage }): void;
    removeReplyMessageFromConversation(payload: { conversationId: string }): void;

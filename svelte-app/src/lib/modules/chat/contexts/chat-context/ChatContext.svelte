@@ -7,6 +7,7 @@
    let accessToken: string;
    let typebarRefModule: HTMLInputElement | null;
    let webSocketEmitterModule: WebSocketEmitter;
+   let chatWorkerModule: Worker | null;
 
    webSocketEmitter.subscribe(value => {
       webSocketEmitterModule = value;
@@ -18,6 +19,10 @@
 
    connection.subscribe(value => {
       connectionModule = value;
+   });
+
+   chatWorker.subscribe(value => {
+      chatWorkerModule = value;
    });
 
    if (browser) {
@@ -39,32 +44,26 @@
       if (conversation.notifications > 0 && connectionModule)
          webSocketEmitterModule.sendReadMessage({ userId: userModule.id, conversationId, isConversationGroup });
 
-      chatDispatch.selectConversation({
-         conversation,
-         typeMessage: typebarRefModule?.value || '',
-         currentUserId: userModule.id,
-      });
+      chatDispatch.selectConversation({ conversation, typeMessage: typebarRefModule?.value || '', currentUserId: userModule.id });
 
-      if(typebarRefModule) {
+      if (typebarRefModule) {
          typebarRefModule.value = conversation.typeMessage;
       }
 
-      readConversationMessagesAsyncDB({
-         conversationId,
-         whoRead: userModule.id,
-         myId: userModule.id,
-         isConversationGroup,
+      chatWorkerModule?.postMessage({
+         type: WorkerMethods.READ_CONVERSATION_MESSAGES,
+         payload: { conversationId, whoRead: userModule.id, myId: userModule.id, isConversationGroup },
       });
 
       if (!conversation.hasMessagesFetched) {
          try {
             const { messages } = await APIGetConversationMessages({ conversationId }, { accessToken });
-            chatDispatch.setConversationMessages({ conversationId, messages, fromServer: true });
+            chatDispatch.setConversationMessages({ conversationId, messages, fromServer: true, currentUserId: userModule.id });
          } catch (error) {
             console.error('🔴 \u001b[31m Error fetching conversations, data will be taken from the cache', error);
 
             const messages = await getConversationsMessagesAsyncDB(conversationId);
-            chatDispatch.setConversationMessages({ conversationId, messages, fromServer: false });
+            chatDispatch.setConversationMessages({ messages, conversationId, fromServer: false, currentUserId: userModule.id });
          }
       }
    }
@@ -75,8 +74,7 @@
    }
 
    export const getChatContext = () => getContext<ChatContextProps>('chat-context');
-   export const setChatContext = () =>
-      setContext<ChatContextProps>('chat-context', { typebarRef, selectedConversationAsync });
+   export const setChatContext = () => setContext<ChatContextProps>('chat-context', { typebarRef, selectedConversationAsync });
 </script>
 
 <script lang="ts">
@@ -97,7 +95,6 @@
 
    import { getConversationCacheAsyncDB } from '../../../../../services/database/use-cases/get-conversations-state';
    import { getConversationsMessagesAsyncDB } from '../../../../../services/database/use-cases/get-conversations-messages';
-   import { readConversationMessagesAsyncDB } from '../../../../../services/database/use-cases/read-conversation-messages';
 
    import { EMessageStatuses } from '../../../../../enums/EMessageStatuses';
    import type { IServerMessage } from '../../../../../types/message';
@@ -116,8 +113,7 @@
 
    $: if ($chatWorker) {
       $chatWorker.onmessage = ({ data }: MessageEvent<{ command: Command; response: any }>) => {
-         console.log('⚙️ Main thread: \u001b[35m' + data.command.type);
-         console.log(data);
+         // console.log('⚙️ Main thread: \u001b[35m' + data.command.type);
       };
    }
 
@@ -136,9 +132,7 @@
                   participants: data.participants.filter(item => item.id !== user.id),
                }));
 
-               console.log({ filteredData });
-
-               chatDispatch.setConversationInitialState({ conversationsData: filteredData });
+               chatDispatch.setConversationInitialState({ conversationsData: filteredData, currentUserId: user.id });
                $chatWorker?.postMessage({ type: WorkerMethods.SAVE_CONVERSATIONS, payload: filteredData });
             })
             .catch(error => {
@@ -148,59 +142,53 @@
                );
 
                getConversationCacheAsyncDB({ userId: user.id })
-                  .then(conversationsData => chatDispatch.setConversationInitialState({ conversationsData }))
+                  .then(conversationsData =>
+                     chatDispatch.setConversationInitialState({ conversationsData, currentUserId: user.id })
+                  )
                   .catch(console.error);
             })
             .finally(() => chatDispatch.setIsFetchingConversations(false));
       }
    });
 
+   // 🔵 Receive Message Handler
    async function receiveMessageHandler(serverMessage: IServerMessage) {
-      if (!serverMessage || !session?.user) return;
+      const conversation = $chatState.conversations.find(item => item.id === serverMessage.conversationId);
+      const conversationId = conversation?.id || '';
+      const isConversationGroup = conversation?.isGroup || false;
+      const userId = session?.user.id || '';
+      const messageId = serverMessage.id;
 
-      const webSocketsPayload = {
-         userId: session?.user.id,
-         conversationId: serverMessage.conversationId,
-         messageId: serverMessage.id,
-         isConversationGroup: $chatState.selectedConversation?.isGroup || false,
-      };
+      const webSocketsPayload = { userId, conversationId, messageId, isConversationGroup };
+      const localMessage = await serverToLocalMessage(serverMessage, isConversationGroup, userId);
 
-      if ($chatState.selectedConversation && $chatState.selectedConversation?.id === serverMessage.conversationId) {
-         $webSocketEmitter.sendReceiveMessage(webSocketsPayload);
+      const targetConversationIsSelectedConversation =
+         $chatState.selectedConversation && $chatState.selectedConversation?.id === serverMessage.conversationId;
+
+      chatDispatch.addMessage({ message: localMessage });
+      chatDispatch.bringToTop(conversationId);
+
+      $chatWorker?.postMessage({ type: WorkerMethods.ADD_MESSAGE, payload: { message: localMessage } });
+
+      $webSocketEmitter.sendReceiveMessage(webSocketsPayload);
+      chatDispatch.updateConversationMessageStatus({ messageId, conversationId, userId, status: EMessageStatuses.RECEIVED });
+
+      if (targetConversationIsSelectedConversation) {
          $webSocketEmitter.sendReadMessage(webSocketsPayload);
+         chatDispatch.updateConversationMessageStatus({ conversationId, status: EMessageStatuses.READ, userId });
       } else {
-         const messageConversation = $chatState.conversations.find(item => item.id === serverMessage.conversationId);
-
          toast.message('New message', {
             id: serverMessage.id,
             description: serverMessage.content,
             action: {
                label: 'Open',
-               onClick: () => {
-                  const conversation = $chatState.conversations.find(item => item.id === serverMessage.conversationId);
-
-                  if (conversation) {
-                     selectedConversationAsync(conversation);
-                  }
-               },
+               onClick: () => conversation && selectedConversationAsync(conversation),
             },
          });
-
-         if (messageConversation)
-            $webSocketEmitter.sendReceiveMessage({
-               ...webSocketsPayload,
-               isConversationGroup: messageConversation?.isGroup,
-            });
       }
-
-      const localMessage = await serverToLocalMessage(serverMessage);
-
-      chatDispatch.addMessage({ message: localMessage });
-      chatDispatch.bringToTop(serverMessage.conversationId);
-
-      $chatWorker?.postMessage({ type: WorkerMethods.ADD_MESSAGE, payload: { message: localMessage } });
    }
 
+   // 🔵 Receive Read Message Handler
    async function receiveReadMessageHandler(userId: string, conversationId: string, isConversationGroup: boolean) {
       if (!session?.user) return;
 
@@ -211,16 +199,17 @@
       });
    }
 
+   // 🔵 Receive Message Status Handler
    function receiveMessageStatusHandler(...args: [string, string, string, string]) {
       const [messageStatus, messageId, conversationId, userId] = args;
 
-      const messageStatusEvent = new CustomEvent(messageId, {
-         detail: { messageStatus, messageId, conversationId, userId, type: "message_status" },
-      });
+      const messageDetail = { messageStatus, messageId, conversationId, userId, type: 'message_status' };
+      const messageStatusEvent = new CustomEvent(messageId, { detail: messageDetail });
 
       dispatchEvent(messageStatusEvent);
    }
 
+   // 🔵 Receive Pending Messages Handler
    function receivePendingMessagesHandler(userId: string) {
       chatDispatch.markAsReceivedMessagesFromConversations({ userId });
    }

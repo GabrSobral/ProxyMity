@@ -12,7 +12,7 @@ export const chatState = writable<ChatState>({
 });
 
 export const notificationsState = writable<NotificationState>({
-   notifications: []
+   notifications: [],
 });
 
 export const chatDispatch: Actions = {
@@ -151,18 +151,24 @@ export const chatDispatch: Actions = {
    selectConversation({ conversation, typeMessage, currentUserId }) {
       chatState.update(store => {
          if (conversation) {
-            const targetIndex = store.conversations.findIndex(
-               conversationState => conversationState.id === conversation?.id
-            );
+            const targetIndex = store.conversations.findIndex(item => item.id === conversation?.id);
 
             if (targetIndex > -1) {
                store.conversations[targetIndex].notifications = 0;
                store.conversations[targetIndex].messages = store.conversations[targetIndex].messages.map(message => {
-                  if (message.read.byAllAt === null && message.author.id !== currentUserId) {
+                  const numberOfParticipants = store.conversations[targetIndex].participants.length;
+                  const currentUserAlreadyRead = store.conversations[targetIndex].isGroup
+                     ? message.read.users.some(read => read.userId === currentUserId)
+                     : !!message.read.byAllAt;
+
+                  if (!currentUserAlreadyRead) {
                      message.read.users.push({ at: new Date(), userId: currentUserId });
+
+                     if (!message.read.byAllAt && numberOfParticipants === message.read.users.length)
+                        message.read.byAllAt = new Date();
                   }
 
-                  return message;
+                  return { ...message }; // using spread operator to ensure that the state will be updated.
                });
             }
          }
@@ -175,11 +181,11 @@ export const chatDispatch: Actions = {
 
          store.selectedConversation = conversation;
 
-         return store;
+         return { ...store };
       });
    },
 
-   setConversationInitialState({ conversationsData }) {
+   setConversationInitialState({ conversationsData, currentUserId }) {
       chatState.update(store => {
          conversationsData.forEach(conversation => {
             store.conversations.push({
@@ -194,12 +200,26 @@ export const chatDispatch: Actions = {
                      content: message.content,
                      author: {
                         id: message.authorId,
-                        name: conversation.participants.find(item => item.id === message.authorId)?.name || "",
+                        name: conversation.participants.find(item => item.id === message.authorId)?.name || '',
                      },
                      writtenAt: message.writtenAt,
                      sentAt: message.sentAt,
-                     received: { users: [], byAllAt: message.receivedByAllAt },
-                     read: { users: [], byAllAt: message.readByAllAt },
+                     received: {
+                        byAllAt: message.receivedByAllAt,
+                        users: conversation.conversation.groupId
+                           ? []
+                           : message.receivedByAllAt
+                             ? [{ at: message.receivedByAllAt!, userId: currentUserId }]
+                             : [],
+                     },
+                     read: {
+                        byAllAt: message.readByAllAt,
+                        users: conversation.conversation.groupId
+                           ? []
+                           : message.readByAllAt
+                             ? [{ at: message.readByAllAt!, userId: currentUserId }]
+                             : [],
+                     },
                      repliedMessage: message.repliedMessage,
                      conversationId: message.conversationId,
                   }))
@@ -216,13 +236,13 @@ export const chatDispatch: Actions = {
       });
    },
 
-   setConversationMessages({ conversationId, messages, fromServer }) {
+   setConversationMessages({ conversationId, messages, fromServer, currentUserId }) {
       chatState.update(store => {
          const index = store.conversations.findIndex(conversation => conversation.id === conversationId);
          const participants = store.conversations[index].participants;
 
          if (index >= 0) {
-            if(fromServer) {
+            if (fromServer) {
                store.conversations[index].messages = messages
                   .map(message => ({
                      id: message.id,
@@ -237,7 +257,7 @@ export const chatDispatch: Actions = {
                         users: store.conversations[index].isGroup
                            ? []
                            : message.readByAllAt
-                             ? participants.map(user => ({ at: message.readByAllAt!, userId: user.id }))
+                             ? [{ at: message.readByAllAt!, userId: currentUserId }]
                              : [],
                      },
                      received: {
@@ -253,7 +273,6 @@ export const chatDispatch: Actions = {
                      conversationId: message.conversationId,
                   }))
                   .toReversed();
-
             } else {
                store.conversations[index].messages = messages.toReversed();
             }
