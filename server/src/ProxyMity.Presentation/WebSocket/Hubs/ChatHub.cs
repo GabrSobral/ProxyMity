@@ -14,14 +14,18 @@ public sealed partial class ChatHub(ILogger<ChatHub> logger, ISender sender) : H
         logger.LogInformation($"The user {Context.UserIdentifier} is connected.");
 
         var userId = Ulid.Parse(Context.UserIdentifier ?? "");
-        var getUserConversationsQuery = new GetUserConversationsQuery(userId);
+
+        GetUserConversationsQuery getUserConversationsQuery = new (userId);
         var userConversations = await sender.Send(getUserConversationsQuery);
 
         foreach (var item in userConversations) 
         {
             string conversationId = item.Conversation.Id.ToString();
             await Groups.AddToGroupAsync(Context.ConnectionId!, conversationId);
-            await Clients.OthersInGroup(conversationId).ReceivePendingMessages(userId);
+
+            await Clients
+                .OthersInGroup(conversationId)
+                .ReceivePendingMessages(userId);
         }
     }
 
@@ -34,7 +38,7 @@ public sealed partial class ChatHub(ILogger<ChatHub> logger, ISender sender) : H
         logger.LogInformation($"The user {Context.UserIdentifier} is disconnected.");
 
         var userId = Ulid.Parse(Context.UserIdentifier ?? "");
-        var getUserConversationsQuery = new GetUserConversationsQuery(userId);
+        GetUserConversationsQuery getUserConversationsQuery = new (userId);
         var userConversations = await sender.Send(getUserConversationsQuery);
 
         foreach (var item in userConversations)

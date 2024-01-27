@@ -38,7 +38,7 @@ public sealed class UpdateMessageStatusCommandHandler(
 
             case EMessageStatuses.READ:
             {
-                await messageStatusRepository.ReadAsync(messageId, userId, conversationId, cancellationToken);
+                await messageStatusRepository.ReadAsync(userId, messageId, conversationId, cancellationToken);
                 var allMessageStatusFromMessage = await messageStatusRepository.GetMessagesStatusByMessageIdAsync(messageId, conversationId, cancellationToken);
 
                 var allParticipantsReadTheMessage = allMessageStatusFromMessage.All(item => item.ReadAt is not null);
@@ -50,7 +50,7 @@ public sealed class UpdateMessageStatusCommandHandler(
 
             case EMessageStatuses.RECEIVED:
             {
-                await messageStatusRepository.ReceiveAsync(messageId, userId, conversationId, cancellationToken);
+                await messageStatusRepository.ReceiveAsync(userId, messageId, conversationId, cancellationToken);
                 var allMessageStatusFromMessage = await messageStatusRepository.GetMessagesStatusByMessageIdAsync(messageId, conversationId, cancellationToken);
 
                 var allParticipantsReceiveTheMessage = allMessageStatusFromMessage.All(item => item.ReceivedAt is not null);

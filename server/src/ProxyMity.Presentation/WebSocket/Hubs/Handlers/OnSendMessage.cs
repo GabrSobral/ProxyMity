@@ -12,17 +12,38 @@ public partial class ChatHub
         var hubGroupId = message.ConversationId.ToString();
         var userId = Ulid.Parse(Context.UserIdentifier ?? "");
 
-        var saveMessageCommand = new SaveMessageCommand(message);
+        SaveMessageCommand saveMessageCommand = new(message);
         await sender.Send(saveMessageCommand);
 
-        await Clients.OthersInGroup(hubGroupId).ReceiveMessage(message);
-        await Clients.OthersInGroup(hubGroupId).ReceiveTyping(false, message.AuthorId, message.ConversationId);
+        await Clients
+            .OthersInGroup(hubGroupId)
+            .ReceiveMessage(message);
 
-        var updateMessageStatusCommand = new UpdateMessageStatusCommand(
-            message.Id, payload.IsConversationGroup, message.ConversationId, EMessageStatuses.SENT, message.AuthorId);
+        await Clients
+            .OthersInGroup(hubGroupId)
+            .ReceiveTyping(
+                isTyping:false, 
+                authorId: message.AuthorId, 
+                conversationId: message.ConversationId
+            );
+
+        UpdateMessageStatusCommand updateMessageStatusCommand = new (
+            MessageId: message.Id,
+            IsConversationGroup: payload.IsConversationGroup, 
+            ConversationId: message.ConversationId, 
+            Status: EMessageStatuses.SENT, 
+            UserId: message.AuthorId
+        );
 
         await sender.Send(updateMessageStatusCommand);
 
-        await Clients.Clients(Context.ConnectionId).ReceiveMessageStatus(EMessageStatuses.SENT, message.Id, message.ConversationId, userId);
+        await Clients
+            .Clients(Context.ConnectionId)
+            .ReceiveMessageStatus(
+                messageStatus: EMessageStatuses.SENT, 
+                messageId: message.Id, 
+                conversationId: message.ConversationId, 
+                userId: userId
+        );
     }
 }

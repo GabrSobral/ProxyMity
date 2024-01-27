@@ -8,9 +8,16 @@ public partial class ChatHub
     /// <param name="payload">Typing status, and data to identify the conversation.</param>
     public async Task OnSendTyping(ChatSendTypingPayload payload)
     {
-        var hubGroupId = payload.ConversationId.ToString();
-        logger.LogInformation($"OnSendTyping: {payload.Typing}, {hubGroupId}, {payload.AuthorId}");
+        logger.LogInformation($"OnSendTyping: {payload.Typing}, {payload.ConversationId}, {payload.AuthorId}");
 
-        await Clients.OthersInGroup(hubGroupId).ReceiveTyping(payload.Typing, payload.AuthorId, payload.ConversationId);
+        var hubGroupId = payload.ConversationId.ToString();
+
+        await Clients
+            .OthersInGroup(hubGroupId)
+            .ReceiveTyping(
+                isTyping: payload.Typing, 
+                authorId: payload.AuthorId, 
+                conversationId: payload.ConversationId
+            );
     }
 }

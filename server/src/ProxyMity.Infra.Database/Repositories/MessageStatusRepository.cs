@@ -14,13 +14,13 @@ public sealed class MessageStatusRepository(DataContext dbContext) : IMessageSta
     public async Task<int> GetUnreadMessagesStatusCountByUserIdAsync(Ulid userId, Ulid conversationId, CancellationToken cancellationToken)
         => await dbContext.MessageStatuses
             .AsNoTracking()
-            .Where(x => x.UserId == userId && x.ConversationId == conversationId)
+            .Where(x => x.UserId == userId && x.ConversationId == conversationId && x.ReadAt == null)
             .CountAsync(cancellationToken);
 
     public async Task<IEnumerable<MessageStatus>> GetUnreadMessagesStatusFromConversationByIdAsync(Ulid conversationId, CancellationToken cancellationToken)
         => await dbContext.MessageStatuses
             .AsNoTracking()
-            .Where(x => x.ConversationId == conversationId)
+            .Where(x => x.ConversationId == conversationId && x.ReadAt == null)
             .ToListAsync(cancellationToken);
 
     public async Task ReadAsync(Ulid userId, Ulid messageId, Ulid conversationId, CancellationToken cancellationToken)
@@ -48,10 +48,11 @@ public sealed class MessageStatusRepository(DataContext dbContext) : IMessageSta
                     x.MessageId == messageId)
                 .ExecuteUpdateAsync(instance => instance.SetProperty(x => x.ReceivedAt, DateTime.UtcNow), cancellationToken);
 
+
     public async Task ReceiveUnreceivedMessagesByUserIdAsync(Ulid userId, CancellationToken cancellationToken)
         => await dbContext.MessageStatuses
                 .Where(x => x.UserId == userId)
                 .ExecuteUpdateAsync(instance => instance.SetProperty(x =>
                     x.ReceivedAt,
-                    entity => entity.ReceivedAt == null ? DateTime.UtcNow : entity.ReadAt), cancellationToken);
+                    entity => entity.ReceivedAt == null ? DateTime.UtcNow : entity.ReceivedAt), cancellationToken);
 }

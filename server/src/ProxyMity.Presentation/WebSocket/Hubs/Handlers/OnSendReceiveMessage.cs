@@ -12,10 +12,22 @@ public partial class ChatHub
         var userId = Ulid.Parse(Context.UserIdentifier ?? "");
 
         var updateMessageStatusCommand = new UpdateMessageStatusCommand(
-            payload.MessageId, payload.IsConversationGroup, payload.ConversationId, EMessageStatuses.RECEIVED, payload.UserId);
+            MessageId: payload.MessageId, 
+            IsConversationGroup: payload.IsConversationGroup, 
+            ConversationId: payload.ConversationId,
+            Status: EMessageStatuses.RECEIVED, 
+            UserId: payload.UserId
+        );
 
         await sender.Send(updateMessageStatusCommand);
 
-        await Clients.OthersInGroup(hubGroupId).ReceiveMessageStatus(EMessageStatuses.RECEIVED, payload.MessageId, payload.ConversationId, userId);
+        await Clients
+            .OthersInGroup(hubGroupId)
+            .ReceiveMessageStatus(
+                messageStatus: EMessageStatuses.RECEIVED, 
+                messageId: payload.MessageId, 
+                conversationId: payload.ConversationId, 
+                userId: userId
+            );
     }
 }

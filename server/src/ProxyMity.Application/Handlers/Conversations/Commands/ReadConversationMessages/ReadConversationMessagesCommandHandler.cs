@@ -32,7 +32,7 @@ internal sealed class ReadConversationMessagesCommandHandler(
         var allUnreadMessageStatusFromConversation =
             await messageStatusRepository.GetUnreadMessagesStatusFromConversationByIdAsync(conversation.Id, cancellationToken);
 
-        var allParticipantsReadTheMessage = allUnreadMessageStatusFromConversation.Any();
+        var allParticipantsReadTheMessage = !allUnreadMessageStatusFromConversation.Any();
 
         if (allParticipantsReadTheMessage)
             await messageRepository.ReadUnreadMessagesByConversationIdAsync(userId, conversation.Id, cancellationToken);
