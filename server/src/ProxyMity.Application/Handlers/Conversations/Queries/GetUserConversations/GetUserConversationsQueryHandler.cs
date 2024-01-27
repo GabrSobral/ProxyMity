@@ -25,7 +25,7 @@ public sealed class GetUserConversationsQueryHandler(
             var conversation = conversationsThatUserParticipate[i];
 
             var participants = await participantRepository.GetParticipantsByConversationIdAsync(conversation.Id, cancellationToken);
-            var lastMessages = await messageRepository.GetMessagesFromConversationAsync(conversation.Id, 3, cancellationToken);
+            var lastMessages = await messageRepository.GetMessagesFromConversationAsync(conversation.Id, 1, cancellationToken);
 
             int unreadMessagesCount = conversation.GroupId is not null
                 ? await messageStatusRepository.GetUnreadMessagesStatusCountByUserIdAsync(userId, conversation.Id, cancellationToken)
@@ -33,6 +33,16 @@ public sealed class GetUserConversationsQueryHandler(
 
             conversations[i] = new GetUserConversationsResponse(conversation, unreadMessagesCount, participants, lastMessages);
         }
+
+        Array.Sort(
+            conversations,
+            (curr, prev) =>
+            {
+                DateTime currDate = curr.LastMessages.Any() ? curr.LastMessages.ElementAt(0).WrittenAt : DateTime.MinValue;
+                DateTime prevDate = prev.LastMessages.Any() ? prev.LastMessages.ElementAt(0).WrittenAt : DateTime.MinValue;
+                return prevDate.CompareTo(currDate); // Reversed order here
+            }
+        );
 
         return conversations;
     }
