@@ -189,7 +189,7 @@
    }
 
    // 🔵 Receive Read Message Handler
-   async function receiveReadMessageHandler(userId: string, conversationId: string, isConversationGroup: boolean) {
+   async function receiveReadMessageHandler(conversationId: string, userId: string, isConversationGroup: boolean) {
       if (!session?.user) return;
 
       chatDispatch.updateConversationMessageStatus({ conversationId, status: EMessageStatuses.READ, userId });

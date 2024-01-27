@@ -313,35 +313,33 @@ export const chatDispatch: Actions = {
 
       chatState.update(store => {
          const conversationIndex = store.conversations.findIndex(item => item.id === conversationId);
-         const numberOfParticipants = store.conversations[conversationIndex].participants.length;
 
          if (conversationIndex > -1) {
-            store.conversations[conversationIndex].messages = store.conversations[conversationIndex].messages.map(
-               message => {
-                  if (status === EMessageStatuses.READ && message.read.byAllAt === null) {
-                     store.conversations[conversationIndex].notifications = 0;
-                     message.read.users.push({ at: new Date(), userId });
+            const numberOfParticipants = store.conversations[conversationIndex].participants.length;
 
-                     if (numberOfParticipants === message.read.users.length) {
-                        message.read.byAllAt = new Date();
-                     }
+            store.conversations[conversationIndex].messages = store.conversations[conversationIndex].messages.map(message => {
+               if (status === EMessageStatuses.READ && message.read.byAllAt === null) {
+                  message.read.users.push({ at: new Date(), userId });
+
+                  if (numberOfParticipants === message.read.users.length) {
+                     message.read.byAllAt = new Date();
                   }
-
-                  if (status === EMessageStatuses.RECEIVED && message.id === params.messageId) {
-                     message.received.users.push({ at: new Date(), userId });
-
-                     if (numberOfParticipants === message.received.users.length) {
-                        message.received.byAllAt = new Date();
-                     }
-                  }
-
-                  if (status === EMessageStatuses.SENT && message.id === params.messageId) {
-                     message.sentAt = new Date();
-                  }
-
-                  return message;
                }
-            );
+
+               if (status === EMessageStatuses.RECEIVED && message.id === params.messageId) {
+                  message.received.users.push({ at: new Date(), userId });
+
+                  if (numberOfParticipants === message.received.users.length) {
+                     message.received.byAllAt = new Date();
+                  }
+               }
+
+               if (status === EMessageStatuses.SENT && message.id === params.messageId) {
+                  message.sentAt = new Date();
+               }
+
+               return message;
+            });
          }
 
          return store;
