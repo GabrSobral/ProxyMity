@@ -11,9 +11,7 @@
    let isCollapsed = false;
 </script>
 
-<section
-   class="flex flex-col dark:bg-gray-900 bg-white transition-all h-fit rounded-[10px] overflow-hidden relative shadow-md"
->
+<section class="flex flex-col dark:bg-gray-900 bg-white transition-all h-fit rounded-[10px] overflow-hidden relative shadow-md">
    <!-- svelte-ignore a11y-click-events-have-key-events -->
    <div
       role="button"
@@ -44,9 +42,7 @@
       data-is-collapsed={isCollapsed}
       class={'max-h-80 h-80  data-[is-collapsed=true]:max-h-0 data-[is-collapsed=true]:h-0 transition-all overflow-hidden duration-300'}
    >
-      {#if isCollapsed}
-         <ParticipantsList />
-      {/if}
+      <ParticipantsList />
    </div>
 
    <div

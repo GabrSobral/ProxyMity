@@ -41,8 +41,7 @@
    let typing = false;
 
    const formatLastMessageDate = Intl.DateTimeFormat('pt-br', { hour: 'numeric', minute: 'numeric' });
-   const conversationName =
-      conversation?.groupName || conversation?.participants.find(item => item.id !== user?.id)?.name || '';
+   const conversationName = conversation?.groupName || conversation?.participants.find(item => item.id !== user?.id)?.name || '';
 </script>
 
 <!-- svelte-ignore a11y-click-events-have-key-events -->
@@ -96,7 +95,7 @@
          )}
       >
          {#if typing}
-            <span>Typing...</span>
+            <span class="text-purple-500 dark:text-purple-300 font-semibold">Typing...</span>
          {:else if lastMessage && !draft}
             <span class="flex gap-4 w-full">
                {lastMessage.content}

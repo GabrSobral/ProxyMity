@@ -27,7 +27,10 @@
 
       <div class="flex flex-col overflow-hidden">
          <strong class="text-white font-light text-lg">{conversationName}</strong>
-         <span class="text-gray-200 font-light text-sm truncate">{contact?.email}</span>
+
+         {#if !$chatState.selectedConversation?.isGroup}
+            <span class="text-gray-200 font-light text-sm truncate">{contact?.email}</span>
+         {/if}
       </div>
    </div>
 
@@ -65,10 +68,12 @@
       </button>
    </div>
 
-   <div>
-      <span class="text-white font-medium">Description:</span>
-      <p class="text-gray-200 font-light">Hello, everybody! 😊</p>
-   </div>
+   {#if $chatState.selectedConversation?.groupDescription}
+      <div>
+         <span class="text-white font-medium">Description:</span>
+         <p class="text-gray-200 font-light">{$chatState.selectedConversation?.groupDescription}</p>
+      </div>
+   {/if}
 
    <div class="flex flex-col gap-2">
       <span class="text-white font-medium block">Badges:</span>
