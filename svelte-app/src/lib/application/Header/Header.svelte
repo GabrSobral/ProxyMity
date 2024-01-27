@@ -17,7 +17,7 @@
       <Routes />
 
       <div class="flex items-center gap-4 ml-auto">
-         <NotificationButton />
+         <!-- <NotificationButton /> -->
       </div>
 
       <Profile />

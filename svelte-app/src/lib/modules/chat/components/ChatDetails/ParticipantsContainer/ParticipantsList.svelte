@@ -25,7 +25,7 @@
          <div class={'flex flex-col gap-1 overflow-hidden w-full z-10'}>
             <Text size="md" className={`truncate font-medium flex items-center justify-between gap-3`}>
                {participant.name}
-               {participant.id === user?.id && '(You)'}
+               {participant.id === user?.id ? '(You)' : ''}
                <span class="text-[12px] text-green-400 ml-auto">Online</span>
             </Text>
 
