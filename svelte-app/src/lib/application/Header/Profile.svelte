@@ -38,9 +38,11 @@
                About ProxyMity
             </DropdownMenu.Item>
 
-            <DropdownMenu.Item class="flex gap-4 items-center">
-               <Settings class="text-white" size={18} />
-               Settings
+            <DropdownMenu.Item>
+               <a href="/settings/profile" class="flex gap-4 items-center">
+                  <Settings class="text-white" size={18} />
+                  Settings
+               </a>
             </DropdownMenu.Item>
 
             <DropdownMenu.Item

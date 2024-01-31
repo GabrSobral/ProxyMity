@@ -1,98 +1,97 @@
-<script lang="ts" context="module">
-   import { z } from 'zod';
-   import type { SuperValidated } from 'sveltekit-superforms';
-
-   import * as Form from '$lib/components/ui/form';
-   import Label from '$lib/components/ui/label/label.svelte';
-
-   export const appearanceFormSchema = z.object({
-      font: z.enum(['System', 'Inter', 'Roboto'], {
-         invalid_type_error: 'Select a font',
-         required_error: 'Please select a font.',
-      }),
-      theme: z.enum(['light', 'dark'], {
-         required_error: 'Please select a theme.',
-      }),
-   });
-
-   export type AppearanceFormSchema = typeof appearanceFormSchema;
-</script>
-
 <script lang="ts">
-   export let data: SuperValidated<AppearanceFormSchema>;
+   import Text from '$lib/design-system/Text.svelte';
+
+   import * as Select from '$lib/components/ui/select';
+   import Label from '$lib/components/ui/label/label.svelte';
+   import * as RadioGroup from '$lib/components/ui/radio-group';
+
+   import DarkPlaceholder from './DarkPlaceholder.svelte';
+   import LightPlaceholder from './LightPlaceholder.svelte';
+   import SystemPlaceholder from './SystemPlaceholder.svelte';
+
+   import { appTheme, getAppThemeContext, setTheme } from '../../../../../../contexts/theme/store';
+
+   const mainColors = [
+      { name: 'Purple', hex: '#9218DE', value: 'purple' },
+      { name: 'Red', hex: '#F12646', value: 'red' },
+      { name: 'Green', hex: '#22c55e', value: 'green' },
+   ];
+
+   let font: 'inter' = 'inter';
+   let mainColor = mainColors[0];
 </script>
 
-<Form.Root schema={appearanceFormSchema} form={data} class="space-y-8" method="POST" let:config>
-   <Form.Item>
-      <Form.Field {config} name="font">
-         <Form.Label>Font</Form.Label>
-         <div class="w-[20rem]">
-            <Form.Select>
-               <Form.SelectTrigger placeholder="Select a font to display" class="flex" />
-               <Form.SelectContent>
-                  <Form.SelectItem value="System">System</Form.SelectItem>
-                  <Form.SelectItem value="Inter">Inter</Form.SelectItem>
-                  <Form.SelectItem value="Roboto">Roboto</Form.SelectItem>
-               </Form.SelectContent>
-            </Form.Select>
+<div class="space-y-8">
+   <div class="flex flex-col">
+      <Select.Root portal={null} selected={{ value: 'inter', label: 'Inter' }}>
+         <div class="flex flex-col gap-1">
+            <Select.Label class="text-md font-medium p-0">Font</Select.Label>
+            <Text size="md">Set the font you want to use in the application</Text>
          </div>
-         <Form.Description>Set the font you want to use in the application.</Form.Description>
-         <Form.Validation />
-      </Form.Field>
-   </Form.Item>
 
-   <Form.Item>
-      <Form.Field {config} name="theme">
-         <Form.Label>Theme</Form.Label>
-         <Form.Description>Select the theme for the application.</Form.Description>
-         <Form.Validation />
-         <Form.RadioGroup class="grid max-w-md grid-cols-2 gap-8 pt-2" orientation="horizontal">
-            <Label for="light" class="[&:has([data-state=checked])>div]:border-primary">
-               <Form.RadioItem id="light" value="light" class="sr-only" />
-               <div class="items-center rounded-md border-2 border-muted p-1 hover:border-accent">
-                  <div class="space-y-2 rounded-sm bg-[#ecedef] p-2">
-                     <div class="space-y-2 rounded-md bg-white p-2 shadow-sm">
-                        <div class="h-2 w-[80px] rounded-lg bg-[#ecedef]" />
-                        <div class="h-2 w-[100px] rounded-lg bg-[#ecedef]" />
-                     </div>
-                     <div class="flex items-center space-x-2 rounded-md bg-white p-2 shadow-sm">
-                        <div class="h-4 w-4 rounded-full bg-[#ecedef]" />
-                        <div class="h-2 w-[100px] rounded-lg bg-[#ecedef]" />
-                     </div>
-                     <div class="flex items-center space-x-2 rounded-md bg-white p-2 shadow-sm">
-                        <div class="h-4 w-4 rounded-full bg-[#ecedef]" />
-                        <div class="h-2 w-[100px] rounded-lg bg-[#ecedef]" />
-                     </div>
-                  </div>
-               </div>
-               <span class="block w-full p-2 text-center font-normal"> Light </span>
-            </Label>
+         <Select.Trigger class="w-[17rem] flex items-center justify-between gap-3 mt-5">
+            <Select.Value placeholder="Select a font" />
+         </Select.Trigger>
 
-            <Label for="dark" class="[&:has([data-state=checked])>div]:border-primary">
-               <Form.RadioItem id="dark" value="dark" class="sr-only" />
+         <Select.Content>
+            <Select.Group>
+               <Select.Item value="inter" label="Inter">Inter</Select.Item>
+            </Select.Group>
+         </Select.Content>
+         <Select.Input name="favoriteFruit" />
+      </Select.Root>
+   </div>
+
+   <RadioGroup.Root value={$appTheme} class="grid max-w-xl gap-8 pt-2" orientation="horizontal" onValueChange={setTheme}>
+      <div class="flex flex-col gap-1">
+         <Label class="text-md font-medium p-0">Theme</Label>
+         <Text size="md">Select the theme for the application.</Text>
+      </div>
+
+      <div class="grid max-w-xl grid-cols-3 gap-4">
+         <Label for="system" class="[&:has([data-state=checked])>div]:border-primary">
+            <RadioGroup.Item id="system" value="system" class="sr-only" />
+            <SystemPlaceholder />
+            <span class="block w-full p-2 text-center font-normal"> System </span>
+         </Label>
+
+         <Label for="light" class="[&:has([data-state=checked])>div]:border-primary">
+            <RadioGroup.Item id="light" value="light" class="sr-only" />
+            <LightPlaceholder />
+            <span class="block w-full p-2 text-center font-normal"> Light </span>
+         </Label>
+
+         <Label for="dark" class="[&:has([data-state=checked])>div]:border-primary">
+            <RadioGroup.Item id="dark" value="dark" class="sr-only" />
+            <DarkPlaceholder />
+            <span class="block w-full p-2 text-center font-normal"> Dark </span>
+         </Label>
+      </div>
+
+      <RadioGroup.Input name="spacing" />
+   </RadioGroup.Root>
+
+   <RadioGroup.Root value="comfortable" class="grid max-w-md gap-8 pt-2" orientation="horizontal">
+      <div class="flex flex-col gap-1">
+         <Label class="text-md font-medium p-0">Main color</Label>
+         <Text size="md">Select the color theme for the application.</Text>
+      </div>
+
+      <div class="flex gap-4 flex-wrap">
+         {#each mainColors as color}
+            <Label
+               for={color.value}
+               class="[&:has([data-state=checked])>div]:ring-purple-300 [&:has([data-state=checked])>div]:ring"
+            >
+               <RadioGroup.Item id={color.value} value={color.value} class="sr-only" />
                <div
-                  class="items-center rounded-md border-2 border-muted bg-popover p-1 hover:bg-accent hover:text-accent-foreground"
-               >
-                  <div class="space-y-2 rounded-sm bg-slate-950 p-2">
-                     <div class="space-y-2 rounded-md bg-slate-800 p-2 shadow-sm">
-                        <div class="h-2 w-[80px] rounded-lg bg-slate-400" />
-                        <div class="h-2 w-[100px] rounded-lg bg-slate-400" />
-                     </div>
-                     <div class="flex items-center space-x-2 rounded-md bg-slate-800 p-2 shadow-sm">
-                        <div class="h-4 w-4 rounded-full bg-slate-400" />
-                        <div class="h-2 w-[100px] rounded-lg bg-slate-400" />
-                     </div>
-                     <div class="flex items-center space-x-2 rounded-md bg-slate-800 p-2 shadow-sm">
-                        <div class="h-4 w-4 rounded-full bg-slate-400" />
-                        <div class="h-2 w-[100px] rounded-lg bg-slate-400" />
-                     </div>
-                  </div>
-               </div>
-               <span class="block w-full p-2 text-center font-normal"> Dark </span>
+                  class={`h-[2rem] w-[2rem] rounded-full cursor-pointer hover:brightness-90 transition-all`}
+                  style:background-color={color.hex}
+               />
+               <span class="sr-only">{color.name}</span>
             </Label>
-         </Form.RadioGroup>
-      </Form.Field>
-   </Form.Item>
-
-   <Form.Button>Update preferences</Form.Button>
-</Form.Root>
+         {/each}
+      </div>
+      <RadioGroup.Input name="spacing" />
+   </RadioGroup.Root>
+</div>

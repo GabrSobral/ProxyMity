@@ -1,11 +1,6 @@
 <script>
    import Routes from './Routes.svelte';
    import Profile from './Profile.svelte';
-   import NotificationButton from './NotificationButton.svelte';
-
-   import { getAppThemeContext } from '../../../contexts/theme/context';
-
-   const appTheme = getAppThemeContext();
 </script>
 
 <header

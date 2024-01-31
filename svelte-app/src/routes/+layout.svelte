@@ -1,17 +1,21 @@
 <script>
    import '../app.css';
 
-   import { setAppThemeContext } from '../contexts/theme/context';
-   import { Toaster } from "$lib/components/ui/sonner";
+   import ThemeContext from '../contexts/theme/context.svelte';
+   import { setAppThemeContext } from '../contexts/theme/store';
+
+   import { Toaster } from '$lib/components/ui/sonner';
 
    import '@fontsource-variable/inter';
 
    setAppThemeContext();
 </script>
 
-<Toaster position="bottom-left" closeButton />
+<ThemeContext>
+   <Toaster position="bottom-left" closeButton />
 
-<slot />
+   <slot />
+</ThemeContext>
 
 <style>
    :global(body) {

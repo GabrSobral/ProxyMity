@@ -1,10 +1,11 @@
 <script lang="ts">
    import Separator from '$lib/components/ui/separator/separator.svelte';
-   import type { PageData } from './$types';
    import AppearanceForm from '../../../lib/modules/settings/pages/appearance/components/AppearanceForm.svelte';
-
-   export let data: PageData;
 </script>
+
+<svelte:head>
+   <title>Settings - Appearance</title>
+</svelte:head>
 
 <div class="space-y-6">
    <div>
@@ -15,5 +16,5 @@
    </div>
    <Separator />
 
-   <AppearanceForm data={data.form} />
+   <AppearanceForm />
 </div>

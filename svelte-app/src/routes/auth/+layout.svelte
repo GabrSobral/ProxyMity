@@ -5,7 +5,7 @@
 
    import LoadingSpinning from '$lib/design-system/LoadingSpinning.svelte';
 
-   import { getAppThemeContext } from '../../contexts/theme/context';
+   import { getAppThemeContext } from '../../contexts/theme/store';
 
    const appTheme = getAppThemeContext();
 
