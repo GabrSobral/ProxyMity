@@ -5,16 +5,18 @@
    import Label from '$lib/components/ui/label/label.svelte';
    import * as RadioGroup from '$lib/components/ui/radio-group';
 
-   import DarkPlaceholder from './DarkPlaceholder.svelte';
-   import LightPlaceholder from './LightPlaceholder.svelte';
-   import SystemPlaceholder from './SystemPlaceholder.svelte';
+   import DarkPlaceholder from './components/DarkPlaceholder.svelte';
+   import LightPlaceholder from './components/LightPlaceholder.svelte';
+   import SystemPlaceholder from './components/SystemPlaceholder.svelte';
 
-   import { appTheme, getAppThemeContext, setTheme } from '../../../../../../contexts/theme/store';
+   import { appTheme, setTheme, setAppColor } from '../../../../contexts/theme/store';
 
    const mainColors = [
+      { name: 'Default', hex: '#6b7280', value: 'gray' },
       { name: 'Purple', hex: '#9218DE', value: 'purple' },
       { name: 'Red', hex: '#F12646', value: 'red' },
-      { name: 'Green', hex: '#22c55e', value: 'green' },
+      { name: 'Blue', hex: '#3b82f6', value: 'blue' },
+      { name: 'Green', hex: '#4d7c0f', value: 'green' },
    ];
 
    let font: 'inter' = 'inter';
@@ -42,7 +44,12 @@
       </Select.Root>
    </div>
 
-   <RadioGroup.Root value={$appTheme} class="grid max-w-xl gap-8 pt-2" orientation="horizontal" onValueChange={setTheme}>
+   <RadioGroup.Root
+      value={$appTheme}
+      class="grid max-w-xl gap-8 pt-2"
+      orientation="horizontal"
+      onValueChange={value => setTheme(value)}
+   >
       <div class="flex flex-col gap-1">
          <Label class="text-md font-medium p-0">Theme</Label>
          <Text size="md">Select the theme for the application.</Text>
@@ -71,7 +78,12 @@
       <RadioGroup.Input name="spacing" />
    </RadioGroup.Root>
 
-   <RadioGroup.Root value="comfortable" class="grid max-w-md gap-8 pt-2" orientation="horizontal">
+   <RadioGroup.Root
+      value="comfortable"
+      class="grid max-w-md gap-8 pt-2"
+      orientation="horizontal"
+      onValueChange={value => setAppColor(value)}
+   >
       <div class="flex flex-col gap-1">
          <Label class="text-md font-medium p-0">Main color</Label>
          <Text size="md">Select the color theme for the application.</Text>

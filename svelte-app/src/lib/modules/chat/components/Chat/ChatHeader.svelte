@@ -4,6 +4,7 @@
    import { Pin, User, X } from 'lucide-svelte';
 
    import { chatDispatch, chatState } from '../../contexts/chat-context/stores/chat';
+   import * as Avatar from '$lib/components/ui/avatar';
 
    $: user = $page.data.session?.user;
 
@@ -16,13 +17,10 @@
 </script>
 
 <header class="px-3 py-2 dark:bg-black bg-white flex items-center gap-4 transition-all overflow-hidden">
-   <div class="relative min-w-[40px] min-h-[40px] max-w-[40px] max-h-[40px]">
-      <div
-         class="min-w-[40px] min-h-[40px] max-w-[40px] max-h-[40px] rounded-full z-0 shadow-xl flex items-center justify-center dark:bg-white bg-black"
-      >
-         <User size={20} class="text-white dark:text-black" />
-      </div>
-   </div>
+   <Avatar.Root>
+      <Avatar.Image src="https://github.com/shadcn.png" alt="@shadcn" />
+      <Avatar.Fallback>CN</Avatar.Fallback>
+   </Avatar.Root>
 
    <h2 class="dark:text-gray-300 text-gray-500 font-light tracking-wide transition-all overflow-ellipsis">
       Conversation with <strong class="dark:text-white text-gray-700">{conversationName}</strong>
@@ -57,8 +55,7 @@
 
       <button
          type="button"
-         on:click={() =>
-            chatDispatch.selectConversation({ conversation: null, typeMessage: '', currentUserId: user.id })}
+         on:click={() => chatDispatch.selectConversation({ conversation: null, typeMessage: '', currentUserId: user.id })}
          title="Close chat"
          class="rounded-full p-2 dark:bg-black bg-white hover:bg-purple-500 hover:text-white group transition-all dark:text-white text-gray-700"
       >

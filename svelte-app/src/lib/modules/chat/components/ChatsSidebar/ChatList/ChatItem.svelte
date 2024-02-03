@@ -4,6 +4,7 @@
    import { twMerge } from 'tailwind-merge';
    import { Clock, User } from 'lucide-svelte';
 
+   import * as Avatar from '$lib/components/ui/avatar';
    import { chatState } from '$lib/modules/chat/contexts/chat-context/stores/chat';
    import { connection } from '$lib/modules/chat/contexts/websocket-context/stores/connection';
    import { getChatContext } from '$lib/modules/chat/contexts/chat-context/ChatContext.svelte';
@@ -57,13 +58,10 @@
       } absolute h-full gradient transition-all rounded-md top-0 z-0 duration-[0.3s] mx-auto`}
    />
 
-   <div class="relative min-w-[40px] min-h-[40px] max-w-[40px] max-h-[40px]">
-      <div
-         class="min-w-[40px] min-h-[40px] max-w-[40px] max-h-[40px] rounded-full z-0 shadow-xl flex items-center justify-center dark:bg-white bg-black transition-colors"
-      >
-         <User size={20} class="dark:text-black text-white transition-colors" />
-      </div>
-   </div>
+   <Avatar.Root>
+      <Avatar.Image src="https://github.com/shadcn.png" alt="@shadcn" />
+      <Avatar.Fallback>CN</Avatar.Fallback>
+   </Avatar.Root>
 
    <div class={'flex flex-col overflow-hidden w-full z-10'}>
       <span

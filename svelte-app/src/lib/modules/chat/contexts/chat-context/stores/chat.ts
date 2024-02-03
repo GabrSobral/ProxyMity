@@ -161,7 +161,7 @@ export const chatDispatch: Actions = {
                      ? message.read.users.some(read => read.userId === currentUserId)
                      : !!message.read.byAllAt;
 
-                  if (!currentUserAlreadyRead) {
+                  if (!currentUserAlreadyRead && message.author.id !== currentUserId) {
                      message.read.users.push({ at: new Date(), userId: currentUserId });
 
                      if (!message.read.byAllAt && numberOfParticipants === message.read.users.length)
@@ -318,24 +318,21 @@ export const chatDispatch: Actions = {
             const numberOfParticipants = store.conversations[conversationIndex].participants.length;
 
             store.conversations[conversationIndex].messages = store.conversations[conversationIndex].messages.map(message => {
-               if (status === EMessageStatuses.READ && message.read.byAllAt === null) {
-                  message.read.users.push({ at: new Date(), userId });
-
-                  if (numberOfParticipants === message.read.users.length) {
-                     message.read.byAllAt = new Date();
-                  }
-               }
-
-               if (status === EMessageStatuses.RECEIVED && message.id === params.messageId) {
-                  message.received.users.push({ at: new Date(), userId });
-
-                  if (numberOfParticipants === message.received.users.length) {
-                     message.received.byAllAt = new Date();
-                  }
-               }
+               console.log({ users: message.read, numberOfParticipants });
 
                if (status === EMessageStatuses.SENT && message.id === params.messageId) {
                   message.sentAt = new Date();
+               }
+
+               const readOrReceived: 'received' | 'read' | '' =
+                  status === EMessageStatuses.READ ? 'read' : status === EMessageStatuses.RECEIVED ? 'received' : '';
+
+               if (readOrReceived && message[readOrReceived].byAllAt === null) {
+                  message[readOrReceived].users.push({ at: new Date(), userId });
+
+                  if (numberOfParticipants === message[readOrReceived].users.length) {
+                     message[readOrReceived].byAllAt = new Date();
+                  }
                }
 
                return message;

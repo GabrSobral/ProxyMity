@@ -9,6 +9,7 @@
 
    import * as AlertDialog from '$lib/components/ui/alert-dialog';
    import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
+   import SettingsModal from '../SettingsModal/SettingsModal.svelte';
 
    $: user = $page.data.session?.user;
 
@@ -17,6 +18,11 @@
    let closeModal = writable(() => {
       show = false;
    });
+
+   let isSettingsModalOpened = false;
+   let closeSettingsModal = () => {
+      isSettingsModalOpened = false;
+   };
 </script>
 
 <div class="flex items-center gap-3">
@@ -25,24 +31,32 @@
       <Text size="sm" className="text-xs text-gray-300">{user?.email}</Text>
    </div>
 
+   <SettingsModal isOpened={isSettingsModalOpened} closeModal={closeSettingsModal} />
+
    <DropdownMenu.Root>
-      <DropdownMenu.Trigger class="flex p-3 rounded-md bg-black border border-gray-800" aria-label="Profile">
+      <DropdownMenu.Trigger
+         class="flex p-3 rounded-md dark:bg-black bg-gray-100 border dark:border-gray-900 border-gray-200"
+         aria-label="Profile"
+      >
          <span class="sr-only">User</span>
-         <User size={24} class="text-white" />
+         <User size={24} />
       </DropdownMenu.Trigger>
 
       <DropdownMenu.Content>
          <DropdownMenu.Group>
             <DropdownMenu.Item class="flex gap-4 items-center">
-               <Info class="text-white" size={18} />
+               <Info size={18} />
                About ProxyMity
             </DropdownMenu.Item>
 
-            <DropdownMenu.Item>
-               <a href="/settings/profile" class="flex gap-4 items-center">
-                  <Settings class="text-white" size={18} />
-                  Settings
-               </a>
+            <DropdownMenu.Item
+               class="flex gap-4 items-center"
+               on:click={() => {
+                  isSettingsModalOpened = true;
+               }}
+            >
+               <Settings size={18} />
+               Settings
             </DropdownMenu.Item>
 
             <DropdownMenu.Item
@@ -51,7 +65,7 @@
                   show = true;
                }}
             >
-               <LogOut class="text-white" size={18} />
+               <LogOut size={18} />
                Sign out
             </DropdownMenu.Item>
          </DropdownMenu.Group>

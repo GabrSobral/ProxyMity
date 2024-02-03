@@ -25,11 +25,7 @@ export type NotificationState = {
 
 export type Actions = {
    addConversation(Conversation: ConversationState): void;
-   selectConversation(params: {
-      conversation: ConversationState | null;
-      typeMessage: string;
-      currentUserId: string;
-   }): void;
+   selectConversation(params: { conversation: ConversationState | null; typeMessage: string; currentUserId: string }): void;
    bringToTop(ConversationId: ConversationState['id']): void;
    handleShowConversationDetail(): void;
    setIsFetchingConversations(value: boolean): void;
@@ -49,10 +45,7 @@ export type Actions = {
            }
          | { conversationId: string; status: EMessageStatuses.READ; userId: string }
    ): void;
-   setConversationInitialState(payload: {
-      conversationsData: GetUserConversationsResponse;
-      currentUserId: string;
-   }): void;
+   setConversationInitialState(payload: { conversationsData: GetUserConversationsResponse; currentUserId: string }): void;
    saveTypeMessageFromConversation(payload: { conversationId: string; typeMessage: string }): void;
    setReplyMessageFromConversation(payload: { conversationId: string; message: ILocalMessage }): void;
    removeReplyMessageFromConversation(payload: { conversationId: string }): void;

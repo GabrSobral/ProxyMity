@@ -4,10 +4,7 @@
    import { Laptop, Moon, Sun } from 'lucide-svelte';
 
    import LoadingSpinning from '$lib/design-system/LoadingSpinning.svelte';
-
-   import { getAppThemeContext } from '../../contexts/theme/store';
-
-   const appTheme = getAppThemeContext();
+   import { appTheme } from '../../contexts/theme/store';
 
    let isSignInPage = $page.url.pathname.includes('sign-in');
 

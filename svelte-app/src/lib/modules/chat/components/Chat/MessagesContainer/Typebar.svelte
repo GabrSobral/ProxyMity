@@ -4,7 +4,6 @@
    import { page } from '$app/stores';
    import { Send, X } from 'lucide-svelte';
 
-   import Button from '$lib/design-system/Button.svelte';
    import InputGroup from '$lib/design-system/Input/InputGroup.svelte';
 
    import { chatWorker } from '$lib/modules/chat/workers/db-worker/initializer';
@@ -15,7 +14,8 @@
 
    import type { ILocalMessage } from '../../../../../../types/message';
    import { EMessageStatuses } from '../../../../../../enums/EMessageStatuses';
-   import { fly } from 'svelte/transition';
+   import { Button } from '$lib/components/ui/button';
+   import { appColor } from '../../../../../../contexts/theme/store';
 
    $: user = $page.data.session?.user;
    $: conversationId = $chatState.selectedConversation?.id || '';
@@ -122,11 +122,11 @@
          />
 
          <Button
-            tabIndex={2}
             type="button"
             title="Send message"
-            onClick={sendMessage}
-            className="p-2 absolute right-3 top-2/4 -translate-y-2/4 min-w-[2.75rem] min-h-[2.75rem] max-w-[2.75rem] max-h-[2.75rem] mt-auto rounded-[10px]"
+            variant={$appColor}
+            on:click={sendMessage}
+            class="p-2 absolute right-3 top-2/4 -translate-y-2/4 min-w-[2.75rem] min-h-[2.75rem] max-w-[2.75rem] max-h-[2.75rem] mt-auto rounded-[10px]"
          >
             <Send class="text-white" size={24} />
          </Button>

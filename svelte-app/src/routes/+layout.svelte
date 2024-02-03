@@ -2,13 +2,10 @@
    import '../app.css';
 
    import ThemeContext from '../contexts/theme/context.svelte';
-   import { setAppThemeContext } from '../contexts/theme/store';
 
    import { Toaster } from '$lib/components/ui/sonner';
 
    import '@fontsource-variable/inter';
-
-   setAppThemeContext();
 </script>
 
 <ThemeContext>

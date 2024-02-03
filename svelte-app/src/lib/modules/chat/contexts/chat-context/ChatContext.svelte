@@ -1,69 +1,71 @@
 <script lang="ts" context="module">
    export let typebarRef = writable<HTMLInputElement | null>(null);
 
-   let chatStateModule: ChatState;
-   let connectionModule: HubConnection | null;
-   let userModule: Session['user'] | undefined;
    let accessToken: string;
-   let typebarRefModule: HTMLInputElement | null;
-   let webSocketEmitterModule: WebSocketEmitter;
-   let chatWorkerModule: Worker | null;
+   let chatStateMod: ChatState;
+   let chatWorkerMod: Worker | null;
+   let connectionMod: HubConnection | null;
+   let typebarRefMod: HTMLInputElement | null;
+   let userMod: Session['user'] | undefined;
+   let webSocketEmitterMod: WebSocketEmitter;
 
    webSocketEmitter.subscribe(value => {
-      webSocketEmitterModule = value;
+      webSocketEmitterMod = value;
    });
 
    chatState.subscribe(value => {
-      chatStateModule = value;
+      chatStateMod = value;
    });
 
    connection.subscribe(value => {
-      connectionModule = value;
+      connectionMod = value;
    });
 
    chatWorker.subscribe(value => {
-      chatWorkerModule = value;
+      chatWorkerMod = value;
    });
 
    if (browser) {
       page.subscribe(value => {
-         userModule = value.data?.session?.user as Session['user'] | undefined;
          accessToken = value.data?.session?.accessToken as string;
+         userMod = value.data?.session?.user as Session['user'] | undefined;
       });
 
       typebarRef.subscribe(value => {
-         typebarRefModule = value;
+         typebarRefMod = value;
       });
    }
 
    async function selectedConversationAsync(conversation: ConversationState) {
-      if (conversation === chatStateModule.selectedConversation || !userModule) return;
+      if (conversation === chatStateMod.selectedConversation || !userMod) return;
 
       const { id: conversationId, isGroup: isConversationGroup } = conversation;
 
-      if (conversation.notifications > 0 && connectionModule)
-         webSocketEmitterModule.sendReadMessage({ userId: userModule.id, conversationId, isConversationGroup });
+      if (conversation.notifications > 0 && connectionMod)
+         webSocketEmitterMod.sendReadMessage({ userId: userMod.id, conversationId, isConversationGroup });
 
-      chatDispatch.selectConversation({ conversation, typeMessage: typebarRefModule?.value || '', currentUserId: userModule.id });
+      chatDispatch.selectConversation({ conversation, typeMessage: typebarRefMod?.value || '', currentUserId: userMod.id });
 
-      if (typebarRefModule) {
-         typebarRefModule.value = conversation.typeMessage;
+      document.title = `ProxyMity - Chat | ${conversation.groupName || conversation.participants[0].name}`;
+
+      if (typebarRefMod) {
+         typebarRefMod.value = conversation.typeMessage;
       }
 
-      chatWorkerModule?.postMessage({
+      chatWorkerMod?.postMessage({
          type: WorkerMethods.READ_CONVERSATION_MESSAGES,
-         payload: { conversationId, whoRead: userModule.id, myId: userModule.id, isConversationGroup },
+         payload: { conversationId, whoRead: userMod.id, myId: userMod.id, isConversationGroup },
       });
 
       if (!conversation.hasMessagesFetched) {
          try {
             const { messages } = await APIGetConversationMessages({ conversationId }, { accessToken });
-            chatDispatch.setConversationMessages({ conversationId, messages, fromServer: true, currentUserId: userModule.id });
+            chatDispatch.setConversationMessages({ conversationId, messages, fromServer: true, currentUserId: userMod.id });
          } catch (error) {
             console.error('🔴 \u001b[31m Error fetching conversations, data will be taken from the cache', error);
 
             const messages = await getConversationsMessagesAsyncDB(conversationId);
-            chatDispatch.setConversationMessages({ messages, conversationId, fromServer: false, currentUserId: userModule.id });
+            chatDispatch.setConversationMessages({ conversationId, messages, fromServer: false, currentUserId: userMod.id });
          }
       }
    }
@@ -111,28 +113,22 @@
 
    $: session = $page.data.session;
 
-   $: if ($chatWorker) {
-      $chatWorker.onmessage = ({ data }: MessageEvent<{ command: Command; response: any }>) => {
-         // console.log('⚙️ Main thread: \u001b[35m' + data.command.type);
-      };
-   }
-
    onMount(() => {
       if (session?.user && session?.accessToken) {
-         const user = session?.user;
+         const userId = session?.user.id;
 
          chatDispatch.setIsFetchingConversations(true);
 
-         APIGetUserConversations({ id: user.id }, { accessToken: session.accessToken })
+         APIGetUserConversations({ id: userId }, { accessToken: session.accessToken })
             .then(conversationsData => {
                console.log('🟢 \u001b[32m Fetching conversations data was successfully.');
 
                const filteredData = conversationsData.map(data => ({
                   ...data,
-                  participants: data.participants.filter(item => item.id !== user.id),
+                  participants: data.participants.filter(item => item.id !== userId),
                }));
 
-               chatDispatch.setConversationInitialState({ conversationsData: filteredData, currentUserId: user.id });
+               chatDispatch.setConversationInitialState({ conversationsData: filteredData, currentUserId: userId });
                $chatWorker?.postMessage({ type: WorkerMethods.SAVE_CONVERSATIONS, payload: filteredData });
             })
             .catch(error => {
@@ -141,9 +137,9 @@
                   error.message
                );
 
-               getConversationCacheAsyncDB({ userId: user.id })
+               getConversationCacheAsyncDB({ userId })
                   .then(conversationsData =>
-                     chatDispatch.setConversationInitialState({ conversationsData, currentUserId: user.id })
+                     chatDispatch.setConversationInitialState({ conversationsData, currentUserId: userId })
                   )
                   .catch(console.error);
             })
@@ -189,7 +185,7 @@
    }
 
    // 🔵 Receive Read Message Handler
-   async function receiveReadMessageHandler(conversationId: string, userId: string, isConversationGroup: boolean) {
+   async function receiveReadMessageHandler(userId: string, conversationId: string, isConversationGroup: boolean) {
       if (!session?.user) return;
 
       chatDispatch.updateConversationMessageStatus({ conversationId, status: EMessageStatuses.READ, userId });

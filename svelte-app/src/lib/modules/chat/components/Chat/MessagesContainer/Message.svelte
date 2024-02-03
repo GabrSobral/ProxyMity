@@ -2,7 +2,9 @@
    import clsx from 'clsx';
    import { onMount } from 'svelte';
    import { page } from '$app/stores';
-   import { Clock, Info, Share, User } from 'lucide-svelte';
+   import { fly } from 'svelte/transition';
+   import { Clock, Info, Share } from 'lucide-svelte';
+   import * as Avatar from '$lib/components/ui/avatar';
 
    import Text from '$lib/design-system/Text.svelte';
 
@@ -13,7 +15,7 @@
 
    import type { ILocalMessage } from '../../../../../../types/message';
    import { EMessageStatuses } from '../../../../../../enums/EMessageStatuses';
-   import { fly, scale } from 'svelte/transition';
+   import { appColor } from '../../../../../../contexts/theme/store';
 
    export let message: ILocalMessage;
    export let previousMessage: ILocalMessage;
@@ -143,13 +145,10 @@
       )}
    >
       {#if !isMine && !previousIsFromUser}
-         <div class="relative min-w-[30px] min-h-[30px] max-w-[30px] max-h-[30px]">
-            <div
-               class="min-w-[30px] min-h-[30px] max-w-[30px] max-h-[30px] rounded-full z-0 shadow-xl flex items-center justify-center dark:bg-white bg-black transition-colors"
-            >
-               <User size={20} class="dark:text-black text-white transition-colors" />
-            </div>
-         </div>
+         <Avatar.Root>
+            <Avatar.Image src="https://github.com/shadcn.png" alt="@shadcn" />
+            <Avatar.Fallback>CN</Avatar.Fallback>
+         </Avatar.Root>
 
          <span class="dark:text-gray-200 text-gray-700 transition-colors text-xs">{message.author.name}</span>
       {/if}
@@ -178,7 +177,11 @@
       <div
          class={clsx('w-fit rounded-[6px] text-white font-light text-sm shadow z-[13] p-1 min-w-[100px]', {
             'bg-gray-950 rounded-tl-none': !isMine,
-            'bg-purple-500 rounded-tr-none': isMine,
+            'bg-purple-500 rounded-tr-none': isMine && $appColor === 'purple',
+            'bg-blue-500 rounded-tr-none': isMine && $appColor === 'blue',
+            'bg-red-500 rounded-tr-none': isMine && $appColor === 'red',
+            'bg-green-600 rounded-tr-none': isMine && $appColor === 'green',
+            'bg-gray-600 dark:bg-gray-800 rounded-tr-none': isMine && $appColor === 'gray',
          })}
       >
          {#if message.repliedMessage}
@@ -186,12 +189,9 @@
                type="button"
                title="Show replied message on chat"
                on:click={scrollToRepliedMessage}
-               class={clsx(
-                  'dark:bg-black bg-white cursor-pointer transition-colors p-2 rounded-[8px] w-full flex flex-col',
-                  {
-                     'ml-auto': isMine,
-                  }
-               )}
+               class={clsx('dark:bg-black bg-white cursor-pointer transition-colors p-2 rounded-[8px] w-full flex flex-col', {
+                  'ml-auto': isMine,
+               })}
             >
                <span class="text-purple-300 text-xs">{message.author.name}</span>
                <span class="text-gray-200 text-sm">{message.repliedMessage.content}</span>

@@ -1,9 +1,19 @@
 <script lang="ts">
    import { onMount } from 'svelte';
-   import { appTheme, localStorageKeyName, type ITheme } from './store';
+   import {
+      appTheme,
+      localStorageThemeKeyName,
+      localStorageAppColorKeyName,
+      type ITheme,
+      appColor,
+      type IAppColor,
+   } from './store';
 
    onMount(() => {
-      const storedTheme = localStorage.getItem(localStorageKeyName);
+      const storedTheme = localStorage.getItem(localStorageThemeKeyName) as ITheme | null;
+      const storedAppColor = localStorage.getItem(localStorageAppColorKeyName) as IAppColor | null;
+
+      appColor.set(storedAppColor || 'purple');
 
       if (storedTheme) {
          appTheme.set(storedTheme as ITheme);

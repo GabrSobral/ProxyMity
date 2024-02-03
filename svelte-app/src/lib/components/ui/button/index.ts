@@ -12,6 +12,12 @@ const buttonVariants = tv({
          secondary: 'bg-secondary text-secondary-foreground hover:bg-secondary/80',
          ghost: 'hover:bg-accent hover:text-accent-foreground',
          link: 'text-primary underline-offset-4 hover:underline',
+
+         purple: 'bg-purple-500 text-white hover:brightness-90',
+         blue: 'bg-blue-500 text-white hover:brightness-90',
+         red: 'bg-red-500 text-white hover:brightness-90',
+         green: 'bg-green-500 text-white hover:brightness-90',
+         gray: 'bg-gray-500 text-white hover:brightness-90',
       },
       size: {
          default: 'h-10 px-4 py-2',

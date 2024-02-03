@@ -10,13 +10,11 @@
 
    import { chatState } from '$lib/modules/chat/contexts/chat-context/stores/chat';
    import ChatItemSkeleton from './ChatItemSkeleton.svelte';
+   import { appColor } from '../../../../../../contexts/theme/store';
 
    let isNewContactModalOpened = false;
 
-   $: allNotificationsCount = $chatState.conversations.reduce(
-      (accumulator, curr) => accumulator + curr.notifications,
-      0
-   );
+   $: allNotificationsCount = $chatState.conversations.reduce((accumulator, curr) => accumulator + curr.notifications, 0);
 </script>
 
 <section
@@ -37,12 +35,13 @@
 
       <Button
          type="button"
+         variant={$appColor}
          on:click={() => {
             isNewContactModalOpened = true;
          }}
          aria-label="add a new contact to your contact list"
       >
-         <UserPlus class="text-black" size={24} /> Create chat
+         <UserPlus size={24} /> Create chat
       </Button>
    </div>
 
