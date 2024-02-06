@@ -42,8 +42,9 @@ export type Actions = {
               messageId: string;
               status: EMessageStatuses.SENT | EMessageStatuses.RECEIVED;
               userId: string;
+              appliedForAll: boolean;
            }
-         | { conversationId: string; status: EMessageStatuses.READ; userId: string }
+         | { conversationId: string; status: EMessageStatuses.READ; userId: string; appliedForAll: boolean }
    ): void;
    setConversationInitialState(payload: { conversationsData: GetUserConversationsResponse; currentUserId: string }): void;
    saveTypeMessageFromConversation(payload: { conversationId: string; typeMessage: string }): void;

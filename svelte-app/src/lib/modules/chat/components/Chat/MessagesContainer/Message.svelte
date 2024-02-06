@@ -47,6 +47,7 @@
            conversationId: string;
            userId: string;
            type: 'message_status';
+           appliedForAll: boolean;
         }
       | {
            type: 'highlight';
@@ -58,12 +59,18 @@
       if (!event.detail) return;
 
       if (event.detail.type === 'message_status') {
-         const { messageId, messageStatus, conversationId, userId } = event.detail;
+         const { messageId, messageStatus, conversationId, userId, appliedForAll } = event.detail;
 
          if (messageStatus && messageId && conversationId) {
             status = messageStatus;
 
-            chatDispatch.updateConversationMessageStatus({ conversationId, messageId, status: messageStatus, userId });
+            chatDispatch.updateConversationMessageStatus({
+               conversationId,
+               messageId,
+               status: messageStatus,
+               userId,
+               appliedForAll,
+            });
             $chatWorker?.postMessage({
                type: WorkerMethods.CHANGE_MESSAGE_STATUS,
                payload: { messageId: messageId, status: messageStatus },

@@ -27,7 +27,7 @@
 <Dialog.Root bind:open={isOpened} bind:onOpenChange={$onChangeFn}>
    <Dialog.Trigger />
 
-   <Dialog.Content class="min-w-[90%] h-[90%]">
+   <Dialog.Content class="min-w-[90%] h-[90%] overflow-auto">
       <div class="space-y-6 px-5 pb-16 md:block">
          <div class="space-y-0.5">
             <h2 class="text-2xl font-bold tracking-tight">Settings</h2>

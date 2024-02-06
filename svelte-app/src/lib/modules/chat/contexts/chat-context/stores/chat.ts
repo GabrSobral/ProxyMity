@@ -309,17 +309,13 @@ export const chatDispatch: Actions = {
    },
 
    updateConversationMessageStatus(params) {
-      const { conversationId, status, userId } = params;
+      const { conversationId, status, userId, appliedForAll } = params;
 
       chatState.update(store => {
          const conversationIndex = store.conversations.findIndex(item => item.id === conversationId);
 
          if (conversationIndex > -1) {
-            const numberOfParticipants = store.conversations[conversationIndex].participants.length;
-
             store.conversations[conversationIndex].messages = store.conversations[conversationIndex].messages.map(message => {
-               console.log({ users: message.read, numberOfParticipants });
-
                if (status === EMessageStatuses.SENT && message.id === params.messageId) {
                   message.sentAt = new Date();
                }
@@ -330,7 +326,7 @@ export const chatDispatch: Actions = {
                if (readOrReceived && message[readOrReceived].byAllAt === null) {
                   message[readOrReceived].users.push({ at: new Date(), userId });
 
-                  if (numberOfParticipants === message[readOrReceived].users.length) {
+                  if (appliedForAll) {
                      message[readOrReceived].byAllAt = new Date();
                   }
                }

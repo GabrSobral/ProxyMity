@@ -167,11 +167,22 @@
       $chatWorker?.postMessage({ type: WorkerMethods.ADD_MESSAGE, payload: { message: localMessage } });
 
       $webSocketEmitter.sendReceiveMessage(webSocketsPayload);
-      chatDispatch.updateConversationMessageStatus({ messageId, conversationId, userId, status: EMessageStatuses.RECEIVED });
+      chatDispatch.updateConversationMessageStatus({
+         messageId,
+         conversationId,
+         userId,
+         status: EMessageStatuses.RECEIVED,
+         appliedForAll: false,
+      });
 
       if (targetConversationIsSelectedConversation) {
          $webSocketEmitter.sendReadMessage(webSocketsPayload);
-         chatDispatch.updateConversationMessageStatus({ conversationId, status: EMessageStatuses.READ, userId });
+         chatDispatch.updateConversationMessageStatus({
+            conversationId,
+            status: EMessageStatuses.READ,
+            userId,
+            appliedForAll: false,
+         });
       } else {
          toast.message('New message', {
             id: serverMessage.id,
@@ -185,10 +196,17 @@
    }
 
    // 🔵 Receive Read Message Handler
-   async function receiveReadMessageHandler(userId: string, conversationId: string, isConversationGroup: boolean) {
+   async function receiveReadMessageHandler(...args: [string, string, boolean, boolean]) {
       if (!session?.user) return;
 
-      chatDispatch.updateConversationMessageStatus({ conversationId, status: EMessageStatuses.READ, userId });
+      const [conversationId, userId, isConversationGroup, readByAll] = args;
+
+      chatDispatch.updateConversationMessageStatus({
+         conversationId,
+         status: EMessageStatuses.READ,
+         userId,
+         appliedForAll: readByAll,
+      });
       $chatWorker?.postMessage({
          type: WorkerMethods.READ_CONVERSATION_MESSAGES,
          payload: { conversationId, myId: session?.user?.id, whoRead: userId, isConversationGroup },
@@ -196,10 +214,10 @@
    }
 
    // 🔵 Receive Message Status Handler
-   function receiveMessageStatusHandler(...args: [string, string, string, string]) {
-      const [messageStatus, messageId, conversationId, userId] = args;
+   function receiveMessageStatusHandler(...args: [string, string, string, string, boolean]) {
+      const [messageStatus, messageId, conversationId, userId, appliedForAll] = args;
 
-      const messageDetail = { messageStatus, messageId, conversationId, userId, type: 'message_status' };
+      const messageDetail = { messageStatus, messageId, conversationId, userId, type: 'message_status', appliedForAll };
       const messageStatusEvent = new CustomEvent(messageId, { detail: messageDetail });
 
       dispatchEvent(messageStatusEvent);
