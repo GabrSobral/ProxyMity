@@ -22,7 +22,7 @@ public sealed class SaveMessageCommandHandler(
 
         await messageRepository.CreateAsync(message, cancellationToken);
 
-        if (conversation.GroupId is Ulid)
+        if (conversation.GroupId is not null)
             await CreateMessageStatusesToParticipantsOnGroup(message, cancellationToken);
 
         await dbContext.SaveChangesAsync(cancellationToken);

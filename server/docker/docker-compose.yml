@@ -11,10 +11,10 @@ services:
     environment:
       ASPNETCORE_URLS: "http://+:5000"
     deploy:
-        resources:
-            limits:
-                cpus: '2'
-                memory: '2GB'
+      resources:
+        limits:
+          cpus: '2'
+          memory: '2GB'
 
   postgres:
     container_name: "ProxyMity.Database"
@@ -26,10 +26,10 @@ services:
       - POSTGRES_PASSWORD=proxymity123
       - POSTGRES_DB=proxymitydb
     deploy:
-        resources:
-            limits:
-                cpus: '2'
-                memory: '1.5GB'
+      resources:
+        limits:
+          cpus: '2'
+          memory: '1.5GB'
     volumes:
       - ../volumes/postgres_data:/var/lib/postgresql/data
     ports:

@@ -1,6 +1,12 @@
 ﻿namespace ProxyMity.Unit.InMemoryRepositories;
 
 internal class InMemoryMessageRepository : InMemoryRepository<Message>, IMessageRepository {
+    public async Task<Message?> GetById(Ulid messageId, CancellationToken cancellationToken) {
+        await Task.Run(() => { }, cancellationToken);
+        
+        return Items.FirstOrDefault(x => x.Id == messageId);
+    }
+
     public async Task CreateAsync(Message message, CancellationToken cancellationToken) {
         await Task.Run(() => { 
             Items.Add(message);
@@ -17,7 +23,7 @@ internal class InMemoryMessageRepository : InMemoryRepository<Message>, IMessage
     }
 
     public async Task<int> GetUnreadConversationMessagesCountAsync(Ulid userId, Ulid conversationId, CancellationToken cancellationToken) {
-        await Task.Run(() => { });
+        await Task.Run(() => { }, cancellationToken);
 
         var unreadMessagesFromConversation = Items.Where(x => x.ConversationId == conversationId && x.ReadByAll == null);
 

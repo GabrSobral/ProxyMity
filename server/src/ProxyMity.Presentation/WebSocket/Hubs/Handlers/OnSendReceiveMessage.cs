@@ -18,16 +18,15 @@ public partial class ChatHub
             Status: EMessageStatuses.RECEIVED, 
             UserId: payload.UserId
         );
-
-        await sender.Send(updateMessageStatusCommand);
-
+        
         await Clients
             .OthersInGroup(hubGroupId)
             .ReceiveMessageStatus(
                 messageStatus: EMessageStatuses.RECEIVED, 
                 messageId: payload.MessageId, 
                 conversationId: payload.ConversationId, 
-                userId: userId
+                userId: userId,
+                appliedForAll: await sender.Send(updateMessageStatusCommand)
             );
     }
 }

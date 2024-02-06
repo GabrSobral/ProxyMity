@@ -6,4 +6,4 @@ public record UpdateMessageStatusCommand(
     Ulid ConversationId,
     EMessageStatuses Status,
     Ulid UserId
-) : ICommand;
+) : ICommand<bool>;

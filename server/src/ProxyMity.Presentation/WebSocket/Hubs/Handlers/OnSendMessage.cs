@@ -22,7 +22,7 @@ public partial class ChatHub
         await Clients
             .OthersInGroup(hubGroupId)
             .ReceiveTyping(
-                isTyping:false, 
+                isTyping: false, 
                 authorId: message.AuthorId, 
                 conversationId: message.ConversationId
             );
@@ -34,16 +34,15 @@ public partial class ChatHub
             Status: EMessageStatuses.SENT, 
             UserId: message.AuthorId
         );
-
-        await sender.Send(updateMessageStatusCommand);
-
+        
         await Clients
             .Clients(Context.ConnectionId)
             .ReceiveMessageStatus(
                 messageStatus: EMessageStatuses.SENT, 
                 messageId: message.Id, 
                 conversationId: message.ConversationId, 
-                userId: userId
+                userId: userId,
+                appliedForAll: await sender.Send(updateMessageStatusCommand)
         );
     }
 }

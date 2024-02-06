@@ -43,6 +43,8 @@ public class Message
     [ForeignKey(nameof(ConversationId))]
     public Conversation Conversation { get; set; }
 
+    public IEnumerable<MessageStatus> MessageStatuses { get; set; } = new HashSet<MessageStatus>();
+
     #endregion
 
     public static Message Create(string content, Ulid conversationId, Ulid authorId, DateTime? writtenAt = null)

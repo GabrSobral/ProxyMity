@@ -4,4 +4,4 @@ public record ReadConversationMessagesCommand(
     Ulid UserId,
     Ulid ConversationId,
     bool IsConversationGroup
-) : ICommand;
+) : ICommand<bool>;
