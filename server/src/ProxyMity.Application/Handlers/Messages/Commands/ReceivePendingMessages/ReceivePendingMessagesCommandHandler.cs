@@ -16,7 +16,7 @@ public sealed class ReceivePendingMessagesCommandHandler(
         logger.LogInformation($"The user '{command.AccountRequesterId}' is receiving all pending messages.");
 
         await messageStatusRepository.ReceiveUnreceivedMessagesByUserIdAsync(command.AccountRequesterId, cancellationToken);
-
+        
         await dbContext.Messages
             .Where(x =>
                 x.ReceivedByAllAt == null &&
