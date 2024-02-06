@@ -14,9 +14,7 @@ public partial class ChatHub
             ConversationId: payload.ConversationId, 
             IsConversationGroup: payload.IsConversationGroup
         );
-
-        await sender.Send(readConversationMessagesCommand);
-
+        
         var hubGroupId = payload.ConversationId.ToString();
 
         await Clients
@@ -24,7 +22,8 @@ public partial class ChatHub
             .ReceiveReadMessage(
                 conversationId: payload.ConversationId, 
                 userId: payload.UserId, 
-                isConversationGroup: payload.IsConversationGroup
+                isConversationGroup: payload.IsConversationGroup,
+                readByAll: await sender.Send(readConversationMessagesCommand)
             );
     }
 }

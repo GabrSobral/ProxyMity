@@ -54,23 +54,26 @@ public sealed class MessageRepository(DataContext dbContext) : IMessageRepositor
     {
         switch(status) 
         {
-            case EMessageStatuses.READ:
-                await dbContext.Messages
-                    .Where(message => message.Id == messageId)
-                    .ExecuteUpdateAsync(instance => instance.SetProperty(message => message.ReadByAllAt, DateTime.UtcNow), cancellationToken);
-                break;
-
-            case EMessageStatuses.RECEIVED:
-                await dbContext.Messages
-                    .Where(message => message.Id == messageId)
-                    .ExecuteUpdateAsync(instance => instance.SetProperty(message => message.ReceivedByAllAt, DateTime.UtcNow), cancellationToken);
-                break;
-
             case EMessageStatuses.SENT:
                 await dbContext.Messages
                     .Where(message => message.Id == messageId)
                     .ExecuteUpdateAsync(instance => instance.SetProperty(message => message.SentAt, DateTime.UtcNow), cancellationToken);
                 break;
+            
+            case EMessageStatuses.RECEIVED:
+                await dbContext.Messages
+                    .Where(message => message.Id == messageId)
+                    .ExecuteUpdateAsync(instance => instance.SetProperty(message => message.ReceivedByAllAt, DateTime.UtcNow), cancellationToken);
+                break;
+            
+            case EMessageStatuses.READ:
+                await dbContext.Messages
+                    .Where(message => message.Id == messageId)
+                    .ExecuteUpdateAsync(instance => instance.SetProperty(message => message.ReadByAllAt, DateTime.UtcNow), cancellationToken);
+                break;
+            
+            default:
+                throw new ArgumentOutOfRangeException(nameof(status), status, null);
         }
     }
 }

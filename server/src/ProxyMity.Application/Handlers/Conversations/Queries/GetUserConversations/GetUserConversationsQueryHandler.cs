@@ -12,11 +12,9 @@ public sealed class GetUserConversationsQueryHandler(
         GetUserConversationsQuery query,
         CancellationToken cancellationToken)
     {
-        Ulid userId = query.UserId;
+        logger.LogInformation($"Listing conversations from {query.UserId}...");
 
-        logger.LogInformation($"Listing conversations of {userId}...");
-
-        var conversationsThatUserParticipate = await participantRepository.GetConversationsByUserIdAsync(userId, cancellationToken);
+        var conversationsThatUserParticipate = await participantRepository.GetConversationsByUserIdAsync(query.UserId, cancellationToken);
 
         GetUserConversationsResponse[] conversations = new GetUserConversationsResponse[conversationsThatUserParticipate.Count];
 
@@ -28,8 +26,8 @@ public sealed class GetUserConversationsQueryHandler(
             var lastMessages = await messageRepository.GetMessagesFromConversationAsync(conversation.Id, 1, cancellationToken);
 
             int unreadMessagesCount = conversation.GroupId is not null
-                ? await messageStatusRepository.GetUnreadMessagesStatusCountByUserIdAsync(userId, conversation.Id, cancellationToken)
-                : await messageRepository.GetUnreadConversationMessagesCountAsync(userId, conversation.Id, cancellationToken);
+                ? await messageStatusRepository.GetUnreadMessagesStatusCountByUserIdAsync(query.UserId, conversation.Id, cancellationToken)
+                : await messageRepository.GetUnreadConversationMessagesCountAsync(query.UserId, conversation.Id, cancellationToken);
 
             conversations[i] = new GetUserConversationsResponse(conversation, unreadMessagesCount, participants, lastMessages);
         }
@@ -42,7 +40,7 @@ public sealed class GetUserConversationsQueryHandler(
                 DateTime prevDate = prev.LastMessages.Any() ? prev.LastMessages.ElementAt(0).WrittenAt : DateTime.MinValue;
                 return prevDate.CompareTo(currDate); // Reversed order here
             }
-        );
+        ); 
 
         return conversations;
     }
