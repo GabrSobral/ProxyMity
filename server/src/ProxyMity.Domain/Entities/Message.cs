@@ -1,4 +1,6 @@
-﻿namespace ProxyMity.Domain.Entities;
+﻿using System.Text.Json.Serialization;
+
+namespace ProxyMity.Domain.Entities;
 
 [Table("message")]
 public class Message
@@ -43,7 +45,8 @@ public class Message
     [ForeignKey(nameof(ConversationId))]
     public Conversation Conversation { get; set; }
 
-    public IEnumerable<MessageStatus> MessageStatuses { get; set; } = new HashSet<MessageStatus>();
+    [JsonIgnore]
+    public IEnumerable<MessageStatus> MessageStatuses { get; set; }
 
     #endregion
 
@@ -56,6 +59,7 @@ public class Message
             ConversationId = conversationId,
             AuthorId = authorId,
             WrittenAt = writtenAt ?? DateTime.UtcNow,
+            MessageStatuses = new HashSet<MessageStatus>()
         };
     }
 }

@@ -34,10 +34,12 @@ export const chatDispatch: Actions = {
          store.conversations = store.conversations.map(conversation => {
             if (conversation.participants.some(participant => participant.id === userId)) {
                conversation.messages = conversation.messages.map(message => {
-                  message.received.users = [...message.received.users, { userId, at: new Date() }];
+                  if (!message.received.users.find(user => user.userId === userId)) {
+                     message.received.users = [...message.received.users, { userId, at: new Date() }];
 
-                  if (conversation.participants.length === message.received.users.filter(x => x.at).length) {
-                     message.received.byAllAt = new Date();
+                     if (conversation.participants.length === message.received.users.filter(x => x.at).length) {
+                        message.received.byAllAt = new Date();
+                     }
                   }
 
                   return message;
