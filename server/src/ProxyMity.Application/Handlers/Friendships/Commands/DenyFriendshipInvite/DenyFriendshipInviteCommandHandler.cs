@@ -8,14 +8,16 @@ public sealed class DenyFriendshipInviteCommandHandler(
 {
     public async Task<DateTime> Handle(DenyFriendshipInviteCommand command, CancellationToken cancellationToken)
     {
-        var friendship = await friendshipRepository.GetFriendshipInvite(command.RequesterUserId, command.CurrentUserId, cancellationToken)
-            ?? throw new FriendshipNotFoundException(command.RequesterUserId, command.CurrentUserId);
+        var ( currentUserId, requesterUserId ) = command;
+        
+        var friendship = await friendshipRepository.GetFriendshipInvite(requesterUserId, currentUserId, cancellationToken)
+            ?? throw new FriendshipNotFoundException(requesterUserId, currentUserId);
 
-        var timestamp = friendship.Deny(command.CurrentUserId);
+        var timestamp = friendship.Deny(currentUserId);
 
         await dbContext.SaveChangesAsync(cancellationToken);
 
-        logger.LogInformation($"The user '{command.CurrentUserId}' accepted friendship invitation from '{command.RequesterUserId}'");
+        logger.LogInformation($"The user '{currentUserId}' accepted friendship invitation from '{requesterUserId}'");
         return timestamp;
     }
 }

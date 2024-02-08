@@ -1,6 +1,6 @@
 ﻿namespace ProxyMity.Application.Handlers.Friendships.Commands.CreateFriendshipInvite;
 
-public class CreateFriendshipInviteCommandHandler(
+public sealed class CreateFriendshipInviteCommandHandler(
     ILogger<CreateFriendshipInviteCommandHandler> logger,
     IFriendshipRepository friendshipRepository,
     DataContext dbContext) : ICommandHandler<CreateFriendshipInviteCommand>
@@ -14,7 +14,7 @@ public class CreateFriendshipInviteCommandHandler(
                 cancellationToken);
 
         if (friendshipAlreadyExist is not null)
-            throw new Exception();
+            throw new FriendshipAlreadyExistException(requesterUserId, targetUserId);
 
         var newFriendship = Friendship.Create(requesterUserId, targetUserId);
 

@@ -3,19 +3,20 @@
 public sealed class AcceptFriendshipInviteCommandHandler(
     ILogger<AcceptFriendshipInviteCommand> logger,
     IFriendshipRepository friendshipRepository,
-    DataContext dbContext
-    ) : ICommandHandler<AcceptFriendshipInviteCommand, DateTime>
+    DataContext dbContext) : ICommandHandler<AcceptFriendshipInviteCommand, DateTime>
 {
     public async Task<DateTime> Handle(AcceptFriendshipInviteCommand command, CancellationToken cancellationToken)
     {
-        var friendship = await friendshipRepository.GetFriendshipInvite(command.RequesterUserId, command.CurrentUserId, cancellationToken)
-            ?? throw new FriendshipNotFoundException(command.RequesterUserId, command.CurrentUserId);
+        var ( currentUserId, requesterUserId ) = command;
+        
+        var friendship = await friendshipRepository.GetFriendshipInvite(requesterUserId, currentUserId, cancellationToken)
+            ?? throw new FriendshipNotFoundException(requesterUserId, currentUserId);
 
-        var timestamp = friendship.Accept(command.CurrentUserId);
+        var timestamp = friendship.Accept(currentUserId);
 
         await dbContext.SaveChangesAsync(cancellationToken);
 
-        logger.LogInformation($"The user '{command.CurrentUserId}' accepted friendship invitation from '{command.RequesterUserId}'");
+        logger.LogInformation($"The user '{currentUserId}' accepted friendship invitation from '{requesterUserId}'");
         return timestamp;
     }
 }

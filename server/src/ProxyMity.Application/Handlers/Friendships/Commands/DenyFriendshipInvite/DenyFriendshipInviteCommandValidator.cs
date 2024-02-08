@@ -1,6 +1,6 @@
 ﻿namespace ProxyMity.Application.Handlers.Friendships.Commands.DenyFriendshipInvite;
 
-public class DenyFriendshipInviteCommandValidator : AbstractValidator<DenyFriendshipInviteCommand>
+public sealed class DenyFriendshipInviteCommandValidator : AbstractValidator<DenyFriendshipInviteCommand>
 {
     public DenyFriendshipInviteCommandValidator()
     {
