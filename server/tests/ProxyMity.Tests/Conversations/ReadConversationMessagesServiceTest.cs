@@ -9,7 +9,7 @@ public class ReadConversationMessagesServiceTest {
     public ReadConversationMessagesServiceTest() {
         _logger = LoggerFactory.Create(builder => { }).CreateLogger<ReadConversationMessagesCommandHandler>();
         _saveMessageLogger = LoggerFactory.Create(builder => { }).CreateLogger<SaveMessageCommandHandler>();
-        _dbContext = new DbContextTest();
+        _dbContext = new Mock<DataContext>().Object;
     }
 
     [Fact]

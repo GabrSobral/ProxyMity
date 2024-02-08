@@ -24,6 +24,7 @@ global using ProxyMity.Unit.InMemoryRepositories;
 global using ProxyMity.Unit.Interfaces;
 global using ProxyMity.Unit.Utils;
 global using Xunit;
+global using Moq;
 
 
 

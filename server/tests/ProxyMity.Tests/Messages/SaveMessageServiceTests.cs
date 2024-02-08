@@ -6,7 +6,7 @@ public class SaveMessageServiceTests {
 
     public SaveMessageServiceTests() {
         _logger = LoggerFactory.Create(builder => { }).CreateLogger<SaveMessageCommandHandler>();
-        _dbContext = new DbContextTest();
+        _dbContext = new Mock<DataContext>().Object;
     }
 
     [Fact]

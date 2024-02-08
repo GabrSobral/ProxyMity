@@ -6,7 +6,7 @@ public class CreatePrivateConversationServiceTests {
 
     public CreatePrivateConversationServiceTests() {
         _logger = LoggerFactory.Create(builder => { }).CreateLogger<CreatePrivateConversationCommandHandler>();
-        _dbContext = new DbContextTest();
+        _dbContext = new Mock<DataContext>().Object;
     }
 
     [Fact]

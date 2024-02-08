@@ -9,10 +9,31 @@ internal class InMemoryMessageStatusRepository : InMemoryRepository<MessageStatu
         return Task.CompletedTask;
     }
 
-    public async Task<IEnumerable<MessageStatus>> GetMessagesStatusByMessageIdAsync(Ulid messageId, Ulid conversationId, CancellationToken cancellationToken) {
+    public async Task UpdateStatusAsync(Ulid userId, Ulid messageId, Ulid conversationId, EMessageStatuses status, CancellationToken cancellationToken) {
+        await Task.Run(() => { }, cancellationToken);
+        
+        foreach (var messageStatus in Items) {
+            if (messageStatus.MessageId != messageId || messageStatus.ConversationId != conversationId || messageStatus.UserId != userId) 
+                continue;
+            
+            if (status is EMessageStatuses.READ) 
+            {
+                messageStatus.ReadAt = DateTime.UtcNow;   
+            }
+                
+            if (status is EMessageStatuses.RECEIVED) 
+            {
+                messageStatus.ReceivedAt = DateTime.UtcNow;   
+            }
+        }
+
+        
+    }
+
+    public async Task<List<MessageStatus>> GetMessagesStatusByMessageIdAsync(Ulid messageId, Ulid conversationId, CancellationToken cancellationToken) {
         await Task.Run(() => { });
 
-        return Items.Where(x => x.MessageId == messageId && x.ConversationId == conversationId);
+        return Items.Where(x => x.MessageId == messageId && x.ConversationId == conversationId).ToList();
     }
 
     public async Task<int> GetUnreadMessagesStatusCountByUserIdAsync(Ulid userId, Ulid conversationId, CancellationToken cancellationToken) {
