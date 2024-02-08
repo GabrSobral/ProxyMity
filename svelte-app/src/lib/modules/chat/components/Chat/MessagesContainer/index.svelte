@@ -1,6 +1,7 @@
 <script lang="ts">
    import { page } from '$app/stores';
    import { afterUpdate } from 'svelte';
+   import { AnimateSharedLayout, Motion } from 'svelte-motion';
 
    import Text from '$lib/design-system/Text.svelte';
    import Heading from '$lib/design-system/Heading.svelte';
@@ -45,10 +46,9 @@
       {:else if $chatState.selectedConversation?.messages}
          {#each conversationMessages as message, i (message.id)}
             <!-- {#if firstUnreadMessage?.id === message.id && message.author.id !== userId}
-               <div class="w-full h-[1px] bg-red-500 flex justify-center">Unread messages</div>
-            {/if} -->
-
-            <Message {message} previousMessage={conversationMessages?.[i - 1]} />
+                     <div class="w-full h-[1px] bg-red-500 flex justify-center">Unread messages</div>
+                  {/if} -->
+            <Message {message} previousMessage={conversationMessages?.[i - 1]} messageIndex={i} />
          {/each}
       {/if}
    </ul>

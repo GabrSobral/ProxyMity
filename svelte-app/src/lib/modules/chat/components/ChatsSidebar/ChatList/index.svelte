@@ -5,6 +5,7 @@
    import Heading from '$lib/design-system/Heading.svelte';
 
    import { Button } from '$lib/components/ui/button';
+   import CreateConversationModal from '$lib/modules/chat/components/CreateConversationModal/index.svelte';
 
    import ChatItem from './ChatItem.svelte';
 
@@ -12,9 +13,12 @@
    import ChatItemSkeleton from './ChatItemSkeleton.svelte';
    import { appColor } from '../../../../../../contexts/theme/store';
 
-   let isNewContactModalOpened = false;
-
    $: allNotificationsCount = $chatState.conversations.reduce((accumulator, curr) => accumulator + curr.notifications, 0);
+
+   let isNewContactModalOpened = false;
+   let closeSettingsModal = () => {
+      isNewContactModalOpened = false;
+   };
 </script>
 
 <section
@@ -43,6 +47,8 @@
       >
          <UserPlus size={24} /> Create chat
       </Button>
+
+      <CreateConversationModal closeModal={closeSettingsModal} isOpened={isNewContactModalOpened} />
    </div>
 
    <div class="flex flex-col gap-[2px] mt-4 overflow-auto rounded-md h-full" role="list" use:autoAnimate>

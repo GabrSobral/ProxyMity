@@ -1,6 +1,5 @@
 <script lang="ts">
    import clsx from 'clsx';
-   import { page } from '$app/stores';
    import { cubicInOut } from 'svelte/easing';
    import { crossfade } from 'svelte/transition';
 

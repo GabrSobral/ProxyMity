@@ -1,9 +1,10 @@
 <script lang="ts">
+   import { writable } from 'svelte/store';
+
    import * as Dialog from '$lib/components/ui/dialog';
 
    import Separator from '$lib/components/ui/separator/separator.svelte';
    import SidebarNav from '$lib/application/SettingsModal/SidebarNav.svelte';
-   import { writable } from 'svelte/store';
    import AppearanceForm from './appearance/AppearanceForm.svelte';
 
    const sidebarNavItems: ['Profile', 'Appearance'] = ['Profile', 'Appearance'];

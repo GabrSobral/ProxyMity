@@ -1,4 +1,6 @@
 <script lang="ts">
+   import { fade } from 'svelte/transition';
+
    import Chat from '../components/Chat/index.svelte';
    import ChatsSidebar from '../components/ChatsSidebar/index.svelte';
    import ChatDetail from '../components/ChatDetails/index.svelte';
@@ -15,6 +17,10 @@
 
    {#if $chatState.selectedConversation}
       <Chat />
+   {:else}
+      <div class="flex items-center justify-center flex-1">
+         <img src="no-messages.svg" alt="No chat was selected." />
+      </div>
    {/if}
 
    {#if $chatState.showConversationDetail}
