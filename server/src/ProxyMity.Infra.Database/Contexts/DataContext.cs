@@ -9,10 +9,11 @@ public class DataContext : DbContext
     public virtual DbSet<User> Users { get; set; }
     public virtual DbSet<Group> Groups { get; set; }
     public virtual DbSet<Message> Messages { get; set; }
+    public virtual DbSet<Friendship> Friendships { get; set; }
     public virtual DbSet<Participant> Participants { get; set; }
     public virtual DbSet<Conversation> Conversations { get; set; }
     public virtual DbSet<MessageStatus> MessageStatuses { get; set; }
-
+    
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Participant>()
@@ -20,6 +21,9 @@ public class DataContext : DbContext
 
         modelBuilder.Entity<MessageStatus>()
            .HasKey(x => new { x.UserId, x.ConversationId, x.MessageId });
+        
+        modelBuilder.Entity<Friendship>()
+            .HasKey(x => new { x.TargetId, x.RequesterId });
     }
 
     /// <summary>

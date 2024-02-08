@@ -21,6 +21,9 @@ global using ProxyMity.Domain.Interfaces.Repositories.UserRepository;
 global using System.Reflection;
 global using ProxyMity.Infra.Database.Contexts;
 
+global using ProxyMity.Domain.Interfaces.Repositories.FriendshipRepository;
+
+
 
 
 
