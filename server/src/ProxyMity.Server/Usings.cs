@@ -1,5 +1,6 @@
 ﻿
 #region Packages
+global using Microsoft.EntityFrameworkCore;
 global using Microsoft.OpenApi.Models;
 global using Microsoft.Extensions.Options;
 global using Microsoft.IdentityModel.Tokens;
@@ -32,6 +33,8 @@ global using ProxyMity.Application;
 
 #region Infraestruture Data
 global using ProxyMity.Infra.Database;
+global using ProxyMity.Infra.Database.Contexts;
+
 #endregion
 
 #region Presentation

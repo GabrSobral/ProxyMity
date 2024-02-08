@@ -18,6 +18,7 @@ internal class Program
 
         app.ConfigureMiddlewares();
         app.ConfigureEndPoints();
+        app.ConfigureMigrations();
         app.ConfigureWebSockets();
 
         app.Run();
