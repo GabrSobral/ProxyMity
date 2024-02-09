@@ -1,14 +1,14 @@
 ﻿namespace ProxyMity.Unit.Friendships;
 
-public class AcceptFriendshipInviteServiceTests {
-    private readonly ILogger<AcceptFriendshipInviteCommandHandler> _logger = LoggerFactory.Create(builder => { }).CreateLogger<AcceptFriendshipInviteCommandHandler>();
+public class DenyFriendshipInviteServiceTests {
+    private readonly ILogger<DenyFriendshipInviteCommandHandler> _logger = LoggerFactory.Create(builder => { }).CreateLogger<DenyFriendshipInviteCommandHandler>();
     private readonly DataContext _dbContext = new Mock<DataContext>().Object;
 
     /// <summary>
     /// 
     /// </summary>
     [Fact]
-    public async Task Handle_Should_AcceptAFriendshipInvite_WhenTheInputIsValid() {
+    public async Task Handle_Should_DenyAFriendshipInvite_WhenTheInputIsValid() {
         var inMemoryFriendshipRepository = new InMemoryFriendshipRepository();
         
         var john = User.Create("John", "john@email.com", "123");
@@ -17,14 +17,14 @@ public class AcceptFriendshipInviteServiceTests {
         var friendship = Friendship.Create(requesterId: john.Id, targetId: michael.Id);
         inMemoryFriendshipRepository.Items.Add(friendship);
         
-        var command = new AcceptFriendshipInviteCommand(michael.Id, john.Id);
-        var commandHandler = new AcceptFriendshipInviteCommandHandler(_logger, inMemoryFriendshipRepository, _dbContext);
+        var command = new DenyFriendshipInviteCommand(michael.Id, john.Id);
+        var commandHandler = new DenyFriendshipInviteCommandHandler(_logger, inMemoryFriendshipRepository, _dbContext);
 
-        Assert.Null(friendship.AcceptedAt);
+        Assert.Null(friendship.DeniedAt);
         
         await commandHandler.Handle(command, new CancellationToken());
 
-        Assert.NotNull(friendship.AcceptedAt);
+        Assert.NotNull(friendship.DeniedAt);
     }
     
     /// <summary>
@@ -34,8 +34,8 @@ public class AcceptFriendshipInviteServiceTests {
     public async Task Validator_Should_ThrowAnError_WhenTheRequesterIdIsTheSameAsTargetId() {
         var john = User.Create("John", "john@email.com", "123");
         
-        var command = new AcceptFriendshipInviteCommand(john.Id, john.Id);
-        var validator = new AcceptFriendshipInviteCommandValidator();
+        var command = new DenyFriendshipInviteCommand(john.Id, john.Id);
+        var validator = new DenyFriendshipInviteCommandValidator();
 
         await Assert.ThrowsAsync<ValidationException>(async () => {
             await validator.ValidateAndThrowAsync(command);

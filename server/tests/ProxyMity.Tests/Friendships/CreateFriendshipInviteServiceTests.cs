@@ -21,7 +21,7 @@ public class CreateFriendshipInviteServiceTests {
     }
     
     [Fact]
-    public async Task Handle_Should_ThrowAnError_WhenTheRequesterIdIsTheSameAsTargetId() {
+    public async Task Validator_Should_ThrowAnError_WhenTheRequesterIdIsTheSameAsTargetId() {
         var michael = User.Create("Michael", "michael@email.com", "123");
 
         var validator = new CreateFriendshipInviteCommandValidator();
