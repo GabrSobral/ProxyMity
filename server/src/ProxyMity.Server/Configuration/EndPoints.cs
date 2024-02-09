@@ -20,6 +20,8 @@ public static class EndPoints
             endpoints.MapUserEndpoints();
 
             endpoints.MapMessageEndpoints();
+
+            endpoints.MapFriendshipEndpoints();
         });
 
         return app;

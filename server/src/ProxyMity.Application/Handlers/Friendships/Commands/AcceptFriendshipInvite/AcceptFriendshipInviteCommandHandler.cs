@@ -1,7 +1,7 @@
 ﻿namespace ProxyMity.Application.Handlers.Friendships.Commands.AcceptFriendshipInvite;
 
 public sealed class AcceptFriendshipInviteCommandHandler(
-    ILogger<AcceptFriendshipInviteCommand> logger,
+    ILogger<AcceptFriendshipInviteCommandHandler> logger,
     IFriendshipRepository friendshipRepository,
     DataContext dbContext) : ICommandHandler<AcceptFriendshipInviteCommand, DateTime>
 {

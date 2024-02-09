@@ -15,6 +15,5 @@ public sealed class CreateFriendshipInviteCommandValidator : AbstractValidator<C
         RuleFor(x => x.RequesterUserId)
             .NotEqual(x => x.TargetUserId)
             .WithMessage("Requester Id cannot be the same as Target Id");
-
     }
 }

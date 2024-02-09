@@ -1,10 +1,7 @@
-﻿global using FluentValidation;
-global using MediatR;
-global using MessagePack;
+﻿global using MediatR;
 global using Microsoft.AspNetCore.Authorization;
 global using Microsoft.AspNetCore.Builder;
 global using Microsoft.AspNetCore.Http;
-global using Microsoft.AspNetCore.Mvc;
 global using Microsoft.AspNetCore.Routing;
 global using Microsoft.AspNetCore.SignalR;
 global using Microsoft.Extensions.DependencyInjection;
@@ -15,6 +12,9 @@ global using ProxyMity.Application.Handlers.Conversations.Commands.CreateGroupCo
 global using ProxyMity.Application.Handlers.Conversations.Commands.CreatePrivateConversation;
 global using ProxyMity.Application.Handlers.Conversations.Commands.ReadConversationMessages;
 global using ProxyMity.Application.Handlers.Conversations.Queries.GetUserConversations;
+global using ProxyMity.Application.Handlers.Friendships.Commands.AcceptFriendshipInvite;
+global using ProxyMity.Application.Handlers.Friendships.Commands.CreateFriendshipInvite;
+global using ProxyMity.Application.Handlers.Friendships.Commands.DenyFriendshipInvite;
 global using ProxyMity.Application.Handlers.Messages.Commands.SaveMessage;
 global using ProxyMity.Application.Handlers.Messages.Commands.UpdateMessageStatus;
 global using ProxyMity.Application.Handlers.Users.GetByEmail;
@@ -30,6 +30,5 @@ global using System.Reflection;
 global using System.Security.Claims;
 global using ProxyMity.Application.Handlers.Messages.Queries.GetStatusFromMessage;
 global using ProxyMity.Application.Handlers.Messages.Commands.ReceivePendingMessages;
-
 global using ProxyMity.Application.Handlers.Messages.Queries.GetMessageById;
 

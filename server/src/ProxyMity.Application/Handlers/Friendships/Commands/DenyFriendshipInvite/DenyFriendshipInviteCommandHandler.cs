@@ -1,7 +1,7 @@
 ﻿namespace ProxyMity.Application.Handlers.Friendships.Commands.DenyFriendshipInvite;
 
 public sealed class DenyFriendshipInviteCommandHandler(
-    ILogger<DenyFriendshipInviteCommand> logger,
+    ILogger<DenyFriendshipInviteCommandHandler> logger,
     IFriendshipRepository friendshipRepository,
     DataContext dbContext
     ) : ICommandHandler<DenyFriendshipInviteCommand, DateTime>

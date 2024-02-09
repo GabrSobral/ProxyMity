@@ -11,5 +11,9 @@ public sealed class DenyFriendshipInviteCommandValidator : AbstractValidator<Den
         RuleFor(x => x.RequesterUserId)
             .NotNull()
             .WithMessage("the field 'RequesterUserId' cannot be null.");
+        
+        RuleFor(x => x.RequesterUserId)
+            .NotEqual(x => x.CurrentUserId)
+            .WithMessage("Requester Id cannot be the same as Current Id");
     }
 }
