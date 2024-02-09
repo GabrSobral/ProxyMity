@@ -1,13 +1,8 @@
 namespace ProxyMity.Unit.Conversations;
 
 public class CreatePrivateConversationServiceTests {
-    private readonly ILogger<CreatePrivateConversationCommandHandler> _logger;
-    private readonly DataContext _dbContext;
-
-    public CreatePrivateConversationServiceTests() {
-        _logger = LoggerFactory.Create(builder => { }).CreateLogger<CreatePrivateConversationCommandHandler>();
-        _dbContext = new Mock<DataContext>().Object;
-    }
+    private readonly ILogger<CreatePrivateConversationCommandHandler> _logger = LoggerFactory.Create(builder => { }).CreateLogger<CreatePrivateConversationCommandHandler>();
+    private readonly DataContext _dbContext = new Mock<DataContext>().Object;
 
     [Fact]
     public async void Handle_Should_CreatesConversationAndParticipants_WhenTheInputIsValid() {

@@ -1,13 +1,8 @@
 ﻿namespace ProxyMity.Unit.Messages;
 
 public class SaveMessageServiceTests {
-    private readonly ILogger<SaveMessageCommandHandler> _logger;
-    private readonly DataContext _dbContext;
-
-    public SaveMessageServiceTests() {
-        _logger = LoggerFactory.Create(builder => { }).CreateLogger<SaveMessageCommandHandler>();
-        _dbContext = new Mock<DataContext>().Object;
-    }
+    private readonly ILogger<SaveMessageCommandHandler> _logger = LoggerFactory.Create(builder => { }).CreateLogger<SaveMessageCommandHandler>();
+    private readonly DataContext _dbContext = new Mock<DataContext>().Object;
 
     [Fact]
     public async Task Handle_Should_SaveMessageInPrivateConversation_WhenTheInputIsValid() {

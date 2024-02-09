@@ -1,16 +1,10 @@
 ﻿namespace ProxyMity.Unit.Conversations;
 
 public class ReadConversationMessagesServiceTest {
-    private readonly ILogger<ReadConversationMessagesCommandHandler> _logger;
-    private readonly ILogger<SaveMessageCommandHandler> _saveMessageLogger;
+    private readonly ILogger<ReadConversationMessagesCommandHandler> _logger = LoggerFactory.Create(builder => { }).CreateLogger<ReadConversationMessagesCommandHandler>();
+    private readonly ILogger<SaveMessageCommandHandler> _saveMessageLogger = LoggerFactory.Create(builder => { }).CreateLogger<SaveMessageCommandHandler>();
 
-    private readonly DataContext _dbContext;
-
-    public ReadConversationMessagesServiceTest() {
-        _logger = LoggerFactory.Create(builder => { }).CreateLogger<ReadConversationMessagesCommandHandler>();
-        _saveMessageLogger = LoggerFactory.Create(builder => { }).CreateLogger<SaveMessageCommandHandler>();
-        _dbContext = new Mock<DataContext>().Object;
-    }
+    private readonly DataContext _dbContext = new Mock<DataContext>().Object;
 
     [Fact]
     public async Task Handle_Should_ReadAllPrivateConversationMessages_WhenTheInputIsValid() {

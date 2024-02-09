@@ -1,13 +1,8 @@
 ﻿namespace ProxyMity.Unit.Conversations;
 
 public class CreateGroupConversationServiceTests {
-    private readonly ILogger<CreateGroupConversationCommandHandler> _logger;
-    private readonly DataContext _dbContext;
-
-    public CreateGroupConversationServiceTests() {
-        _logger = LoggerFactory.Create(builder => { }).CreateLogger<CreateGroupConversationCommandHandler>();
-        _dbContext = new DbContextTest();
-    }
+    private readonly ILogger<CreateGroupConversationCommandHandler> _logger = LoggerFactory.Create(builder => { }).CreateLogger<CreateGroupConversationCommandHandler>();
+    private readonly DataContext _dbContext = new DbContextTest();
 
     private CreateGroupConversationCommandHandler CreateInstanceAndAddUsers(IEnumerable<User> users) {
         var inMemoryUserRepository = new InMemoryUserRepository();
