@@ -34,10 +34,10 @@ internal class InMemoryParticipantRepository(
 
         foreach (var item in participationInConversations) {
             var conversation = await conversationRepository.GetByIdAsync(item.UserId, cancellationToken)
-                ?? throw new Exception("Conversation not found");
+                ?? throw new ConversationNotFoundException(item.ConversationId);
 
             var group = await groupRepository.FindByIdAsync(item.UserId, cancellationToken)
-                ?? throw new Exception("Conversation not found");
+                ?? throw new ConversationNotFoundException(item.ConversationId);
 
             conversationsWithParticipants.Add(new GetConversationsByUserIdQuery(
                 conversation.Id,
