@@ -1,13 +1,19 @@
 <script lang="ts">
-   import { cubicInOut } from 'svelte/easing';
-   import Button from '$lib/components/ui/button/button.svelte';
-   import * as Dialog from '$lib/components/ui/dialog';
-   import Separator from '$lib/components/ui/separator/separator.svelte';
-   import { cn } from '$lib/utils';
-   import { writable } from 'svelte/store';
-   import { appColor } from '../../../../../contexts/theme/store';
-   import { crossfade } from 'svelte/transition';
    import clsx from 'clsx';
+   import { writable } from 'svelte/store';
+   import { cubicInOut } from 'svelte/easing';
+   import { crossfade } from 'svelte/transition';
+
+   import { cn } from '$lib/utils';
+
+   import * as Dialog from '$lib/components/ui/dialog';
+   import Button from '$lib/components/ui/button/button.svelte';
+   import Separator from '$lib/components/ui/separator/separator.svelte';
+
+   import GroupConversation from './group-conversation.svelte';
+   import PrivateConversation from './private-conversation.svelte';
+
+   import { appColor } from '../../../../../contexts/theme/store';
 
    export let isOpened: boolean = false;
    export let closeModal: () => void;
@@ -79,5 +85,11 @@
             {/each}
          </nav>
       </div>
+
+      {#if selectedPanel === 'Private'}
+         <PrivateConversation />
+      {:else}
+         <GroupConversation />
+      {/if}
    </Dialog.Content>
 </Dialog.Root>
