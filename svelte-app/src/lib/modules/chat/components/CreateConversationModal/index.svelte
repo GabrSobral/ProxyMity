@@ -14,6 +14,7 @@
    import PrivateConversation from './private-conversation.svelte';
 
    import { appColor } from '../../../../../contexts/theme/store';
+   import { twMerge } from 'tailwind-merge';
 
    export let isOpened: boolean = false;
    export let closeModal: () => void;
@@ -41,13 +42,19 @@
 <Dialog.Root bind:open={isOpened} bind:onOpenChange={$onChangeFn}>
    <Dialog.Trigger />
 
-   <Dialog.Content class="min-w-[40rem] h-[90%] overflow-auto flex flex-col">
+   <Dialog.Content
+      class={twMerge(
+         clsx('min-w-[40rem] overflow-auto flex flex-col h-[90%] w-fit transition-all', {
+            'max-w-[90%]': selectedPanel === 'Group',
+         })
+      )}
+   >
       <div class="space-y-5">
          <Dialog.Title>Create chat</Dialog.Title>
 
          <Dialog.Description>
-            Lorem ipsum dolor sit amet consectetur, adipisicing elit. Accusamus illo dolorum est in neque non, omnis provident?
-            Ratione, corrupti eveniet? Quaerat veniam doloremque alias autem dolorum temporibus qui quas tenetur!
+            Seamlessly establish private or group conversations with ease. Whether you're fostering one-on-one connections or
+            collaborating with teams, this intuitive modal lets you initiate real-time communication effortlessly.
          </Dialog.Description>
       </div>
 

@@ -7,48 +7,113 @@
    import InputGroup from '$lib/design-system/Input/InputGroup.svelte';
 
    let email = '';
+   let groupName = '';
+   let groupDescription = '';
+
+   interface SearchUser {
+      id: string;
+      name: string;
+      email: string;
+      avatarUrl: string | null;
+   }
+
+   let users: SearchUser[] = [
+      {
+         id: crypto.randomUUID(),
+         name: 'Gabriel Sobral',
+         email: 'gabriel.sobral@gmail.com',
+         avatarUrl: 'https://github.com/GabrSobral.png',
+      },
+      {
+         id: crypto.randomUUID(),
+         name: 'Sobral Gabriel',
+         email: 'asgoth55@gmail.com',
+         avatarUrl: null,
+      },
+   ];
+
+   let selectedUsers: SearchUser[] = [];
 </script>
 
-<form action="" class="flex flex-col gap-4">
-   <InputGroup let:Label let:Input let:Wrapper>
-      <Label>Name</Label>
+<div class="flex gap-4">
+   <form action="" class="flex flex-col gap-4 min-w-[25rem]">
+      <InputGroup let:Label let:Input let:Wrapper>
+         <Label>Name</Label>
 
-      <Input placeholder="Group Name" type="text" />
-   </InputGroup>
+         <Input placeholder="Group Name" type="text" bind:value={groupName} />
+      </InputGroup>
 
-   <InputGroup let:Label let:Input let:Wrapper>
-      <Label>Description</Label>
+      <InputGroup let:Label let:Input let:Wrapper>
+         <Label>Description</Label>
 
-      <Input placeholder="Group Description" type="text" />
-   </InputGroup>
+         <Input placeholder="Group Description" type="text" value={groupDescription} />
+      </InputGroup>
 
-   <InputGroup let:Label let:ErrorMessage let:Input let:Wrapper>
-      <Label>Search user</Label>
+      <InputGroup let:Label let:ErrorMessage let:Input let:Wrapper>
+         <Label>Search user</Label>
 
-      <Wrapper className="w-full">
-         <AtSign class="absolute left-4 top-2/4 -translate-y-2/4 pointer-events-none" />
+         <Wrapper className="w-full">
+            <AtSign size={18} class="absolute left-4 top-2/4 -translate-y-2/4 pointer-events-none" />
 
-         <Input placeholder="account@email.com" type="email" name="account-email" className="pr-20 pl-12" value={email} />
+            <Input placeholder="account@email.com" type="email" name="account-email" className="pr-20 pl-12" value={email} />
 
-         <Button class="absolute right-4 top-2/4 -translate-y-2/4 w-12">
-            <Search size="16" />
+            <Button class="absolute right-4 top-2/4 -translate-y-2/4 w-12">
+               <Search size="16" />
+            </Button>
+         </Wrapper>
+      </InputGroup>
+
+      <ul class="flex flex-col gap-2">
+         {#each users as user (user.id)}
+            {@const name = `${user.name.split(' ')[0]?.charAt(0)}${
+               user.name.split(' ')[1]?.charAt(0) || user.name.split(' ')[0]?.charAt(1)
+            }`}
+
+            <li
+               on:click={() => {
+                  selectedUsers.push(user);
+               }}
+               title="Click to select account"
+               class="flex gap-4 border border-gray-700 p-2 rounded-md hover:bg-gray-600 transition-all cursor-pointer"
+            >
+               <Avatar class="bg-purple-500 flex items-center justify-center">
+                  {name}
+               </Avatar>
+
+               <div class="flex flex-col gap-1">
+                  <Text size="md">{user.name}</Text>
+                  <Text size="sm">{user.email}</Text>
+               </div>
+            </li>
+         {/each}
+      </ul>
+
+      {#if selectedUsers.length}
+         <Button type="submit" class="ml-auto" title={`Create "${groupName}" group.`}>
+            Create "{groupName.slice(0, 15)}{groupName.length > 15 ? '...' : ''}" group
          </Button>
-      </Wrapper>
-   </InputGroup>
+      {/if}
+   </form>
 
-   <ul class="flex flex-col gap-2">
-      <li
-         title="Click to select account"
-         class="flex gap-4 border border-gray-700 p-2 rounded-md hover:bg-gray-600 transition-all cursor-pointer"
-      >
-         <Avatar class="bg-purple-500 flex items-center justify-center">GS</Avatar>
+   <ul class="flex flex-col gap-2 min-w-[30rem]">
+      {#each selectedUsers as user (user.id)}
+         {@const name = `${user.name.split(' ')[0]?.charAt(0)}${
+            user.name.split(' ')[1]?.charAt(0) || user.name.split(' ')[0]?.charAt(1)
+         }`}
 
-         <div class="flex flex-col gap-1">
-            <Text size="md">Gabriel Sobral</Text>
-            <Text size="sm">Gabriel.Sobral@email.com</Text>
-         </div>
-      </li>
+         <li
+            title="Click to select account"
+            class="flex gap-4 border border-gray-700 p-2 rounded-md hover:bg-gray-600 transition-all cursor-pointer"
+         >
+            <Avatar class="bg-purple-500 flex items-center justify-center">
+               {name}
+            </Avatar>
+
+            <div class="flex flex-col gap-1">
+               <Text size="md">{user.name}</Text>
+               <Text size="sm">{user.email}</Text>
+            </div>
+         </li>
+      {/each}
    </ul>
-
-   <Button type="submit" class="ml-auto">Create conversation with Gabriel</Button>
-</form>
+</div>
