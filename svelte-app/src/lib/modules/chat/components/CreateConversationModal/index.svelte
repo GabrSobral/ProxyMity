@@ -44,7 +44,7 @@
 
    <Dialog.Content
       class={twMerge(
-         clsx('min-w-[40rem] overflow-auto flex flex-col h-[90%] w-fit transition-all', {
+         clsx('min-w-[40rem] overflow-auto flex flex-col h-[90%] w-fit transition-all duration-500', {
             'max-w-[90%]': selectedPanel === 'Group',
          })
       )}

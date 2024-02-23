@@ -5,6 +5,7 @@
    import Avatar from '$lib/components/ui/avatar/avatar.svelte';
    import Button from '$lib/components/ui/button/button.svelte';
    import InputGroup from '$lib/design-system/Input/InputGroup.svelte';
+   import clsx from 'clsx';
 
    let email = '';
    let groupName = '';
@@ -33,6 +34,8 @@
    ];
 
    let selectedUsers: SearchUser[] = [];
+
+   $: console.log(selectedUsers);
 </script>
 
 <div class="flex gap-4">
@@ -69,12 +72,20 @@
                user.name.split(' ')[1]?.charAt(0) || user.name.split(' ')[0]?.charAt(1)
             }`}
 
+            {@const isSelected = selectedUsers.some(item => item.id === user.id)}
+
             <li
                on:click={() => {
-                  selectedUsers.push(user);
+                  if (isSelected) {
+                     selectedUsers = selectedUsers.filter(item => item.id !== user.id);
+                  } else {
+                     selectedUsers = [user, ...selectedUsers];
+                  }
                }}
                title="Click to select account"
-               class="flex gap-4 border border-gray-700 p-2 rounded-md hover:bg-gray-600 transition-all cursor-pointer"
+               class={clsx('flex gap-4 border border-gray-700 p-2 rounded-md hover:bg-gray-600 transition-all cursor-pointer', {
+                  'bg-purple-500': isSelected,
+               })}
             >
                <Avatar class="bg-purple-500 flex items-center justify-center">
                   {name}
@@ -102,6 +113,9 @@
          }`}
 
          <li
+            on:click={() => {
+               selectedUsers = selectedUsers.filter(item => item.id !== user.id);
+            }}
             title="Click to select account"
             class="flex gap-4 border border-gray-700 p-2 rounded-md hover:bg-gray-600 transition-all cursor-pointer"
          >

@@ -115,7 +115,7 @@
 
    onMount(() => {
       if (session?.user && session?.accessToken) {
-         const userId = session?.user.id;
+         const userId = session?.user?.id;
 
          chatDispatch.setIsFetchingConversations(true);
 
@@ -152,7 +152,7 @@
       const conversation = $chatState.conversations.find(item => item.id === serverMessage.conversationId);
       const conversationId = conversation?.id || '';
       const isConversationGroup = conversation?.isGroup || false;
-      const userId = session?.user.id || '';
+      const userId = session?.user?.id || '';
       const messageId = serverMessage.id;
 
       const webSocketsPayload = { userId, conversationId, messageId, isConversationGroup };
