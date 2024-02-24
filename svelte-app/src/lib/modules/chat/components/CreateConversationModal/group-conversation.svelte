@@ -58,9 +58,9 @@
          <Wrapper className="w-full">
             <AtSign size={18} class="absolute left-4 top-2/4 -translate-y-2/4 pointer-events-none" />
 
-            <Input placeholder="account@email.com" type="email" name="account-email" className="pr-20 pl-12" value={email} />
+            <Input placeholder="account@email.com" type="email" name="account-email" className="pr-20 pl-12" bind:value={email} />
 
-            <Button class="absolute right-4 top-2/4 -translate-y-2/4 w-12">
+            <Button class="absolute right-2 top-2/4 -translate-y-2/4 w-12">
                <Search size="16" />
             </Button>
          </Wrapper>
@@ -99,14 +99,14 @@
          {/each}
       </ul>
 
-      {#if selectedUsers.length}
+      {#if selectedUsers.length && groupName}
          <Button type="submit" class="ml-auto" title={`Create "${groupName}" group.`}>
             Create "{groupName.slice(0, 15)}{groupName.length > 15 ? '...' : ''}" group
          </Button>
       {/if}
    </form>
 
-   <ul class="flex flex-col gap-2 min-w-[30rem]">
+   <ul class="flex flex-col gap-2 min-w-[30rem] bg-gray-950 p-2 flex-1 rounded-lg">
       {#each selectedUsers as user (user.id)}
          {@const name = `${user.name.split(' ')[0]?.charAt(0)}${
             user.name.split(' ')[1]?.charAt(0) || user.name.split(' ')[0]?.charAt(1)
