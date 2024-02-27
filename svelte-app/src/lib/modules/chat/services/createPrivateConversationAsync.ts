@@ -7,10 +7,9 @@ interface Request {
 
 interface Response {
    id: string;
-   name: string;
-   email: string;
-   photoUrl: string;
+   groupId: string;
    createdAt: Date;
+   participants: string[];
 }
 
 export async function createPrivateConversationAsync(

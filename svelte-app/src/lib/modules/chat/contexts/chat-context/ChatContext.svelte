@@ -101,7 +101,6 @@
    import { EMessageStatuses } from '../../../../../enums/EMessageStatuses';
    import type { IServerMessage } from '../../../../../types/message';
 
-   import type { Command } from '../../workers/db-worker/worker';
    import { chatWorker } from '../../workers/db-worker/initializer';
    import { WorkerMethods } from '../../workers/db-worker/method-types';
 

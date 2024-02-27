@@ -1,11 +1,13 @@
 <script lang="ts">
+   import clsx from 'clsx';
    import { AtSign, Search } from 'lucide-svelte';
 
    import Text from '$lib/design-system/Text.svelte';
+   import Heading from '$lib/design-system/Heading.svelte';
+   import InputGroup from '$lib/design-system/Input/InputGroup.svelte';
+
    import Avatar from '$lib/components/ui/avatar/avatar.svelte';
    import Button from '$lib/components/ui/button/button.svelte';
-   import InputGroup from '$lib/design-system/Input/InputGroup.svelte';
-   import clsx from 'clsx';
 
    let email = '';
    let groupName = '';
@@ -34,19 +36,17 @@
    ];
 
    let selectedUsers: SearchUser[] = [];
-
-   $: console.log(selectedUsers);
 </script>
 
 <div class="flex gap-4">
    <form action="" class="flex flex-col gap-4 min-w-[25rem]">
-      <InputGroup let:Label let:Input let:Wrapper>
-         <Label>Name</Label>
+      <InputGroup let:Label let:Input>
+         <Label isRequired>Name</Label>
 
          <Input placeholder="Group Name" type="text" bind:value={groupName} />
       </InputGroup>
 
-      <InputGroup let:Label let:Input let:Wrapper>
+      <InputGroup let:Label let:Input>
          <Label>Description</Label>
 
          <Input placeholder="Group Description" type="text" value={groupDescription} />
@@ -106,28 +106,38 @@
       {/if}
    </form>
 
-   <ul class="flex flex-col gap-2 min-w-[30rem] bg-gray-950 p-2 flex-1 rounded-lg">
-      {#each selectedUsers as user (user.id)}
-         {@const name = `${user.name.split(' ')[0]?.charAt(0)}${
-            user.name.split(' ')[1]?.charAt(0) || user.name.split(' ')[0]?.charAt(1)
-         }`}
+   <div class="flex flex-col gap-2 min-w-[30rem] bg-gray-950 p-2 flex-1 rounded-lg">
+      <Heading size="lg">Members</Heading>
 
-         <li
-            on:click={() => {
-               selectedUsers = selectedUsers.filter(item => item.id !== user.id);
-            }}
-            title="Click to select account"
-            class="flex gap-4 border border-gray-700 p-2 rounded-md hover:bg-gray-600 transition-all cursor-pointer"
-         >
-            <Avatar class="bg-purple-500 flex items-center justify-center">
-               {name}
-            </Avatar>
+      {#if selectedUsers.length > 0}
+         <ul class="flex flex-col gap-2">
+            {#each selectedUsers as user (user.id)}
+               {@const name = `${user.name.split(' ')[0]?.charAt(0)}${
+                  user.name.split(' ')[1]?.charAt(0) || user.name.split(' ')[0]?.charAt(1)
+               }`}
 
-            <div class="flex flex-col gap-1">
-               <Text size="md">{user.name}</Text>
-               <Text size="sm">{user.email}</Text>
-            </div>
-         </li>
-      {/each}
-   </ul>
+               <li
+                  on:click={() => {
+                     selectedUsers = selectedUsers.filter(item => item.id !== user.id);
+                  }}
+                  title="Click to select account"
+                  class="flex gap-4 border border-gray-700 p-2 rounded-md hover:bg-gray-600 transition-all cursor-pointer"
+               >
+                  <Avatar class="bg-purple-500 flex items-center justify-center">
+                     {name}
+                  </Avatar>
+
+                  <div class="flex flex-col gap-1">
+                     <Text size="md">{user.name}</Text>
+                     <Text size="sm">{user.email}</Text>
+                  </div>
+               </li>
+            {/each}
+         </ul>
+      {:else}
+         <div class="flex flex-1 items-center justify-center">
+            <Text size="lg" defaultTextColor="text-gray-400">No members selected.</Text>
+         </div>
+      {/if}
+   </div>
 </div>

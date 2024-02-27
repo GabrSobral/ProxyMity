@@ -15,7 +15,7 @@
 
 <ButtonPrimitive.Root
    {builders}
-   class={cn('gap-2 flex', buttonVariants({ variant, size, className }))}
+   class={cn('gap-2 flex transition-all', buttonVariants({ variant, size, className }))}
    type="button"
    {...$$restProps}
    on:click
