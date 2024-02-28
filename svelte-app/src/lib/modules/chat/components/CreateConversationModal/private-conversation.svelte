@@ -14,6 +14,9 @@
    import { getUserByEmailAsync } from '../../services/getUserByEmailAsync';
    import { showMessageSonner } from '../../../../../contexts/error-context/store';
    import { createPrivateConversationAsync } from '../../services/createPrivateConversationAsync';
+   import { chatDispatch } from '../../contexts/chat-context/stores/chat';
+
+   export let closeModal: () => void;
 
    let email = '';
 
@@ -44,9 +47,9 @@
       } catch (error: any) {
          console.error('An error occurred at:', new Date(), error);
          showMessageSonner({ message: error?.response?.data?.error || error?.message });
+      } finally {
+         searchedUser.isLoading = false;
       }
-
-      searchedUser.isLoading = false;
    }
 
    async function createChat() {
@@ -64,6 +67,34 @@
          isCreatingLoading = true;
 
          const newConversation = await createPrivateConversationAsync({ participantId: selectedAccount.id }, { accessToken });
+         const newConversationState = {
+            id: newConversation.id,
+            isGroup: false,
+            createdAt: new Date(),
+            hasMessagesFetched: true,
+            messages: [],
+            notifications: 0,
+            participants: [
+               {
+                  id: selectedAccount.id,
+                  createdAt: selectedAccount.createdAt,
+                  email: selectedAccount.email,
+                  name: selectedAccount.name,
+                  photoUrl: selectedAccount.photoUrl,
+                  removedAt: null,
+                  lastOnline: new Date(),
+               },
+            ],
+            replyMessage: null,
+            typeMessage: '',
+            groupDescription: null,
+            groupName: null,
+         };
+
+         chatDispatch.addConversation(newConversationState);
+         chatDispatch.selectConversation({ conversation: newConversationState, typeMessage: '', currentUserId: '' });
+
+         closeModal();
       } catch (error: any) {
          console.error('An error occurred at:', new Date(), error);
          showMessageSonner({ message: error?.response?.data?.error || error?.message });

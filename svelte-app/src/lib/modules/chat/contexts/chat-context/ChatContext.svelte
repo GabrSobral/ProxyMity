@@ -107,6 +107,7 @@
    import { serverToLocalMessage } from './functions/parse-server-message';
    import type { WebSocketEmitter } from '../websocket-context/WebSocketEmitter';
    import { connection, webSocketEmitter } from '../websocket-context/stores/connection';
+   import { showMessageSonner } from '../../../../../contexts/error-context/store';
 
    setChatContext();
 
@@ -115,6 +116,12 @@
    onMount(() => {
       if (session?.user && session?.accessToken) {
          const userId = session?.user?.id;
+
+         if (!userId) {
+            console.error('User Id not found.');
+            showMessageSonner({ message: 'User Id not found.' });
+            return;
+         }
 
          chatDispatch.setIsFetchingConversations(true);
 

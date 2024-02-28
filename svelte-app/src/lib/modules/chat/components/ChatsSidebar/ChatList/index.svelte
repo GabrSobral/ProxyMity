@@ -38,7 +38,7 @@
       </Heading>
 
       <Button
-         type="button"
+         class=""
          variant={$appColor}
          on:click={() => {
             isNewContactModalOpened = true;
@@ -47,8 +47,6 @@
       >
          <UserPlus size={24} /> Create chat
       </Button>
-
-      <CreateConversationModal closeModal={closeSettingsModal} isOpened={isNewContactModalOpened} />
    </div>
 
    <div class="flex flex-col gap-[2px] mt-4 overflow-auto rounded-md h-full" role="list" use:autoAnimate>
@@ -68,3 +66,5 @@
       class="absolute bottom-0 left-0 h-16 w-full z-10 bg-gradient-to-t dark:from-gray-900 transition-all from-gray-200 pointer-events-none"
    />
 </section>
+
+<CreateConversationModal closeModal={closeSettingsModal} isOpened={isNewContactModalOpened} />

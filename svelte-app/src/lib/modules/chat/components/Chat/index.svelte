@@ -1,6 +1,4 @@
 <script lang="ts">
-   import { fade } from 'svelte/transition';
-
    import ChatHeader from './ChatHeader.svelte';
    import MessagesContainer from './MessagesContainer/index.svelte';
 </script>

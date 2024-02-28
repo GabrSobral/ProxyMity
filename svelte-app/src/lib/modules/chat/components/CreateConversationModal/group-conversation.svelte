@@ -8,38 +8,50 @@
 
    import Avatar from '$lib/components/ui/avatar/avatar.svelte';
    import Button from '$lib/components/ui/button/button.svelte';
+   import { getUserByEmailAsync } from '../../services/getUserByEmailAsync';
+   import type { User } from '../../../../../types/user';
+   import { showMessageSonner } from '../../../../../contexts/error-context/store';
+   import { page } from '$app/stores';
 
    let email = '';
    let groupName = '';
    let groupDescription = '';
 
-   interface SearchUser {
-      id: string;
-      name: string;
-      email: string;
-      avatarUrl: string | null;
+   let isCreatingLoading = false;
+
+   let accessToken = $page.data.session?.accessToken;
+   let currentUser = $page.data.session?.user;
+
+   let errorMessage = '';
+
+   let usersData: { users: User[]; isLoading: boolean } = { users: [], isLoading: false };
+   let selectedUsers: User[] = [];
+
+   async function searchUser() {
+      errorMessage = '';
+      usersData.users = [];
+
+      usersData.isLoading = true;
+
+      try {
+         const user = await getUserByEmailAsync({ userEmail: email }, { accessToken: accessToken || '' });
+
+         if (!user) {
+            errorMessage = 'No user was found with this e-mail.';
+         }
+
+         usersData.users = [...usersData.users, { ...user, status: 'online' }];
+      } catch (error: any) {
+         console.error('An error occurred at:', new Date(), error);
+         showMessageSonner({ message: error?.response?.data?.error || error?.message });
+      } finally {
+         usersData.isLoading = false;
+      }
    }
-
-   let users: SearchUser[] = [
-      {
-         id: crypto.randomUUID(),
-         name: 'Gabriel Sobral',
-         email: 'gabriel.sobral@gmail.com',
-         avatarUrl: 'https://github.com/GabrSobral.png',
-      },
-      {
-         id: crypto.randomUUID(),
-         name: 'Sobral Gabriel',
-         email: 'asgoth55@gmail.com',
-         avatarUrl: null,
-      },
-   ];
-
-   let selectedUsers: SearchUser[] = [];
 </script>
 
 <div class="flex gap-4">
-   <form action="" class="flex flex-col gap-4 min-w-[25rem]">
+   <form action="" class="flex flex-col gap-4 min-w-[25rem]" on:submit|preventDefault={searchUser}>
       <InputGroup let:Label let:Input>
          <Label isRequired>Name</Label>
 
@@ -60,14 +72,14 @@
 
             <Input placeholder="account@email.com" type="email" name="account-email" className="pr-20 pl-12" bind:value={email} />
 
-            <Button class="absolute right-2 top-2/4 -translate-y-2/4 w-12">
+            <Button class="absolute right-2 top-2/4 -translate-y-2/4 w-12" type="submit">
                <Search size="16" />
             </Button>
          </Wrapper>
       </InputGroup>
 
       <ul class="flex flex-col gap-2">
-         {#each users as user (user.id)}
+         {#each usersData.users as user (user.id)}
             {@const name = `${user.name.split(' ')[0]?.charAt(0)}${
                user.name.split(' ')[1]?.charAt(0) || user.name.split(' ')[0]?.charAt(1)
             }`}

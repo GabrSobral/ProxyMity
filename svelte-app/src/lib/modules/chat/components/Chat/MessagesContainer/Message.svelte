@@ -127,8 +127,6 @@
       addEventListener(message.id, messageEventHandler);
       return () => removeEventListener(message.id, messageEventHandler);
    });
-
-   console.log({ messageIndex });
 </script>
 
 <Motion animate={{ x: 0 }} initial={{ x: isMine ? -20 : 20 }} transition={{ delay: (messageIndex + 1) * 100 }} let:motion>

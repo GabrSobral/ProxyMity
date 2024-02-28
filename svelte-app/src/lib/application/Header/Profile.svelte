@@ -25,8 +25,8 @@
    };
 </script>
 
-<div class="flex items-center gap-3">
-   <div class="flex flex-col gap-1">
+<div class="flex items-center">
+   <div class="flex flex-col gap-1 mr-3">
       <Text size="md">Good Morning, {user?.name}</Text>
       <Text size="sm" className="text-xs text-gray-300">{user?.email}</Text>
    </div>
@@ -71,33 +71,33 @@
          </DropdownMenu.Group>
       </DropdownMenu.Content>
    </DropdownMenu.Root>
+
+   <AlertDialog.Root bind:open={show} bind:onOutsideClick={$closeModal}>
+      <AlertDialog.Trigger></AlertDialog.Trigger>
+
+      <AlertDialog.Content>
+         <AlertDialog.Header>
+            <AlertDialog.Title>Are you leaving already?..</AlertDialog.Title>
+            <AlertDialog.Description>
+               If you logout, all your data saved data will be deleted, and you will must to Login again.
+            </AlertDialog.Description>
+         </AlertDialog.Header>
+
+         <AlertDialog.Footer>
+            <AlertDialog.Cancel>Cancel</AlertDialog.Cancel>
+            <AlertDialog.Action
+               on:click={() => {
+                  isLoading = true;
+                  signOut({ callbackUrl: '/auth/sign-in', redirect: true });
+               }}
+            >
+               {#if isLoading}
+                  <LoadingSpinning size={32} lineSize={2} color="white" />
+               {:else}
+                  Sign out
+               {/if}
+            </AlertDialog.Action>
+         </AlertDialog.Footer>
+      </AlertDialog.Content>
+   </AlertDialog.Root>
 </div>
-
-<AlertDialog.Root bind:open={show} bind:onOutsideClick={$closeModal}>
-   <AlertDialog.Trigger></AlertDialog.Trigger>
-
-   <AlertDialog.Content>
-      <AlertDialog.Header>
-         <AlertDialog.Title>Are you leaving already?..</AlertDialog.Title>
-         <AlertDialog.Description>
-            If you logout, all your data saved data will be deleted, and you will must to Login again.
-         </AlertDialog.Description>
-      </AlertDialog.Header>
-
-      <AlertDialog.Footer>
-         <AlertDialog.Cancel>Cancel</AlertDialog.Cancel>
-         <AlertDialog.Action
-            on:click={() => {
-               isLoading = true;
-               signOut({ callbackUrl: '/auth/sign-in', redirect: true });
-            }}
-         >
-            {#if isLoading}
-               <LoadingSpinning size={32} lineSize={2} color="white" />
-            {:else}
-               Sign out
-            {/if}
-         </AlertDialog.Action>
-      </AlertDialog.Footer>
-   </AlertDialog.Content>
-</AlertDialog.Root>

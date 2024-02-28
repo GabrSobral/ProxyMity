@@ -94,7 +94,7 @@
       </div>
 
       {#if selectedPanel === 'Private'}
-         <PrivateConversation />
+         <PrivateConversation {closeModal} />
       {:else}
          <GroupConversation />
       {/if}
