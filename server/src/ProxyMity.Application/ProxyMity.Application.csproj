@@ -7,17 +7,17 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="FluentValidation" Version="11.9.0"/>
-        <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="11.9.0"/>
-        <PackageReference Include="MediatR" Version="12.2.0"/>
-        <PackageReference Include="Microsoft.Extensions.Configuration" Version="8.0.0"/>
-        <PackageReference Include="Microsoft.Extensions.Logging" Version="8.0.0"/>
+        <PackageReference Include="FluentValidation" Version="11.9.0" />
+        <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="11.9.0" />
+        <PackageReference Include="MediatR" Version="12.2.0" />
+        <PackageReference Include="Microsoft.Extensions.Configuration" Version="8.0.0" />
+        <PackageReference Include="Microsoft.Extensions.Logging" Version="8.0.0" />
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\ProxyMity.Application.Authentication\ProxyMity.Application.Authentication.csproj"/>
-        <ProjectReference Include="..\ProxyMity.Domain\ProxyMity.Domain.csproj"/>
-        <ProjectReference Include="..\ProxyMity.Infra.Database\ProxyMity.Infra.Database.csproj"/>
+        <ProjectReference Include="..\ProxyMity.Application.Authentication\ProxyMity.Application.Authentication.csproj" />
+        <ProjectReference Include="..\ProxyMity.Domain\ProxyMity.Domain.csproj" />
+        <ProjectReference Include="..\ProxyMity.Infra.Database\ProxyMity.Infra.Database.csproj" />
     </ItemGroup>
 
     <ItemGroup>

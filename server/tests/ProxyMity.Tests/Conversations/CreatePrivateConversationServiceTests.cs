@@ -19,13 +19,13 @@ public class CreatePrivateConversationServiceTests {
           _dbContext
         );
 
-        var user1 = User.Create("Test 1", "Test1@email.com", "123");
-        var user2 = User.Create("Test 2", "Test2@email.com", "123");
+        var john = User.Create("John", "john@email.com", "123");
+        var michael = User.Create("Michael", "michael@email.com", "123");
 
-        inMemoryUserRepository.Items.Add(user1);
-        inMemoryUserRepository.Items.Add(user2);
+        inMemoryUserRepository.Items.Add(john);
+        inMemoryUserRepository.Items.Add(michael);
 
-        var inputModel = new CreatePrivateConversationCommand(user1.Id, user2.Id);
+        var inputModel = new CreatePrivateConversationCommand(john.Id, michael.Id);
 
         var cancellationToken = new CancellationToken();
 

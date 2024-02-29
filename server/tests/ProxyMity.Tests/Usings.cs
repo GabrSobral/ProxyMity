@@ -6,6 +6,8 @@ global using ProxyMity.Application.Handlers.Authentication.SignIn;
 global using ProxyMity.Application.Handlers.Conversations.Commands.CreateGroupConversation;
 global using ProxyMity.Application.Handlers.Conversations.Commands.CreatePrivateConversation;
 global using ProxyMity.Application.Handlers.Conversations.Commands.ReadConversationMessages;
+global using ProxyMity.Application.Handlers.Conversations.Commands.PinConversation;
+global using ProxyMity.Application.Handlers.Conversations.Commands.UnpinConversation;
 global using ProxyMity.Application.Handlers.Friendships.Commands.CreateFriendshipInvite;
 global using ProxyMity.Application.Handlers.Friendships.Commands.AcceptFriendshipInvite;
 global using ProxyMity.Application.Handlers.Friendships.Commands.DenyFriendshipInvite;

@@ -79,8 +79,28 @@ internal class InMemoryParticipantRepository(
         return participants;
     }
 
+    public Task PinConversation(Ulid conversationId, Ulid userId, CancellationToken cancellationToken) {
+        foreach (var item in Items) {
+            if (item.UserId == userId && item.ConversationId == conversationId) {
+                item.ConversationPinnedAt = DateTime.UtcNow;
+            }
+        }
+
+        return Task.CompletedTask;
+    }
+
     public Task Remove(Participant participant, CancellationToken cancellationToken) {
         Items.Remove(participant);
+
+        return Task.CompletedTask;
+    }
+
+    public Task UnpinConversation(Ulid conversationId, Ulid userId, CancellationToken cancellationToken) {
+        foreach (var item in Items) {
+            if (item.UserId == userId && item.ConversationId == conversationId) {
+                item.ConversationPinnedAt = null;
+            }
+        }
 
         return Task.CompletedTask;
     }
