@@ -6,9 +6,9 @@ public sealed class PinConversationCommandHandler(
     IParticipantRepository participantRepository,
 
     DataContext dbContext
-) : ICommandHandler<UnpinConversationCommand>
+) : ICommandHandler<PinConversationCommand>
 {
-    public async Task Handle(UnpinConversationCommand command, CancellationToken cancellationToken)
+    public async Task Handle(PinConversationCommand command, CancellationToken cancellationToken)
     {
         var ( conversationId, userId ) = command;
 

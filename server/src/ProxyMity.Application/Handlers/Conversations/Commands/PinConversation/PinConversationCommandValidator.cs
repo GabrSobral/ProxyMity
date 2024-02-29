@@ -1,8 +1,8 @@
 ﻿namespace ProxyMity.Application.Handlers.Conversations.Commands.PinConversation;
 
-public sealed class PinConversationCommandValidator: AbstractValidator<UnpinConversationCommand>
+public sealed class UnpinConversationCommandValidator: AbstractValidator<PinConversationCommand>
 {
-    public PinConversationCommandValidator(DataContext dbContext)
+    public UnpinConversationCommandValidator(DataContext dbContext)
     {
         RuleFor(x => x.ConversationId)
             .NotNull()
