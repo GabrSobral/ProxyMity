@@ -12,6 +12,7 @@ public static class DependenyInjection
         services.AddScoped<IParticipantRepository, ParticipantRepository>();
         services.AddScoped<IConversationRepository, ConversationRepository>();
         services.AddScoped<IMessageStatusRepository, MessageStatusRepository>();
+        services.AddScoped<IFriendshipRepository, FriendshipRepository>();
 
         string connectionString = configuration.GetConnectionString("PostgreSql")!;
 

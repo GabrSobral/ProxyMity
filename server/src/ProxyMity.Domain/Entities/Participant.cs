@@ -13,6 +13,8 @@ public class Participant
 
     public DateTime? UpdatedAt { get; set; }
 
+    public DateTime? ConversationPinnedAt { get; set; }
+
     #region Foreign Keys
 
     [ForeignKey(nameof(UserId))]
@@ -29,7 +31,7 @@ public class Participant
         {
             UserId = userId,
             ConversationId = conversationId,
-            CreatedAt = DateTime.UtcNow
+            CreatedAt = DateTime.UtcNow,
         };
     }
 }

@@ -1,4 +1,5 @@
-﻿global using FluentValidation;
+﻿global using System.Reflection;
+global using FluentValidation;
 global using MediatR;
 global using Microsoft.EntityFrameworkCore;
 global using Microsoft.Extensions.DependencyInjection;
@@ -18,13 +19,5 @@ global using ProxyMity.Domain.Interfaces.Repositories.MessageStatusRepository;
 global using ProxyMity.Domain.Interfaces.Repositories.ParticipantRepository;
 global using ProxyMity.Domain.Interfaces.Repositories.ParticipantRepository.CustomQueries;
 global using ProxyMity.Domain.Interfaces.Repositories.UserRepository;
-global using System.Reflection;
-global using ProxyMity.Infra.Database.Contexts;
-
 global using ProxyMity.Domain.Interfaces.Repositories.FriendshipRepository;
-
-
-
-
-
-
+global using ProxyMity.Infra.Database.Contexts;
