@@ -12,6 +12,7 @@
    import { chatState } from '$lib/modules/chat/contexts/chat-context/stores/chat';
    import ChatItemSkeleton from './ChatItemSkeleton.svelte';
    import { appColor } from '../../../../../../contexts/theme/store';
+   import Text from '$lib/design-system/Text.svelte';
 
    $: allNotificationsCount = $chatState.conversations.reduce((accumulator, curr) => accumulator + curr.notifications, 0);
 
@@ -19,12 +20,13 @@
    let closeSettingsModal = () => {
       isNewContactModalOpened = false;
    };
+
+   $: pinnedConversations = $chatState.conversations.filter(item => item.conversationPinnedAt).sort();
+   $: unpinnedConversations = $chatState.conversations.filter(item => !item.conversationPinnedAt);
 </script>
 
-<section
-   class="flex flex-col dark:bg-black border dark:border-gray-900 border-gray-200 bg-white transition-all rounded-[10px] p-3 relative overflow-hidden flex-1"
->
-   <div class="flex gap-4 justify-between">
+<section class="flex flex-col gap-3 transition-all relative overflow-hidden flex-1">
+   <div class="flex gap-4 justify-between px-3">
       <Heading size="md" className="flex gap-3 items-center">
          Chats
 
@@ -49,22 +51,37 @@
       </Button>
    </div>
 
-   <div class="flex flex-col gap-[2px] mt-4 overflow-auto rounded-md h-full" role="list" use:autoAnimate>
+   {#if pinnedConversations.length}
+      <div class="flex flex-col gap-[2px] rounded-md bg-gray-100 dark:bg-gray-950 px-1 py-2" role="list" use:autoAnimate>
+         <Text size="md">Pinned</Text>
+
+         {#if $chatState.isFetchingConversations}
+            {#each [0, 1, 2, 3] as _}
+               <ChatItemSkeleton />
+            {/each}
+         {:else}
+            {#each pinnedConversations as conversation (conversation.id)}
+               <ChatItem {conversation} />
+            {/each}
+         {/if}
+      </div>
+   {/if}
+
+   <div
+      class="flex flex-col gap-[2px] overflow-auto rounded-md h-full dark:bg-black border dark:border-gray-900 border-gray-200 bg-white p-1 rounded-[10px]"
+      role="list"
+      use:autoAnimate
+   >
       {#if $chatState.isFetchingConversations}
          {#each [0, 1, 2, 3] as _}
             <ChatItemSkeleton />
          {/each}
       {:else}
-         {#each $chatState.conversations as conversation (conversation.id)}
+         {#each unpinnedConversations as conversation (conversation.id)}
             <ChatItem {conversation} />
          {/each}
       {/if}
    </div>
 
    <CreateConversationModal closeModal={closeSettingsModal} isOpened={isNewContactModalOpened} />
-
-   <div
-      aria-hidden="true"
-      class="absolute bottom-0 left-0 h-16 w-full z-10 bg-gradient-to-t dark:from-gray-900 transition-all from-gray-200 pointer-events-none"
-   />
 </section>

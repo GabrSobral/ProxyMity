@@ -49,7 +49,7 @@
 <div
    role="button"
    tabindex="0"
-   class="w-full hover:dark:border-gray-700 hover:border-gray-100 border-[1px] dark:border-gray-900 border-white relative py-2 px-3 rounded-md flex gap-4 cursor-pointer hover:opacity-90 group dark:bg-gray-900 bg-white transition-all shadow-md"
+   class="w-full hover:dark:border-gray-700 hover:border-gray-100 border-[1px] dark:border-gray-900 border-white relative py-[0.4rem] px-3 rounded-md flex gap-4 cursor-pointer hover:opacity-90 group dark:bg-gray-900 bg-white transition-all shadow-md"
    on:click={() => selectedConversationAsync(conversation)}
 >
    <div
@@ -58,7 +58,7 @@
       } absolute h-full gradient transition-all rounded-md top-0 z-0 duration-[0.3s] mx-auto`}
    />
 
-   <Avatar.Root>
+   <Avatar.Root class="size-9 my-auto">
       <Avatar.Image src="https://github.com/shadcn.png" alt="@shadcn" />
       <Avatar.Fallback>CN</Avatar.Fallback>
    </Avatar.Root>
@@ -84,7 +84,12 @@
          {/if}
 
          {#if conversation.conversationPinnedAt}
-            <Pin size="16" />
+            <Pin
+               size="16"
+               class={twMerge(
+                  clsx('dark:text-gray-100 text-gray-600 transition-colors', { 'text-white dark:text-white': isSelectedContact })
+               )}
+            />
          {/if}
       </span>
 
