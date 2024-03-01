@@ -5,6 +5,7 @@ internal class InMemoryParticipantRepository(
     IUserRepository userRepository,
     IConversationRepository conversationRepository
 ) : InMemoryRepository<Participant>, IParticipantRepository {
+
     public Task AddAsync(Participant participant, CancellationToken cancellationToken) {
         Items.Add(participant);
         return Task.CompletedTask;
@@ -33,11 +34,15 @@ internal class InMemoryParticipantRepository(
         var conversationsWithParticipants = new List<GetConversationsByUserIdQuery>();
 
         foreach (var item in participationInConversations) {
-            var conversation = await conversationRepository.GetByIdAsync(item.UserId, cancellationToken)
+            Conversation conversation = await conversationRepository.GetByIdAsync(item.ConversationId, cancellationToken)
                 ?? throw new ConversationNotFoundException(item.ConversationId);
 
-            var group = await groupRepository.FindByIdAsync(item.UserId, cancellationToken)
-                ?? throw new ConversationNotFoundException(item.ConversationId);
+            Group group;
+
+            if (conversation?.GroupId is not null) {
+             group = await groupRepository.FindByIdAsync(conversation.GroupId, cancellationToken)
+                ?? throw new Exception("Group not found");
+            }
 
             conversationsWithParticipants.Add(new GetConversationsByUserIdQuery(
                 conversation.Id,

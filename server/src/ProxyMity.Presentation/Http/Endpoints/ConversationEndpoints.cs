@@ -1,4 +1,6 @@
-﻿namespace ProxyMity.Presentation.Http.Endpoints;
+﻿using ProxyMity.Application.Handlers.Conversations.Commands.UnpinConversation;
+
+namespace ProxyMity.Presentation.Http.Endpoints;
 
 public static class ConversationEndpoints
 {
@@ -9,8 +11,34 @@ public static class ConversationEndpoints
         group.MapPost("group", CreateGroupConversation).WithName(nameof(CreateGroupConversation));
         group.MapPost("private", CreatePrivateConversation).WithName(nameof(CreatePrivateConversation));
 
-        group.MapGet("get-by-user/{userId}", GetUserConversations).WithName(nameof(GetUserConversations));
+        group.MapGet("user/{userId}", GetUserConversations).WithName(nameof(GetUserConversations));
         group.MapGet("messages/{conversationId}", GetConversationMessages).WithName(nameof(GetConversationMessages));
+        group.MapPatch("{conversationId}/pin", PinConversation).WithName(nameof(PinConversation));
+        group.MapPatch("{conversationId}/unpin", UnpinConversation).WithName(nameof(UnpinConversation));
+    }
+
+    public static async Task<IResult> UnpinConversation(Ulid conversationId, HttpContext httpContext, ISender sender)
+    {
+        UnpinConversationCommand command = new(
+            ConversationId: conversationId,
+            UserId: HttpUserClaims.GetId(httpContext)
+        );
+
+        await sender.Send(command);
+
+        return TypedResults.NoContent();
+    }
+
+    public static async Task<IResult> PinConversation(Ulid conversationId, HttpContext httpContext, ISender sender)
+    {
+        PinConversationCommand command = new(
+            ConversationId: conversationId,
+            UserId: HttpUserClaims.GetId(httpContext)
+        );
+
+        await sender.Send(command);
+
+        return TypedResults.NoContent();
     }
 
     public static async Task<IResult> GetConversationMessages(Ulid conversationId, ISender sender)
@@ -37,8 +65,8 @@ public static class ConversationEndpoints
         HttpContext httpContext,
         ISender sender)
     {
-        CreatePrivateConversationCommand command = new (
-            RequesterId: HttpUserClaims.GetId(httpContext), 
+        CreatePrivateConversationCommand command = new(
+            RequesterId: HttpUserClaims.GetId(httpContext),
             ParticipantId: Ulid.Parse(model.ParticipantId)
         );
 
