@@ -45,7 +45,7 @@
    <Dialog.Content
       class={twMerge(
          clsx('min-w-[40rem] overflow-auto flex flex-col h-[90%] w-fit transition-all duration-500', {
-            'max-w-[90%]': selectedPanel === 'Group',
+            'max-w-[70rem]': selectedPanel === 'Group',
          })
       )}
    >
@@ -96,7 +96,7 @@
       {#if selectedPanel === 'Private'}
          <PrivateConversation {closeModal} />
       {:else}
-         <GroupConversation />
+         <GroupConversation {closeModal} />
       {/if}
    </Dialog.Content>
 </Dialog.Root>

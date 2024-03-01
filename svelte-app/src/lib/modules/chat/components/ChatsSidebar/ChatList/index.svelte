@@ -61,10 +61,10 @@
       {/if}
    </div>
 
+   <CreateConversationModal closeModal={closeSettingsModal} isOpened={isNewContactModalOpened} />
+
    <div
       aria-hidden="true"
       class="absolute bottom-0 left-0 h-16 w-full z-10 bg-gradient-to-t dark:from-gray-900 transition-all from-gray-200 pointer-events-none"
    />
 </section>
-
-<CreateConversationModal closeModal={closeSettingsModal} isOpened={isNewContactModalOpened} />

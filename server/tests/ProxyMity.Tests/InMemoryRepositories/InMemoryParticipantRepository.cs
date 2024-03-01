@@ -40,7 +40,7 @@ internal class InMemoryParticipantRepository(
             Group? group = await groupRepository.FindByIdAsync(conversation?.GroupId ?? Ulid.NewUlid(), cancellationToken);
 
             conversationsWithParticipants.Add(new GetConversationsByUserIdQuery(
-                Id: conversation.Id,
+                Id: conversation!.Id,
                 CreatedAt: conversation.CreatedAt,
                 GroupName: group?.Name,
                 GroupDescription: group?.Description,

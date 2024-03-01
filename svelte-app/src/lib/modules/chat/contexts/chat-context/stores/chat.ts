@@ -16,6 +16,19 @@ export const notificationsState = writable<NotificationState>({
 });
 
 export const chatDispatch: Actions = {
+   handleConversationPin({ conversationId }) {
+      chatState.update(store => ({
+         ...store,
+         conversations: store.conversations.map(conversation => {
+            if (conversation.id === conversationId) {
+               conversation.conversationPinnedAt = conversation.conversationPinnedAt ? null : new Date();
+            }
+
+            return conversation;
+         }),
+      }));
+   },
+
    setIsFetchingConversations(value) {
       chatState.update(store => ({
          ...store,
@@ -196,6 +209,7 @@ export const chatDispatch: Actions = {
                groupDescription: conversation.conversation.groupDescription,
                groupName: conversation.conversation.groupName,
                isGroup: !!conversation.conversation.groupId,
+               conversationPinnedAt: conversation.conversation.conversationPinnedAt,
                messages: conversation.lastMessages
                   .map(message => ({
                      id: message.id,

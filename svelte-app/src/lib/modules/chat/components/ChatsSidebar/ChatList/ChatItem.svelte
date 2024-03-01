@@ -2,7 +2,7 @@
    import clsx from 'clsx';
    import { page } from '$app/stores';
    import { twMerge } from 'tailwind-merge';
-   import { Clock, User } from 'lucide-svelte';
+   import { Clock, Pin, PinIcon, User } from 'lucide-svelte';
 
    import * as Avatar from '$lib/components/ui/avatar';
    import { chatState } from '$lib/modules/chat/contexts/chat-context/stores/chat';
@@ -81,6 +81,10 @@
             >
                {formatLastMessageDate.format(new Date(lastMessage.writtenAt))}
             </span>
+         {/if}
+
+         {#if conversation.conversationPinnedAt}
+            <Pin size="16" />
          {/if}
       </span>
 

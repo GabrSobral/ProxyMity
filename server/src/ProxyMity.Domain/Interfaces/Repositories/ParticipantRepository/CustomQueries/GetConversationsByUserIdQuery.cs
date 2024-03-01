@@ -5,5 +5,6 @@ public record GetConversationsByUserIdQuery(
     DateTime CreatedAt,
     string? GroupName,
     string? GroupDescription,
-    Ulid? GroupId
+    Ulid? GroupId,
+    DateTime? ConversationPinnedAt
 );

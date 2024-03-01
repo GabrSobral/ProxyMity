@@ -14,6 +14,7 @@ export interface IConversationAPI {
       groupName: null | string;
       groupDescription: null | string;
       groupId: null | string;
+      conversationPinnedAt: Date | null;
    };
    unreadMessagesCount: number;
    participants: {
@@ -31,7 +32,7 @@ export interface IConversationAPI {
 export type GetUserConversationsResponse = IConversationAPI[];
 
 export async function APIGetUserConversations({ id }: Request, { accessToken }: IServiceOptions) {
-   const { data } = await api.get<GetUserConversationsResponse>(`/conversation/get-by-user/${id}`, {
+   const { data } = await api.get<GetUserConversationsResponse>(`/conversation/user/${id}`, {
       headers: {
          Authorization: `Bearer ${accessToken}`,
       },

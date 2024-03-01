@@ -1,5 +1,6 @@
 <script lang="ts">
    import clsx from 'clsx';
+   import { page } from '$app/stores';
    import { AtSign, Search } from 'lucide-svelte';
 
    import Text from '$lib/design-system/Text.svelte';
@@ -8,10 +9,15 @@
 
    import Avatar from '$lib/components/ui/avatar/avatar.svelte';
    import Button from '$lib/components/ui/button/button.svelte';
+
    import { getUserByEmailAsync } from '../../services/getUserByEmailAsync';
+   import { createGroupConversationAsync } from '../../services/createGroupConversationAsync';
+
    import type { User } from '../../../../../types/user';
+   import { chatDispatch } from '../../contexts/chat-context/stores/chat';
    import { showMessageSonner } from '../../../../../contexts/error-context/store';
-   import { page } from '$app/stores';
+
+   export let closeModal: () => void;
 
    let email = '';
    let groupName = '';
@@ -48,9 +54,70 @@
          usersData.isLoading = false;
       }
    }
+
+   async function createChat() {
+      if (!currentUser?.id) {
+         console.error('No user was found');
+         return showMessageSonner({ message: 'No user was not found. Try logout and login again.' });
+      }
+
+      if (!selectedUsers.length) {
+         console.error('No user was selected.');
+         return showMessageSonner({ message: 'No user was selected. Please, select one' });
+      }
+
+      if (!accessToken) {
+         console.error('No access token detected');
+         return showMessageSonner({ message: 'No access token detected. Try logout and login again.' });
+      }
+
+      try {
+         isCreatingLoading = true;
+
+         const newConversation = await createGroupConversationAsync(
+            {
+               name: groupName,
+               description: groupDescription,
+               participants: [currentUser.id, ...selectedUsers.map(user => user.id)],
+            },
+            { accessToken }
+         );
+         const newConversationState = {
+            id: newConversation.id,
+            isGroup: true,
+            createdAt: new Date(),
+            hasMessagesFetched: true,
+            messages: [],
+            notifications: 0,
+            participants: selectedUsers.map(user => ({
+               id: user.id,
+               createdAt: user.createdAt,
+               email: user.email,
+               name: user.name,
+               photoUrl: user.photoUrl,
+               removedAt: null,
+               lastOnline: new Date(),
+            })),
+            replyMessage: null,
+            typeMessage: '',
+            groupDescription,
+            groupName,
+         };
+
+         chatDispatch.addConversation(newConversationState);
+         chatDispatch.selectConversation({ conversation: newConversationState, typeMessage: '', currentUserId: '' });
+
+         closeModal();
+      } catch (error: any) {
+         console.error('An error occurred at:', new Date(), error);
+         showMessageSonner({ message: error?.response?.data?.error || error?.message });
+      } finally {
+         isCreatingLoading = false;
+      }
+   }
 </script>
 
-<div class="flex gap-4">
+<div class="flex gap-4 h-full">
    <form action="" class="flex flex-col gap-4 min-w-[25rem]" on:submit|preventDefault={searchUser}>
       <InputGroup let:Label let:Input>
          <Label isRequired>Name</Label>
@@ -72,7 +139,7 @@
 
             <Input placeholder="account@email.com" type="email" name="account-email" className="pr-20 pl-12" bind:value={email} />
 
-            <Button class="absolute right-2 top-2/4 -translate-y-2/4 w-12" type="submit">
+            <Button class="absolute right-2 top-2/4 -translate-y-2/4 w-12" type="submit" disabled={!email}>
                <Search size="16" />
             </Button>
          </Wrapper>
@@ -92,6 +159,9 @@
                      selectedUsers = selectedUsers.filter(item => item.id !== user.id);
                   } else {
                      selectedUsers = [user, ...selectedUsers];
+                     usersData.users = [];
+
+                     email = '';
                   }
                }}
                title="Click to select account"
@@ -112,7 +182,7 @@
       </ul>
 
       {#if selectedUsers.length && groupName}
-         <Button type="submit" class="ml-auto" title={`Create "${groupName}" group.`}>
+         <Button type="button" on:click={createChat} class="ml-auto" title={`Create "${groupName}" group.`}>
             Create "{groupName.slice(0, 15)}{groupName.length > 15 ? '...' : ''}" group
          </Button>
       {/if}

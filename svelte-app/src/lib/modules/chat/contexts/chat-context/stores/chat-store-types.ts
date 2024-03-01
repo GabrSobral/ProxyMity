@@ -1,8 +1,9 @@
-import type { ILocalMessage, IServerMessage } from '../../../../../../types/message';
-import type { Conversation } from '../../../../../../types/conversation';
-import type { GetUserConversationsResponse } from '../../../../../../services/api/get-user-conversations';
 import type { EMessageStatuses } from '../../../../../../enums/EMessageStatuses';
+import type { GetUserConversationsResponse } from '../../../../../../services/api/get-user-conversations';
+
+import type { Conversation } from '../../../../../../types/conversation';
 import type { INotification } from '../../../../../../types/notification';
+import type { ILocalMessage, IServerMessage } from '../../../../../../types/message';
 
 export interface ConversationState extends Conversation {
    messages: ILocalMessage[];
@@ -30,6 +31,7 @@ export type Actions = {
    handleShowConversationDetail(): void;
    setIsFetchingConversations(value: boolean): void;
    addMessage(payload: { message: ILocalMessage }): void;
+   handleConversationPin(payload: { conversationId: string }): void;
    setConversationMessages(
       payload:
          | { conversationId: string; messages: IServerMessage[]; fromServer: true; currentUserId: string }

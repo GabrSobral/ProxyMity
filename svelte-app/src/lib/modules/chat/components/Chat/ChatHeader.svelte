@@ -5,15 +5,47 @@
 
    import { chatDispatch, chatState } from '../../contexts/chat-context/stores/chat';
    import * as Avatar from '$lib/components/ui/avatar';
+   import { twMerge } from 'tailwind-merge';
+   import { pinConversationAsync } from '../../services/pinConversationAsync';
+   import { unpinConversationAsync } from '../../services/unpinConversationAsync';
 
-   $: user = $page.data.session?.user;
+   $: userId = $page.data.session?.user?.id || '';
+   $: accessToken = $page.data.session?.accessToken;
 
    $: conversationName =
       $chatState.selectedConversation?.groupName ||
-      $chatState.selectedConversation?.participants.find(item => item.id !== user?.id)?.name ||
+      $chatState.selectedConversation?.participants.find(item => item.id !== userId)?.name ||
       '';
 
    $: showConversationDetail = $chatState.showConversationDetail;
+
+   $: isChatPinned = !!$chatState.selectedConversation?.conversationPinnedAt;
+
+   async function handlePin() {
+      if (!$chatState.selectedConversation) {
+         console.warn('No conversation was selected.');
+         return;
+      }
+
+      if (!accessToken) {
+         console.warn('No access token was detected.');
+         return;
+      }
+
+      chatDispatch.handleConversationPin({ conversationId: $chatState.selectedConversation?.id });
+
+      const conversationId = $chatState.selectedConversation.id;
+
+      try {
+         if (isChatPinned) {
+            unpinConversationAsync({ conversationId }, { accessToken });
+         } else {
+            pinConversationAsync({ conversationId }, { accessToken });
+         }
+      } catch (error: any) {
+         console.error('Error on trying to handle with pin and unpin chat.', error);
+      }
+   }
 </script>
 
 <header class="px-3 py-2 dark:bg-black bg-white flex items-center gap-4 transition-all overflow-hidden">
@@ -29,8 +61,16 @@
    <div class="flex gap-1 ml-auto">
       <button
          title="Pin chat"
-         class="rounded-full p-2 dark:bg-black bg-white hover:bg-purple-500 transition-all group hover:text-white dark:dark:text-whit text-gray-700"
+         class={twMerge(
+            clsx(
+               'rounded-full p-2 dark:bg-black bg-white hover:bg-purple-500 dark:hover:bg-purple-500 transition-all group hover:text-white dark:dark:text-whit text-gray-700',
+               {
+                  'bg-purple-500 dark:bg-purple-500': isChatPinned,
+               }
+            )
+         )}
          type="button"
+         on:click={handlePin}
       >
          <Pin size={24} class="dark:text-white text-gray-700 group-hover:text-white" />
       </button>
@@ -53,13 +93,15 @@
          />
       </button>
 
-      <button
-         type="button"
-         on:click={() => chatDispatch.selectConversation({ conversation: null, typeMessage: '', currentUserId: user.id })}
-         title="Close chat"
-         class="rounded-full p-2 dark:bg-black bg-white hover:bg-purple-500 hover:text-white group transition-all dark:text-white text-gray-700"
-      >
-         <X size={24} class="dark:text-white text-gray-700 group-hover:text-white" />
-      </button>
+      {#if userId}
+         <button
+            type="button"
+            on:click={() => chatDispatch.selectConversation({ conversation: null, typeMessage: '', currentUserId: userId })}
+            title="Close chat"
+            class="rounded-full p-2 dark:bg-black bg-white hover:bg-purple-500 hover:text-white group transition-all dark:text-white text-gray-700"
+         >
+            <X size={24} class="dark:text-white text-gray-700 group-hover:text-white" />
+         </button>
+      {/if}
    </div>
 </header>

@@ -6,6 +6,7 @@ export interface Conversation {
    createdAt: Date;
    groupName: string | null;
    groupDescription: string | null;
+   conversationPinnedAt: Date | null;
    participants: {
       id: string;
       name: string;

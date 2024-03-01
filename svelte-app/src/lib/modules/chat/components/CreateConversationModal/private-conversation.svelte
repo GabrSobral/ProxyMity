@@ -113,7 +113,7 @@
 
          <Input placeholder="account@email.com" type="email" name="account-email" className="pr-20 pl-12" bind:value={email} />
 
-         <Button type="submit" class="absolute right-2 top-2/4 -translate-y-2/4 w-12">
+         <Button type="submit" class="absolute right-2 top-2/4 -translate-y-2/4 w-12" disabled={!email}>
             {#if searchedUser.isLoading}
                <LoadingSpinning size={18} lineSize={3} />
             {:else}

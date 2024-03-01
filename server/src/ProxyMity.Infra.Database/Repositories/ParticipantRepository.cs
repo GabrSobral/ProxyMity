@@ -1,6 +1,4 @@
-﻿using ProxyMity.Domain.Entities;
-
-namespace ProxyMity.Infra.Database.Repositories;
+﻿namespace ProxyMity.Infra.Database.Repositories;
 
 public sealed class ParticipantRepository(DataContext dbContext) : IParticipantRepository
 {
@@ -37,7 +35,8 @@ public sealed class ParticipantRepository(DataContext dbContext) : IParticipantR
                 x.CreatedAt,
                 x.Conversation.Group.Name,
                 x.Conversation.Group.Description,
-                x.Conversation.GroupId
+                x.Conversation.GroupId,
+                x.ConversationPinnedAt
             ))
             .ToListAsync(cancellationToken);
 
@@ -64,9 +63,11 @@ public sealed class ParticipantRepository(DataContext dbContext) : IParticipantR
             .ExecuteUpdateAsync(x => x.SetProperty(instance => instance.ConversationPinnedAt, DateTime.UtcNow), cancellationToken: cancellationToken);
     }
 
-    public async Task Remove(Participant participant, CancellationToken cancellationToken)
+    public Task Remove(Participant participant, CancellationToken cancellationToken)
     {
         dbContext.Participants.Remove(participant);
+
+        return Task.CompletedTask;
     }
 
     public async Task UnpinConversation(Ulid conversationId, Ulid userId, CancellationToken cancellationToken)
