@@ -37,19 +37,14 @@ internal class InMemoryParticipantRepository(
             Conversation conversation = await conversationRepository.GetByIdAsync(item.ConversationId, cancellationToken)
                 ?? throw new ConversationNotFoundException(item.ConversationId);
 
-            Group group;
-
-            if (conversation?.GroupId is not null) {
-             group = await groupRepository.FindByIdAsync(conversation.GroupId, cancellationToken)
-                ?? throw new Exception("Group not found");
-            }
+            Group? group = await groupRepository.FindByIdAsync(conversation?.GroupId ?? Ulid.NewUlid(), cancellationToken);
 
             conversationsWithParticipants.Add(new GetConversationsByUserIdQuery(
-                conversation.Id,
-                conversation.CreatedAt,
-                group.Description,
-                group.Name,
-                group.Id
+                Id: conversation.Id,
+                CreatedAt: conversation.CreatedAt,
+                GroupName: group?.Name,
+                GroupDescription: group?.Description,
+                GroupId: conversation?.GroupId
             ));
         }
 
