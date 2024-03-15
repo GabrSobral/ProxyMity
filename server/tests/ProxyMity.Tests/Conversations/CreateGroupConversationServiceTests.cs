@@ -33,7 +33,7 @@ public class CreateGroupConversationServiceTests {
             Name: "Test Group",
             Description: "Test Description",
             CreatorId: user1.Id,
-            Participants: new[] { user2.Id }
+            Participants: [user2.Id]
         );
 
         var validator = new CreateGroupConversationCommandValidator();
@@ -49,7 +49,7 @@ public class CreateGroupConversationServiceTests {
             Name: "",
             Description: "Test Description",
             CreatorId: Ulid.NewUlid(),
-            Participants: new List<Ulid>()
+            Participants: []
         );
 
         var validator = new CreateGroupConversationCommandValidator();

@@ -40,7 +40,7 @@ public sealed class GetUserConversationsQueryHandler(
                 DateTime prevDate = prev.LastMessages.Any() ? prev.LastMessages.ElementAt(0).WrittenAt : DateTime.MinValue;
                 return prevDate.CompareTo(currDate); // Reversed order here
             }
-        ); 
+        );
 
         return conversations;
     }

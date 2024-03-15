@@ -44,7 +44,8 @@ internal class InMemoryParticipantRepository(
                 CreatedAt: conversation.CreatedAt,
                 GroupName: group?.Name,
                 GroupDescription: group?.Description,
-                GroupId: conversation?.GroupId
+                GroupId: conversation?.GroupId,
+                ConversationPinnedAt: item.ConversationPinnedAt
             ));
         }
 
