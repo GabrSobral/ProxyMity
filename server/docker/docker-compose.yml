@@ -2,7 +2,9 @@ version: "3.4"
 
 services:
   proxymity.server:
+    container_name: "ProxyMity.Server"
     image: ${DOCKER_REGISTRY-}proxymityserver
+    restart: always
     build:
       context: ../src
       dockerfile: ../src/ProxyMity.Server/Dockerfile
@@ -13,12 +15,14 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '2'
-          memory: '2GB'
+          cpus: "2"
+          memory: "1.5GB"
+    depends_on:
+      - postgres
 
   postgres:
     container_name: "ProxyMity.Database"
-    command: postgres -c 'max_connections=40'
+    command: postgres -c 'max_connections=10'
     image: postgres:16.1
     restart: always
     environment:
@@ -28,8 +32,8 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '2'
-          memory: '1.5GB'
+          cpus: "2"
+          memory: "1.5GB"
     volumes:
       - ../volumes/postgres_data:/var/lib/postgresql/data
     ports:
