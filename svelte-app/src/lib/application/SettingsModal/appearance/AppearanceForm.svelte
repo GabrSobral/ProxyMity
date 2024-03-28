@@ -1,9 +1,8 @@
 <script lang="ts">
    import Text from '$lib/design-system/Text.svelte';
 
-   import * as Select from '$lib/components/ui/select';
-   import Label from '$lib/components/ui/label/label.svelte';
-   import * as RadioGroup from '$lib/components/ui/radio-group';
+   // import * as Select from '$lib/components/ui/select';
+   // import * as RadioGroup from '$lib/components/ui/radio-group';
 
    import DarkPlaceholder from './components/DarkPlaceholder.svelte';
    import LightPlaceholder from './components/LightPlaceholder.svelte';
@@ -25,7 +24,7 @@
 
 <div class="space-y-8">
    <div class="flex flex-col">
-      <Select.Root portal={null} selected={{ value: 'inter', label: 'Inter' }}>
+      <!-- <Select.Root portal={null} selected={{ value: 'inter', label: 'Inter' }}>
          <div class="flex flex-col gap-1">
             <Select.Label class="text-md font-medium p-0">Font</Select.Label>
             <Text size="md">Set the font you want to use in the application</Text>
@@ -41,10 +40,10 @@
             </Select.Group>
          </Select.Content>
          <Select.Input name="favoriteFruit" />
-      </Select.Root>
+      </Select.Root> -->
    </div>
 
-   <RadioGroup.Root
+   <!-- <RadioGroup.Root
       value={$appTheme}
       class="grid max-w-xl gap-8 pt-2"
       orientation="horizontal"
@@ -105,5 +104,5 @@
          {/each}
       </div>
       <RadioGroup.Input name="spacing" />
-   </RadioGroup.Root>
+   </RadioGroup.Root> -->
 </div>

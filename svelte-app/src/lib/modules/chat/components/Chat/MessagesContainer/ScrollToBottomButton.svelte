@@ -1,7 +1,6 @@
 <script lang="ts">
-   import { afterUpdate, onMount } from 'svelte';
-   import { ChevronDown } from 'lucide-svelte';
    import { scale } from 'svelte/transition';
+   import { ChevronDown } from 'lucide-svelte';
 
    export let container: HTMLUListElement;
 

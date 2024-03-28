@@ -1,11 +1,12 @@
 import { redirect } from '@sveltejs/kit';
 
+/**
+ * Middleware to check if the user is already logged in.
+ * @param event Middleware event
+ * @returns
+ */
 export async function load(event) {
-   if (!event?.locals?.getSession) {
-      return {};
-   }
-
-   const session = await event.locals.getSession();
+   const session = await event.locals.auth();
 
    if (session?.user) {
       redirect(303, '/chat');

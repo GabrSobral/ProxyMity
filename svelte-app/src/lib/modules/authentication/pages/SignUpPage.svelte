@@ -1,9 +1,9 @@
 <script lang="ts">
    import { goto } from '$app/navigation';
    import { signIn } from '@auth/sveltekit/client';
-   import { Eye, UserPlus, EyeOff } from "lucide-svelte"
+   import { Eye, UserPlus, EyeOff } from 'lucide-svelte';
 
-   import Button from '$lib/design-system/Button.svelte';
+   import Button from '$lib/design-system/button/button.svelte';
    import InputGroup from '$lib/design-system/Input/InputGroup.svelte';
    import LoadingSpinning from '$lib/design-system/LoadingSpinning.svelte';
 
@@ -114,18 +114,14 @@
          </button>
       </Wrapper>
 
-      <StrongPasswordModal setPasswordValue={newPassword => { password = newPassword; }}/>
+      <StrongPasswordModal
+         setPasswordValue={newPassword => {
+            password = newPassword;
+         }}
+      />
    </InputGroup>
 
-   
-
-   <Button
-      tabIndex={6}
-      type="submit"
-      className="w-full"
-      disabled={!(email && password) || isLoading}
-      title={isLoading ? 'Loading...' : 'Sign In'}
-   >
+   <Button type="submit" class="w-full" disabled={!(email && password) || isLoading} title={isLoading ? 'Loading...' : 'Sign In'}>
       {#if isLoading}
          <LoadingSpinning size={32} lineSize={2} color="white" />
       {:else}

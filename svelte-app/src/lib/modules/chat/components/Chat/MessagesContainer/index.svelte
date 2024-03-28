@@ -1,7 +1,6 @@
 <script lang="ts">
    import { page } from '$app/stores';
    import { afterUpdate } from 'svelte';
-   import { AnimateSharedLayout, Motion } from 'svelte-motion';
 
    import Text from '$lib/design-system/Text.svelte';
    import Heading from '$lib/design-system/Heading.svelte';
@@ -41,7 +40,7 @@
       {#if $chatState.selectedConversation?.messages.length === 0}
          <div class="flex-1 flex items-center justify-center flex-col gap-3 pointer-events-none">
             <img src="/no-messages.svg" alt="No message" class="w-[15rem]" />
-            <Heading size="md" className="opacity-80">No messages have been sent yet...</Heading>
+            <Heading size="md" class="opacity-80">No messages have been sent yet...</Heading>
          </div>
       {:else if $chatState.selectedConversation?.messages}
          {#each conversationMessages as message, i (message.id)}

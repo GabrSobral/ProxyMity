@@ -1,13 +1,13 @@
 <script lang="ts">
-   import { goto } from '$app/navigation';
    import { signIn } from '@auth/sveltekit/client';
-   import { Eye, LogIn, EyeOff } from "lucide-svelte"
+   import { Eye, LogIn, EyeOff } from 'lucide-svelte';
 
    import WarningAlert from '../components/WarningAlert.svelte';
 
-   import Button from '$lib/design-system/Button.svelte';
+   import Button from '$lib/design-system/button/button.svelte';
    import InputGroup from '$lib/design-system/Input/InputGroup.svelte';
    import LoadingSpinning from '$lib/design-system/LoadingSpinning.svelte';
+   import { goto } from '$app/navigation';
 
    //#region States
    let email = '';
@@ -24,7 +24,8 @@
       isLoading = true;
 
       try {
-         await signIn('credentials', { email, password, command: 'sign-in', redirect: false });
+         const response = await signIn('credentials', { email, password, command: 'sign-in', redirect: false });
+         const content = await response?.json();
 
          goto('/chat');
       } catch (error: any) {
@@ -53,7 +54,6 @@
 
       <Wrapper className="w-full">
          <Input
-            tabindex={1}
             type="email"
             name="email"
             placeholder="Type your e-mail"
@@ -71,7 +71,6 @@
 
       <Wrapper className="w-full">
          <Input
-            tabindex={2}
             type={showPassword ? 'text' : 'password'}
             name="password"
             placeholder="**********"
@@ -84,7 +83,6 @@
 
          <button
             type="button"
-            tabindex={3}
             aria-label={showPassword ? 'Hide password' : 'Show Password'}
             on:click={() => (showPassword = !showPassword)}
             class="absolute right-4 -translate-y-2/4 top-2/4"
@@ -99,13 +97,7 @@
       </Wrapper>
    </InputGroup>
 
-   <Button
-      tabIndex={4}
-      type="submit"
-      className="w-full"
-      disabled={!(email && password) || isLoading}
-      title={isLoading ? 'Loading...' : 'Sign In'}
-   >
+   <Button type="submit" class="w-full" disabled={!(email && password) || isLoading} title={isLoading ? 'Loading...' : 'Sign In'}>
       {#if isLoading}
          <LoadingSpinning size={32} lineSize={2} color="white" />
       {:else}

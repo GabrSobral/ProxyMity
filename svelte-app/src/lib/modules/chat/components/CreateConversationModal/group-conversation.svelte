@@ -4,11 +4,10 @@
    import { AtSign, Search } from 'lucide-svelte';
 
    import Text from '$lib/design-system/Text.svelte';
+   import * as Avatar from '$lib/design-system/avatar/';
    import Heading from '$lib/design-system/Heading.svelte';
+   import Button from '$lib/design-system/button/button.svelte';
    import InputGroup from '$lib/design-system/Input/InputGroup.svelte';
-
-   import Avatar from '$lib/components/ui/avatar/avatar.svelte';
-   import Button from '$lib/components/ui/button/button.svelte';
 
    import { getUserByEmailAsync } from '../../services/getUserByEmailAsync';
    import { createGroupConversationAsync } from '../../services/createGroupConversationAsync';
@@ -16,6 +15,7 @@
    import type { User } from '../../../../../types/user';
    import { chatDispatch } from '../../contexts/chat-context/stores/chat';
    import { showMessageSonner } from '../../../../../contexts/error-context/store';
+   import type { ConversationState } from '../../contexts/chat-context/stores/chat-store-types';
 
    export let closeModal: () => void;
 
@@ -82,7 +82,7 @@
             },
             { accessToken }
          );
-         const newConversationState = {
+         const newConversationState: ConversationState = {
             id: newConversation.id,
             isGroup: true,
             createdAt: new Date(),
@@ -102,6 +102,7 @@
             typeMessage: '',
             groupDescription,
             groupName,
+            conversationPinnedAt: null,
          };
 
          chatDispatch.addConversation(newConversationState);
@@ -147,10 +148,6 @@
 
       <ul class="flex flex-col gap-2">
          {#each usersData.users as user (user.id)}
-            {@const name = `${user.name.split(' ')[0]?.charAt(0)}${
-               user.name.split(' ')[1]?.charAt(0) || user.name.split(' ')[0]?.charAt(1)
-            }`}
-
             {@const isSelected = selectedUsers.some(item => item.id === user.id)}
 
             <li
@@ -169,9 +166,7 @@
                   'bg-purple-500': isSelected,
                })}
             >
-               <Avatar class="bg-purple-500 flex items-center justify-center">
-                  {name}
-               </Avatar>
+               <Avatar.Image src="" username={user.name} />
 
                <div class="flex flex-col gap-1">
                   <Text size="md">{user.name}</Text>
@@ -194,10 +189,6 @@
       {#if selectedUsers.length > 0}
          <ul class="flex flex-col gap-2">
             {#each selectedUsers as user (user.id)}
-               {@const name = `${user.name.split(' ')[0]?.charAt(0)}${
-                  user.name.split(' ')[1]?.charAt(0) || user.name.split(' ')[0]?.charAt(1)
-               }`}
-
                <li
                   on:click={() => {
                      selectedUsers = selectedUsers.filter(item => item.id !== user.id);
@@ -205,9 +196,7 @@
                   title="Click to select account"
                   class="flex gap-4 border border-gray-700 p-2 rounded-md hover:bg-gray-600 transition-all cursor-pointer"
                >
-                  <Avatar class="bg-purple-500 flex items-center justify-center">
-                     {name}
-                  </Avatar>
+                  <Avatar.Image src="" username={user.name} />
 
                   <div class="flex flex-col gap-1">
                      <Text size="md">{user.name}</Text>

@@ -98,3 +98,7 @@
 .gradient {
    @apply bg-gradient-to-r from-[#B809A6] border-0 to-[#1C64CE];
 }
+
+.blue-shadow {
+   box-shadow: 0px 0px 16px #136dce;
+}

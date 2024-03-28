@@ -7,14 +7,15 @@
    import InputGroup from '$lib/design-system/Input/InputGroup.svelte';
    import LoadingSpinning from '$lib/design-system/LoadingSpinning.svelte';
 
-   import Avatar from '$lib/components/ui/avatar/avatar.svelte';
-   import Button from '$lib/components/ui/button/button.svelte';
+   import * as Avatar from '$lib/design-system/avatar/';
+   import Button from '$lib/design-system/button/button.svelte';
 
    import type { User } from '../../../../../types/user';
    import { getUserByEmailAsync } from '../../services/getUserByEmailAsync';
    import { showMessageSonner } from '../../../../../contexts/error-context/store';
    import { createPrivateConversationAsync } from '../../services/createPrivateConversationAsync';
    import { chatDispatch } from '../../contexts/chat-context/stores/chat';
+   import type { ConversationState } from '../../contexts/chat-context/stores/chat-store-types';
 
    export let closeModal: () => void;
 
@@ -67,7 +68,7 @@
          isCreatingLoading = true;
 
          const newConversation = await createPrivateConversationAsync({ participantId: selectedAccount.id }, { accessToken });
-         const newConversationState = {
+         const newConversationState: ConversationState = {
             id: newConversation.id,
             isGroup: false,
             createdAt: new Date(),
@@ -89,6 +90,7 @@
             typeMessage: '',
             groupDescription: null,
             groupName: null,
+            conversationPinnedAt: null,
          };
 
          chatDispatch.addConversation(newConversationState);
@@ -128,10 +130,6 @@
    </InputGroup>
 
    {#if searchedUser.user}
-      {@const name = `${searchedUser.user?.name.split(' ')[0]?.charAt(0)}${
-         searchedUser.user?.name.split(' ')[1]?.charAt(0) || searchedUser.user?.name?.split(' ')[0]?.charAt(1)
-      }`}
-
       {@const isSelected = selectedAccount?.id === searchedUser.user?.id}
 
       <button
@@ -147,7 +145,7 @@
             'bg-purple-500': isSelected,
          })}
       >
-         <Avatar class="bg-purple-500 flex items-center justify-center">{name}</Avatar>
+         <Avatar.Image src="" username={searchedUser.user.name} />
 
          <div class="flex flex-col gap-1 items-start">
             <Text size="md">

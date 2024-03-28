@@ -23,14 +23,14 @@
          </div>
 
          <div class={'flex flex-col gap-1 overflow-hidden w-full z-10'}>
-            <Text size="md" className={`truncate font-medium flex items-center justify-between gap-3`}>
+            <Text size="md" class={`truncate font-medium flex items-center justify-between gap-3`}>
                {participant.name}
                {participant.id === user?.id ? '(You)' : ''}
                <span class="text-[12px] text-green-400 ml-auto">Online</span>
             </Text>
 
             <div class={'truncate flex justify-between gap-4 text-gray-200 text-sm'}>
-               <Text size="sm" className="text-gray-400">
+               <Text size="sm" class="text-gray-400">
                   {participant.email}
                </Text>
             </div>

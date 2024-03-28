@@ -2,10 +2,12 @@
    import clsx from 'clsx';
    import { twMerge } from 'tailwind-merge';
 
-   export let tag: 'span' | 'p' = 'span';
-   export let size: 'sm' | 'md' | 'lg';
-   export let defaultTextColor = 'text-gray-700 dark:text-white';
-   export let className = '';
+   let tag: 'span' | 'p' = 'span';
+   let size: 'sm' | 'md' | 'lg';
+   let defaultTextColor = 'text-gray-200';
+   let className = '';
+
+   export { tag, size, defaultTextColor, className as class };
 </script>
 
 <svelte:element

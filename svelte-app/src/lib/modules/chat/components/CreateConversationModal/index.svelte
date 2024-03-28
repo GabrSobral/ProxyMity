@@ -6,9 +6,8 @@
 
    import { cn } from '$lib/utils';
 
-   import * as Dialog from '$lib/components/ui/dialog';
-   import Button from '$lib/components/ui/button/button.svelte';
-   import Separator from '$lib/components/ui/separator/separator.svelte';
+   import * as Dialog from '$lib/design-system/dialog';
+   import Button from '$lib/design-system/button/button.svelte';
 
    import GroupConversation from './group-conversation.svelte';
    import PrivateConversation from './private-conversation.svelte';
@@ -20,18 +19,11 @@
    export let closeModal: () => void;
 
    let selectedPanel: 'Private' | 'Group' = 'Private';
+   const items: ['Private', 'Group'] = ['Private', 'Group'];
 
    function selectPanel(panel: 'Private' | 'Group') {
       selectedPanel = panel;
    }
-
-   const onChangeFn = writable((change: boolean) => {
-      if (!change) {
-         closeModal();
-      }
-   });
-
-   const items: ['Private', 'Group'] = ['Private', 'Group'];
 
    const [send, receive] = crossfade({
       duration: 250,
@@ -39,10 +31,8 @@
    });
 </script>
 
-<Dialog.Root bind:open={isOpened} bind:onOpenChange={$onChangeFn}>
-   <Dialog.Trigger />
-
-   <Dialog.Content
+<Dialog.Root {isOpened} closeDialog={closeModal}>
+   <Dialog.Panel
       class={twMerge(
          clsx('min-w-[40rem] overflow-auto flex flex-col h-[90%] w-fit transition-all duration-500', {
             'max-w-[70rem]': selectedPanel === 'Group',
@@ -58,17 +48,14 @@
          </Dialog.Description>
       </div>
 
-      <Separator class="my-2" />
-
       <div class="flex">
          <nav class={cn('flex space-x-2')}>
             {#each items as item (item)}
                {@const isActive = item === selectedPanel}
 
-               <Button
+               <button
                   on:click={() => selectPanel(item)}
-                  variant="ghost"
-                  class={cn(!isActive && 'hover:underline', 'relative justify-start hover:bg-transparent')}
+                  class={cn(!isActive && 'hover:underline', 'text-white px-2 py-2 relative justify-start hover:bg-transparent')}
                   data-sveltekit-noscroll
                >
                   {#if isActive}
@@ -88,7 +75,7 @@
                   <div class={clsx('relative transition-colors', { 'text-white ': isActive })}>
                      {item}
                   </div>
-               </Button>
+               </button>
             {/each}
          </nav>
       </div>
@@ -98,5 +85,5 @@
       {:else}
          <GroupConversation {closeModal} />
       {/if}
-   </Dialog.Content>
+   </Dialog.Panel>
 </Dialog.Root>

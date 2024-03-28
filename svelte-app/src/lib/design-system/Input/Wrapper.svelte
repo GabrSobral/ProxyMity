@@ -4,6 +4,6 @@
    export let className = '';
 </script>
 
-<div class={twMerge('relative w-fit', className)}>
+<div class={twMerge('relative w-fit text-white', className)}>
    <slot />
 </div>

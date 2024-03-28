@@ -1,3 +1,3 @@
-export const portal = (node: HTMLElement) => {
+export const appendToPortal = (node: HTMLElement) => {
    document.getElementById('portal-target')?.appendChild(node).focus();
 };

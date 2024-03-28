@@ -10,7 +10,7 @@
    const context = getContext<Writable<InputContextProps>>('@design-system:inputContext');
 </script>
 
-<label class={twMerge('text-gray-700 dark:text-gray-200 font-medium', className)} for={$context.inputId} {...$$restProps}>
+<label class={twMerge('text-gray-200 font-medium', className)} for={$context.inputId} {...$$restProps}>
    <slot />
 
    {#if isRequired}

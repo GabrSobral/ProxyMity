@@ -14,7 +14,7 @@
 
    import type { ILocalMessage } from '../../../../../../types/message';
    import { EMessageStatuses } from '../../../../../../enums/EMessageStatuses';
-   import { Button } from '$lib/components/ui/button';
+   import Button from '$lib/design-system/button/button.svelte';
    import { appColor } from '../../../../../../contexts/theme/store';
 
    $: user = $page.data.session?.user;
@@ -116,7 +116,7 @@
             id="typebar-input-id"
             bind:this={$typebarRef}
             type="text"
-            class="max-h-[20rem] min-h-[3.5rem] resize-none flex flex-1 py-3 focus:outline-none outline-none hover:ring-1 transition-all dark:ring-gray-700 ring-gray-100 rounded-md dark:bg-gray-900 bg-white dark:text-gray-200 text-gray-700 focus:outline-purple-500 focus:ring-0 dark:placeholder:text-gray-400 placeholder:text-gray-600 w-full px-4"
+            class="max-h-[20rem] min-h-[3.5rem] resize-none flex flex-1 py-3 focus:outline-none outline-none hover:ring-1 transition-all ring-gray-700 rounded-md bg-gray-900 text-gray-200 focus:outline-purple-500 focus:ring-0 placeholder:text-gray-400 w-full px-4"
             placeholder="Type your message"
             autoComplete="off"
          />
@@ -124,7 +124,6 @@
          <Button
             type="button"
             title="Send message"
-            variant={$appColor}
             on:click={sendMessage}
             class="p-2 absolute right-3 top-2/4 -translate-y-2/4 min-w-[2.75rem] min-h-[2.75rem] max-w-[2.75rem] max-h-[2.75rem] mt-auto rounded-[10px]"
          >

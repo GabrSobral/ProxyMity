@@ -2,14 +2,17 @@
    import clsx from 'clsx';
    import { page } from '$app/stores';
    import { twMerge } from 'tailwind-merge';
-   import { Clock, Pin, PinIcon, User } from 'lucide-svelte';
+   import { Clock, Pin } from 'lucide-svelte';
 
-   import * as Avatar from '$lib/components/ui/avatar';
+   import * as Avatar from '$lib/design-system/avatar';
+
    import { chatState } from '$lib/modules/chat/contexts/chat-context/stores/chat';
    import { connection } from '$lib/modules/chat/contexts/websocket-context/stores/connection';
    import { getChatContext } from '$lib/modules/chat/contexts/chat-context/ChatContext.svelte';
    import type { ConversationState } from '$lib/modules/chat/contexts/chat-context/stores/chat-store-types';
+
    import { EMessageStatuses } from '../../../../../../enums/EMessageStatuses';
+   import { cn } from '$lib/utils';
 
    export let conversation: ConversationState;
 
@@ -49,24 +52,21 @@
 <div
    role="button"
    tabindex="0"
-   class="w-full hover:dark:border-gray-700 hover:border-gray-100 border-[1px] dark:border-gray-900 border-white relative py-[0.4rem] px-3 rounded-md flex gap-4 cursor-pointer hover:opacity-90 group dark:bg-gray-900 bg-white transition-all shadow-md"
+   class="w-full relative py-[0.4rem] px-3 rounded-md flex gap-4 cursor-pointer hover:opacity-90 group bg-[#0A0A0A] transition-all shadow-md border-1 border-gray-950"
    on:click={() => selectedConversationAsync(conversation)}
 >
    <div
       class={`${
          isSelectedContact ? 'w-full left-0 opacity-100' : 'w-0 left-2/4 opacity-10'
-      } absolute h-full gradient transition-all rounded-md top-0 z-0 duration-[0.3s] mx-auto`}
+      } absolute h-full bg-gradient-to-r from-[#9D12E0dd] via-[75%] via-transparent to-transparent transition-all rounded-md top-0 z-0 duration-[0.3s] mx-auto items-center`}
    />
 
-   <Avatar.Root class="size-9 my-auto">
-      <Avatar.Image src="https://github.com/shadcn.png" alt="@shadcn" />
-      <Avatar.Fallback>CN</Avatar.Fallback>
-   </Avatar.Root>
+   <Avatar.Image src="https://github.com/shadcn.png" username={conversationName} />
 
    <div class={'flex flex-col overflow-hidden w-full z-10'}>
       <span
          class={`${
-            isSelectedContact ? 'text-white' : 'text-gray-700 dark:text-gray-200'
+            isSelectedContact ? 'text-white' : 'text-gray-200'
          } truncate font-medium flex items-center justify-between gap-3 `}
       >
          {conversationName}
@@ -76,7 +76,7 @@
 
          {#if lastMessage}
             <span
-               class="text-[12px] dark:text-gray-200 transition-colors text-gray-700 ml-auto data-[is-selected=true]:text-gray-100"
+               class="text-[12px] text-gray-200 transition-colors ml-auto data-[is-selected=true]:text-gray-100"
                data-is-selected={isSelectedContact}
             >
                {formatLastMessageDate.format(new Date(lastMessage.writtenAt))}
@@ -84,25 +84,18 @@
          {/if}
 
          {#if conversation.conversationPinnedAt}
-            <Pin
-               size="16"
-               class={twMerge(
-                  clsx('dark:text-gray-100 text-gray-600 transition-colors', { 'text-white dark:text-white': isSelectedContact })
-               )}
-            />
+            <Pin size="16" class={twMerge(clsx('text-gray-100 transition-colors', { 'text-white': isSelectedContact }))} />
          {/if}
       </span>
 
       <div
-         class={twMerge(
-            clsx('truncate flex justify-between gap-4 dark:text-gray-200 text-gray-600 text-sm', {
-               'text-purple-500': typing && !isSelectedContact,
-               'text-white': isSelectedContact,
-            })
-         )}
+         class={cn('truncate flex justify-between gap-4 text-gray-200 text-sm', {
+            'text-purple-500': typing && !isSelectedContact,
+            'text-white': isSelectedContact,
+         })}
       >
          {#if typing}
-            <span class="text-purple-500 dark:text-purple-300 font-semibold">Typing...</span>
+            <span class="text-white dark:text-purple-300 font-semibold">Typing...</span>
          {:else if lastMessage && !draft}
             <span class="flex gap-4 w-full">
                {lastMessage.content}

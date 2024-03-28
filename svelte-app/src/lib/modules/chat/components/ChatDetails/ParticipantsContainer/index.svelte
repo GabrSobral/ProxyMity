@@ -22,7 +22,7 @@
    >
       <Heading
          size="sm"
-         className="text-white w-full dark:bg-black bg-gray-100 px-4 py-2 flex gap-2 items-center justify-between cursor-pointer hover:brightness-90 transition-all"
+         class="text-white w-full dark:bg-black bg-gray-100 px-4 py-2 flex gap-2 items-center justify-between cursor-pointer hover:brightness-90 transition-all"
       >
          <span class="flex gap-2 text-gray-700 dark:text-white transition-colors">
             <UsersRound size={24} className="text-gray-700 dark:text-white transition-colors" /> Participants -{' '}

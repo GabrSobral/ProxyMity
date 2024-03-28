@@ -4,7 +4,10 @@
    import { twMerge } from 'tailwind-merge';
    import type { Writable } from 'svelte/store';
 
+   import type { InputEvents } from '.';
    import type { InputContextProps } from './InputGroup.svelte';
+
+   type $$Events = InputEvents;
 
    export let value = '';
    export let className = '';
@@ -17,13 +20,27 @@
 
 <input
    id={inputId}
-   bind:value
    class={twMerge(
       clsx(
-         'outline-none flex hover:ring-1 transition-all dark:ring-gray-700 ring-gray-100 rounded-md dark:bg-gray-900 bg-white dark:text-gray-200 text-gray-700 focus:outline-purple-500 focus:ring-0 dark:placeholder:text-gray-300 placeholder:text-gray-600 w-full px-4 py-3',
-         { 'border-red-500 dark:border-red-500': hasError }
+         'outline-none flex hover:ring-1 transition-all ring-gray-700 rounded-md bg-gray-900 text-gray-200 focus:outline-purple-500 focus:ring-0 placeholder:text-gray-200 placeholder:font-light w-full px-4 py-3',
+         { 'border-red-500 ': hasError }
       ),
       className
    )}
+   bind:value
+   on:blur
+   on:change
+   on:click
+   on:focus
+   on:focusin
+   on:focusout
+   on:keydown
+   on:keypress
+   on:keyup
+   on:mouseover
+   on:mouseenter
+   on:mouseleave
+   on:paste
+   on:input
    {...$$restProps}
 />

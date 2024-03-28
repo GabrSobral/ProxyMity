@@ -4,7 +4,7 @@
    import { crossfade } from 'svelte/transition';
 
    import { cn } from '$lib/utils';
-   import Button from '$lib/components/ui/button/button.svelte';
+   import Button from '$lib/design-system/button/button.svelte';
    import { appColor } from '../../../contexts/theme/store';
 
    let className: string | undefined | null = undefined;
@@ -25,10 +25,9 @@
    {#each items as item}
       {@const isActive = item === selectedPanel}
 
-      <Button
+      <button
          on:click={() => selectPanel(item)}
-         variant="ghost"
-         class={cn(!isActive && 'hover:underline', 'relative justify-start hover:bg-transparent')}
+         class={cn(!isActive && 'hover:underline', 'text-white px-2 py-2 relative justify-start hover:bg-transparent')}
          data-sveltekit-noscroll
       >
          {#if isActive}
@@ -48,6 +47,6 @@
          <div class={clsx('relative transition-colors', { 'text-white ': isActive })}>
             {item}
          </div>
-      </Button>
+      </button>
    {/each}
 </nav>

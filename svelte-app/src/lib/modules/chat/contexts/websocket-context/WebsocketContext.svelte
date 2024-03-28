@@ -15,6 +15,7 @@
                transport: HttpTransportType.WebSockets,
                skipNegotiation: true,
                withCredentials: true,
+               logMessageContent: false,
             })
             .build();
 

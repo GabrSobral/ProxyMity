@@ -144,9 +144,10 @@
                );
 
                getConversationCacheAsyncDB({ userId })
-                  .then(conversationsData =>
-                     chatDispatch.setConversationInitialState({ conversationsData, currentUserId: userId })
-                  )
+                  .then(conversationsData => {
+                     console.log({ conversationsData });
+                     chatDispatch.setConversationInitialState({ conversationsData, currentUserId: userId });
+                  })
                   .catch(console.error);
             })
             .finally(() => chatDispatch.setIsFetchingConversations(false));

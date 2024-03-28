@@ -1,9 +1,6 @@
 <script lang="ts">
-   import { writable } from 'svelte/store';
+   import * as Dialog from '$lib/design-system/dialog';
 
-   import * as Dialog from '$lib/components/ui/dialog';
-
-   import Separator from '$lib/components/ui/separator/separator.svelte';
    import SidebarNav from '$lib/application/SettingsModal/SidebarNav.svelte';
    import AppearanceForm from './appearance/AppearanceForm.svelte';
 
@@ -17,25 +14,15 @@
    function selectPanel(panel: 'Profile' | 'Appearance') {
       selectedPanel = panel;
    }
-
-   const onChangeFn = writable((change: boolean) => {
-      if (!change) {
-         closeModal();
-      }
-   });
 </script>
 
-<Dialog.Root bind:open={isOpened} bind:onOpenChange={$onChangeFn}>
-   <Dialog.Trigger />
-
-   <Dialog.Content class="min-w-[90%] h-[90%] overflow-auto">
+<Dialog.Root {isOpened} closeDialog={closeModal}>
+   <Dialog.Panel class="min-w-[90%] h-[90%] overflow-auto">
       <div class="space-y-6 px-5 pb-16 md:block">
          <div class="space-y-0.5">
-            <h2 class="text-2xl font-bold tracking-tight">Settings</h2>
-            <p class="text-muted-foreground">Manage your account settings and set e-mail preferences.</p>
+            <Dialog.Title>Settings</Dialog.Title>
+            <Dialog.Description>Manage your account settings and set e-mail preferences.</Dialog.Description>
          </div>
-
-         <Separator class="my-6" />
 
          <div class="flex flex-col space-y-8 lg:flex-row lg:space-x-12 lg:space-y-0">
             <aside class="-mx-4 lg:w-1/5">
@@ -53,5 +40,5 @@
             </div>
          </div>
       </div>
-   </Dialog.Content>
+   </Dialog.Panel>
 </Dialog.Root>

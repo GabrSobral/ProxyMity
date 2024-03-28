@@ -1,25 +1,24 @@
 <script lang="ts">
-   import clsx from 'clsx';
-   import { twMerge } from 'tailwind-merge';
+   import { cn } from '$lib/utils';
 
-   export let tag: 'span' | 'p' = 'span';
-   export let size: 'sm' | 'md' | 'lg';
-   export let defaultTextColor = 'text-gray-700 dark:text-white';
-   export let className = '';
+   let tag: undefined | 'span' | 'p' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' = 'h2';
+   let size: 'sm' | 'md' | 'lg';
+   let defaultTextColor = 'text-white';
+   let className = '';
+
+   export { tag, size, defaultTextColor, className as class };
 </script>
 
 <svelte:element
    this={tag}
-   class={twMerge(
-      clsx(
-         'transition-colors ',
-         {
-            'text-xs': size === 'sm',
-            'text-sm': size === 'md',
-            'text-md': size === 'lg',
-         },
-         defaultTextColor
-      ),
+   class={cn(
+      'transition-colors font-semibold',
+      {
+         'text-md': size === 'sm',
+         'text-lg': size === 'md',
+         'text-xl': size === 'lg',
+      },
+      defaultTextColor,
       className
    )}
 >
