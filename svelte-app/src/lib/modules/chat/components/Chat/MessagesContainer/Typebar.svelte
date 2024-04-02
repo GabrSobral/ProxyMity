@@ -4,6 +4,7 @@
    import { page } from '$app/stores';
    import { Send, X } from 'lucide-svelte';
 
+   import Button from '$lib/design-system/button/button.svelte';
    import InputGroup from '$lib/design-system/Input/InputGroup.svelte';
 
    import { chatWorker } from '$lib/modules/chat/workers/db-worker/initializer';
@@ -14,8 +15,6 @@
 
    import type { ILocalMessage } from '../../../../../../types/message';
    import { EMessageStatuses } from '../../../../../../enums/EMessageStatuses';
-   import Button from '$lib/design-system/button/button.svelte';
-   import { appColor } from '../../../../../../contexts/theme/store';
 
    $: user = $page.data.session?.user;
    $: conversationId = $chatState.selectedConversation?.id || '';
@@ -78,6 +77,12 @@
          }
 
          typeValueManaged = $typebarRef?.value || '';
+      });
+
+      $typebarRef?.addEventListener('keypress', async (e: KeyboardEvent) => {
+         if (e.code === 'Enter') {
+            await sendMessage();
+         }
       });
    });
 </script>
