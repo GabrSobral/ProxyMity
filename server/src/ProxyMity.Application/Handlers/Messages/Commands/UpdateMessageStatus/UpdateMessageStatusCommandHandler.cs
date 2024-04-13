@@ -30,7 +30,9 @@ public sealed class UpdateMessageStatusCommandHandler(
                 Predicate<MessageStatus> predicate = command.Status switch
                 {
                     EMessageStatuses.READ => status => status.ReadAt != null,
-                    EMessageStatuses.RECEIVED => status => status.ReceivedAt != null
+                    EMessageStatuses.RECEIVED => status => status.ReceivedAt != null,
+                    EMessageStatuses.SENT => throw new NotImplementedException(),
+                    _ => throw new NotImplementedException(),
                 };
 
                 var currentMessageStatusIndex = allMessageStatusFromMessage.FindIndex(x => x.UserId == command.UserId);

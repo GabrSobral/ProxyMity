@@ -3,10 +3,12 @@
 public sealed class CreateFriendshipInviteCommandHandler(
     ILogger<CreateFriendshipInviteCommandHandler> logger,
     IFriendshipRepository friendshipRepository,
-    DataContext dbContext) : ICommandHandler<CreateFriendshipInviteCommand>
+    DataContext dbContext) : ICommandHandler<CreateFriendshipInviteCommand, Friendship>
 {
-    public async Task Handle(CreateFriendshipInviteCommand command, CancellationToken cancellationToken)
+    public async Task<Friendship> Handle(CreateFriendshipInviteCommand command, CancellationToken cancellationToken)
     {
+        logger.LogInformation($"The user {command.RequesterUserId} is requesting the user {command.TargetUserId} to a friendship.");
+
         var ( requesterUserId, targetUserId ) = command;
         
         var friendshipAlreadyExist =
@@ -21,5 +23,7 @@ public sealed class CreateFriendshipInviteCommandHandler(
         await friendshipRepository.Create(newFriendship, cancellationToken);
 
         await dbContext.SaveChangesAsync(cancellationToken);
+
+        return newFriendship;
     }
 }

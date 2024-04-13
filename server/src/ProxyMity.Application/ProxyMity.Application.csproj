@@ -26,8 +26,4 @@
         </AssemblyAttribute>
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Handlers\Friendships\Queries\" />
-    </ItemGroup>
-
 </Project>

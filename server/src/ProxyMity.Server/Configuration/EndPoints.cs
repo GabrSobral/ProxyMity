@@ -13,15 +13,7 @@ public static class EndPoints
 
         app.UseEndpoints(endpoints =>
         {
-            endpoints.MapAuthenticationEndPoints();
-
-            endpoints.MapConversationEndpoints();
-
-            endpoints.MapUserEndpoints();
-
-            endpoints.MapMessageEndpoints();
-
-            endpoints.MapFriendshipEndpoints();
+            endpoints.MapControllers();
         });
 
         return app;

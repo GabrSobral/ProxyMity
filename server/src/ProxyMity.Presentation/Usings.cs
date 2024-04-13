@@ -1,6 +1,6 @@
 ﻿global using MediatR;
+global using Microsoft.AspNetCore.Mvc;
 global using Microsoft.AspNetCore.Authorization;
-global using Microsoft.AspNetCore.Builder;
 global using Microsoft.AspNetCore.Http;
 global using Microsoft.AspNetCore.Routing;
 global using Microsoft.AspNetCore.SignalR;
@@ -8,6 +8,7 @@ global using Microsoft.Extensions.DependencyInjection;
 global using Microsoft.Extensions.Logging;
 global using ProxyMity.Application.Handlers.Authentication.SignIn;
 global using ProxyMity.Application.Handlers.Authentication.SignUp;
+global using ProxyMity.Application.Handlers.Conversations.Commands.UnpinConversation;
 global using ProxyMity.Application.Handlers.Conversations.Commands.CreateGroupConversation;
 global using ProxyMity.Application.Handlers.Conversations.Commands.CreatePrivateConversation;
 global using ProxyMity.Application.Handlers.Conversations.Commands.ReadConversationMessages;
@@ -29,7 +30,6 @@ global using ProxyMity.Presentation.WebSocket.Hubs.Contracts;
 global using ProxyMity.Presentation.WebSocket.Hubs.Payloads;
 global using System.Reflection;
 global using System.Security.Claims;
+global using ProxyMity.Application;
 global using ProxyMity.Application.Handlers.Messages.Queries.GetStatusFromMessage;
-global using ProxyMity.Application.Handlers.Messages.Commands.ReceivePendingMessages;
 global using ProxyMity.Application.Handlers.Messages.Queries.GetMessageById;
-

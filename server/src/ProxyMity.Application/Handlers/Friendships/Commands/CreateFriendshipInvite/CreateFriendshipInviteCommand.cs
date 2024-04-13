@@ -2,4 +2,4 @@
 
 public record CreateFriendshipInviteCommand(
     Ulid RequesterUserId,
-    Ulid TargetUserId): ICommand;
+    Ulid TargetUserId): ICommand<Friendship>;

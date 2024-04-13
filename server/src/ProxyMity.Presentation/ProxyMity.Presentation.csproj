@@ -4,19 +4,22 @@
         <TargetFramework>net8.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
+
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <NoWarn>$(NoWarn);1591</NoWarn>
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Asp.Versioning.Http" Version="8.0.0"/>
-        <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.1"/>
-        <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="8.0.1"/>
-        <PackageReference Include="Microsoft.AspNetCore.SignalR.Protocols.MessagePack" Version="8.0.1"/>
-        <PackageReference Include="SignalRSwaggerGen" Version="4.5.0"/>
+        <PackageReference Include="Asp.Versioning.Http" Version="8.0.0" />
+        <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.1" />
+        <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="8.0.1" />
+        <PackageReference Include="Microsoft.AspNetCore.SignalR.Protocols.MessagePack" Version="8.0.1" />
+        <PackageReference Include="SignalRSwaggerGen" Version="4.5.0" />
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\ProxyMity.Application.Authentication\ProxyMity.Application.Authentication.csproj"/>
-        <ProjectReference Include="..\ProxyMity.Application\ProxyMity.Application.csproj"/>
+        <ProjectReference Include="..\ProxyMity.Application.Authentication\ProxyMity.Application.Authentication.csproj" />
+        <ProjectReference Include="..\ProxyMity.Application\ProxyMity.Application.csproj" />
     </ItemGroup>
 
 </Project>
