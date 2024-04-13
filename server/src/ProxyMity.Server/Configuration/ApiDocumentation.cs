@@ -16,11 +16,23 @@ public static class ApiDocumentation
             );
         });
 
-        services.AddSwaggerGen(c =>
+        services.AddSwaggerGen(options =>
         {
-            c.SwaggerDoc("v1", new OpenApiInfo { Title = "ProxyMity.Server", Version = "v1" });
+            options.SwaggerDoc("v1", new OpenApiInfo { 
+                Title = "ProxyMity.Server", 
+                Version = "v1", 
+                Contact = new OpenApiContact() {
+                    Name = "ProxyMity",
+                    Email = "gabriel.sobral1367@gmail.com"
+                },
+                Description = "The ProxyMity API that handles with user endpoints, conversation endpoints, and message endpoints. It is used for web socket connections and real time events.",
+                License = new OpenApiLicense() { Name = "MIT", Url = new Uri("https://www.mit.edu/~amini/LICENSE.md") },
+            });
 
-            c.AddSignalRSwaggerGen();
+            var xmlFilename = $"{typeof(PresentationAssemblyReference).Assembly.GetName().Name}.xml";
+            options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
+
+            options.AddSignalRSwaggerGen();
         });
 
         services.AddEndpointsApiExplorer();
