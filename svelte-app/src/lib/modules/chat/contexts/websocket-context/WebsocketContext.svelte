@@ -1,13 +1,14 @@
 <script lang="ts">
    import { page } from '$app/stores';
-   import { afterUpdate } from 'svelte';
-   import { HttpTransportType, HubConnectionBuilder, HubConnectionState, LogLevel } from '@microsoft/signalr';
+   import { HttpTransportType, HubConnectionBuilder, HubConnectionState } from '@microsoft/signalr';
 
    import { connection } from './stores/connection';
 
-   $: accessToken = $page.data.session?.accessToken;
+   const accessToken = $derived($page.data.session?.accessToken);
 
-   afterUpdate(() => {
+   let { children } = $props();
+
+   $effect(() => {
       if (accessToken) {
          const hubConnection = new HubConnectionBuilder()
             .withUrl('http://localhost:5000/chat', {
@@ -23,11 +24,11 @@
       }
    });
 
-   afterUpdate(() => {
+   $effect(() => {
       if (connection && $connection?.state === HubConnectionState.Disconnected) {
          $connection.start().then(async () => console.log('🖥️ Client connected to hub.'));
       }
    });
 </script>
 
-<slot><!-- optional fallback --></slot>
+{@render children()}

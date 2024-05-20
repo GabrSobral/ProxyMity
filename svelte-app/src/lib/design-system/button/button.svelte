@@ -4,21 +4,16 @@
    import type { ButtonEvents } from '.';
 
    type $$Events = ButtonEvents;
-   type $$Props = HTMLButtonAttributes & InternalProps;
 
    type InternalProps = {
       class?: string;
       isOutlined?: boolean;
    };
 
-   let className = '';
-   let isOutlined = false;
-
-   export { isOutlined, role, element, className as class };
+   const { isOutlined = false, class: className = '', children, ...rest }: HTMLButtonAttributes & InternalProps = $props();
 </script>
 
 <button
-   on:click
    class={cn(
       'disabled:cursor-not-allowed disabled:opacity-40 min-h-[38px] border-2 border-solid h-fit w-fit whitespace-nowrap px-4 py-[0.375rem] rounded-md flex gap-2 items-center justify-center font-semibold hover:brightness-90 transition-all outline-none focus:outline-purple-500 focus:ring-0',
       {
@@ -27,7 +22,7 @@
       },
       className
    )}
-   {...$$restProps}
+   {...rest}
 >
-   <slot />
+   {@render children()}
 </button>

@@ -35,7 +35,7 @@
                {/if}
 
                {#if selectedPanel === 'Profile'}
-                  <div />
+                  <div></div>
                {/if}
             </div>
          </div>

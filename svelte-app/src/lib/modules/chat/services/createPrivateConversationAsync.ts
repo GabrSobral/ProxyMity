@@ -17,7 +17,7 @@ export async function createPrivateConversationAsync(
    { accessToken }: IServiceOptions
 ): Promise<Response> {
    const { data } = await api.post<Response>(
-      '/conversation/private',
+      '/conversations/private',
       { participantId },
       {
          headers: {

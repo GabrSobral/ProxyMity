@@ -7,14 +7,12 @@
 
    import { chatDispatch, chatState } from '../../contexts/chat-context/stores/chat';
 
-   $: userId = $page.data.session?.user?.id || '';
-
-   $: conversationName =
+   const userId = $derived($page.data.session?.user?.id || '');
+   const conversationName = $derived(
       $chatState.selectedConversation?.groupName ||
-      $chatState.selectedConversation?.participants.find(item => item.id !== userId)?.name ||
-      '';
-
-   $: showConversationDetail = $chatState.showConversationDetail;
+         $chatState.selectedConversation?.participants.find(item => item.id !== userId)?.name ||
+         ''
+   );
 </script>
 
 <header class="px-3 py-2 bg-black flex items-center gap-4 transition-all overflow-hidden">
@@ -28,11 +26,11 @@
       <button
          title="Conversation info"
          class={clsx('rounded-full p-2 hover:bg-purple-500 transition-all hover:text-white group ', {
-            'bg-purple-500': showConversationDetail,
-            'bg-black': !showConversationDetail,
+            'bg-purple-500': $chatState.showConversationDetail,
+            'bg-black': !$chatState.showConversationDetail,
          })}
          type="button"
-         on:click={chatDispatch.handleShowConversationDetail}
+         onclick={chatDispatch.handleShowConversationDetail}
       >
          <User size={24} class="text-white group-hover:text-white" />
       </button>
@@ -40,7 +38,7 @@
       {#if userId}
          <button
             type="button"
-            on:click={() => chatDispatch.selectConversation({ conversation: null, typeMessage: '', currentUserId: userId })}
+            onclick={() => chatDispatch.selectConversation({ conversation: null, typeMessage: '', currentUserId: userId })}
             title="Close chat"
             class="rounded-full p-2 bg-black hover:bg-purple-500 hover:text-white group transition-all text-white"
          >

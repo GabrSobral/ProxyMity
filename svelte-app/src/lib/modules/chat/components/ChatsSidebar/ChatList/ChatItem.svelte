@@ -4,24 +4,26 @@
    import { twMerge } from 'tailwind-merge';
    import { Clock, Pin } from 'lucide-svelte';
 
+   import { cn } from '$lib/utils';
+
    import * as Avatar from '$lib/design-system/avatar';
 
    import { chatState } from '$lib/modules/chat/contexts/chat-context/stores/chat';
    import { connection } from '$lib/modules/chat/contexts/websocket-context/stores/connection';
-   import { getChatContext } from '$lib/modules/chat/contexts/chat-context/ChatContext.svelte';
+   import { selectConversationAsync } from '$lib/modules/chat/contexts/chat-context/ChatContext.svelte';
    import type { ConversationState } from '$lib/modules/chat/contexts/chat-context/stores/chat-store-types';
 
    import { EMessageStatuses } from '../../../../../../enums/EMessageStatuses';
-   import { cn } from '$lib/utils';
 
-   export let conversation: ConversationState;
+   let typing = $state(false);
+   let { conversation } = $props() as { conversation: ConversationState };
 
-   $: user = $page.data.session?.user;
-   $: lastMessage = conversation.messages?.at(-1);
-   $: isSelectedContact = $chatState.selectedConversation?.id === conversation.id;
-   $: isMine = lastMessage?.author?.id === user?.id;
-   $: draft = conversation.typeMessage;
-   $: status = (() => {
+   let user = $derived($page.data.session?.user);
+   let lastMessage = $derived(conversation.messages?.at(-1));
+   let isSelectedContact = $derived($chatState.selectedConversation?.id === conversation.id);
+   let isMine = $derived(lastMessage?.author?.id === user?.id);
+   let draft = $derived(conversation.typeMessage);
+   let status = $derived.by(() => {
       if (!lastMessage) {
          return;
       }
@@ -31,7 +33,7 @@
       if (lastMessage.sentAt !== null) return EMessageStatuses.SENT;
 
       return EMessageStatuses.WROTE;
-   })();
+   });
 
    $connection?.on('receiveTyping', (typingWs, authorId, conversationId) => {
       if (conversationId === conversation.id) {
@@ -41,25 +43,23 @@
       }
    });
 
-   let { selectedConversationAsync } = getChatContext();
-   let typing = false;
-
    const formatLastMessageDate = Intl.DateTimeFormat('pt-br', { hour: 'numeric', minute: 'numeric' });
    const conversationName = conversation?.groupName || conversation?.participants.find(item => item.id !== user?.id)?.name || '';
 </script>
 
-<!-- svelte-ignore a11y-click-events-have-key-events -->
+<!-- svelte-ignore a11y_click_events_have_key_events -->
 <div
    role="button"
    tabindex="0"
    class="w-full relative py-[0.4rem] px-3 rounded-md flex gap-4 cursor-pointer hover:opacity-90 group bg-[#0A0A0A] transition-all shadow-md border-1 border-gray-950"
-   on:click={() => selectedConversationAsync(conversation)}
+   onclick={() => selectConversationAsync(conversation)}
 >
    <div
+      aria-hidden="true"
       class={`${
          isSelectedContact ? 'w-full left-0 opacity-100' : 'w-0 left-2/4 opacity-10'
       } absolute h-full bg-gradient-to-r from-[#9D12E0dd] via-[75%] via-transparent to-transparent transition-all rounded-md top-0 z-0 duration-[0.3s] mx-auto items-center`}
-   />
+   ></div>
 
    <Avatar.Image src="https://github.com/shadcn.png" username={conversationName} />
 
@@ -89,7 +89,7 @@
       </span>
 
       <div
-         class={cn('truncate flex justify-between gap-4 text-gray-200 text-sm', {
+         class={cn('truncate flex justify-between gap-4 text-gray-200 text-sm max-w-[17rem]', {
             'text-purple-500': typing && !isSelectedContact,
             'text-white': isSelectedContact,
          })}
@@ -97,7 +97,7 @@
          {#if typing}
             <span class="text-white dark:text-purple-300 font-semibold">Typing...</span>
          {:else if lastMessage && !draft}
-            <span class="flex gap-4 w-full">
+            <span class="flex gap-4 w-full truncate">
                {lastMessage.content}
 
                <span class="flex items-center gap-2 ml-auto">
@@ -112,7 +112,7 @@
                            'justify-start bg-purple-500': status === EMessageStatuses.READ,
                         })}
                      >
-                        <div class="rounded-full w-2 h-2 bg-white transition-all" />
+                        <div class="rounded-full w-2 h-2 bg-white transition-all"></div>
                      </div>
                   {/if}
                </span>
@@ -125,7 +125,7 @@
 
          {#if conversation.notifications > 0}
             <span
-               class="rounded-full bg-purple-500 w-5 h-5 ml-auto flex items-center justify-center text-[12px] text-white font-medium animate-pulse z-10"
+               class="rounded-full shadow-purple-500 shadow-[0_0_30px] bg-purple-500 w-5 h-5 ml-auto flex items-center justify-center text-[12px] text-white font-medium animate-pulse z-10"
             >
                {conversation.notifications}
             </span>

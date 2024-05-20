@@ -20,7 +20,7 @@ export async function createGroupConversationAsync(
    { accessToken }: IServiceOptions
 ): Promise<Response> {
    const { data } = await api.post<Response>(
-      '/conversation/group',
+      '/conversations/group',
       {
          name,
          description,

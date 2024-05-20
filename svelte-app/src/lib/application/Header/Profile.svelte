@@ -9,14 +9,14 @@
 
    import LogoutDialog from './logout-dialog.svelte';
 
-   $: user = $page.data.session?.user;
+   let user = $derived($page.data.session?.user);
 
-   let showLogoutDialog = false;
+   let showLogoutDialog = $state(false);
    let closeModal = () => {
       showLogoutDialog = false;
    };
 
-   let isSettingsModalOpened = false;
+   let isSettingsModalOpened = $state(false);
    let closeSettingsModal = () => {
       isSettingsModalOpened = false;
    };
@@ -44,7 +44,7 @@
 
          <DropdownMenu.Item
             class="flex gap-4 items-center"
-            on:click={() => {
+            onclick={() => {
                isSettingsModalOpened = true;
             }}
          >
@@ -54,7 +54,7 @@
 
          <DropdownMenu.Item
             class="flex gap-4 items-center"
-            on:click={() => {
+            onclick={() => {
                showLogoutDialog = true;
             }}
          >

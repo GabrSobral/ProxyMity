@@ -1,9 +1,7 @@
 <script lang="ts">
-   import { fade } from 'svelte/transition';
-
    import Chat from '../components/Chat/index.svelte';
-   import ChatsSidebar from '../components/ChatsSidebar/index.svelte';
    import ChatDetail from '../components/ChatDetails/index.svelte';
+   import ChatsSidebar from '../components/ChatsSidebar/index.svelte';
 
    import { chatState } from '../contexts/chat-context/stores/chat';
 </script>

@@ -41,7 +41,7 @@
                })}
                in:send={{ key: 'active-sidebar-tab' }}
                out:receive={{ key: 'active-sidebar-tab' }}
-            />
+            ></div>
          {/if}
 
          <div class={clsx('relative transition-colors', { 'text-white ': isActive })}>

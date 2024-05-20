@@ -3,6 +3,7 @@ import { writable } from 'svelte/store';
 import type { Actions, ChatState, NotificationState } from './chat-store-types';
 import { EMessageStatuses } from '../../../../../../enums/EMessageStatuses';
 import type { TimestampWithAccount } from '../../../../../../types/message';
+import { logDebug } from '../../../../../../utils/logging';
 
 export const chatState = writable<ChatState>({
    conversations: [],
@@ -35,6 +36,7 @@ export const chatDispatch: Actions = {
          isFetchingConversations: value,
       }));
    },
+
    addConversation(newConversation) {
       chatState.update(store => ({
          ...store,
@@ -110,6 +112,8 @@ export const chatDispatch: Actions = {
    },
 
    addMessage({ message }) {
+      logDebug('chat store -> addMessage');
+
       chatState.update(store => {
          const index = store.conversations.findIndex(conversation => conversation.id === message.conversationId);
 
@@ -169,6 +173,7 @@ export const chatDispatch: Actions = {
             const targetIndex = store.conversations.findIndex(item => item.id === conversation?.id);
 
             if (targetIndex > -1) {
+               // Reset notifications and update messages read status
                store.conversations[targetIndex].notifications = 0;
                store.conversations[targetIndex].messages = store.conversations[targetIndex].messages.map(message => {
                   const numberOfParticipants = store.conversations[targetIndex].participants.length;
@@ -188,7 +193,6 @@ export const chatDispatch: Actions = {
             }
          }
 
-         // Storing the current value of input at current conversation
          const currentIndex = store.conversations.findIndex(item => item.id === store.selectedConversation?.id);
          if (currentIndex >= 0) {
             store.conversations[currentIndex].typeMessage = typeMessage;
@@ -296,7 +300,7 @@ export const chatDispatch: Actions = {
             store.conversations[index].hasMessagesFetched = true;
          }
 
-         return store;
+         return { ...store };
       });
    },
 

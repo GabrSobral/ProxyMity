@@ -1,43 +1,44 @@
 <script lang="ts">
    import { page } from '$app/stores';
-
    import { User, Pin, PhoneCall, Camera, Speaker } from 'lucide-svelte';
 
-   import { chatDispatch, chatState } from '../../contexts/chat-context/stores/chat';
-   import { unpinConversationAsync } from '../../services/unpinConversationAsync';
    import { pinConversationAsync } from '../../services/pinConversationAsync';
+   import { unpinConversationAsync } from '../../services/unpinConversationAsync';
 
-   $: user = $page.data.session?.user;
-   $: accessToken = $page.data.session?.accessToken;
+   import { chatDispatch, chatState } from '../../contexts/chat-context/stores/chat';
 
-   $: conversationName =
-      $chatState.selectedConversation?.groupName ||
-      $chatState.selectedConversation?.participants.find(item => item.id !== user?.id)?.name ||
-      '';
+   let { selectedConversation } = $chatState;
+   let session = $derived($page.data.session);
 
-   $: contact = $chatState.selectedConversation?.participants[0];
-   $: isChatPinned = !!$chatState.selectedConversation?.conversationPinnedAt;
+   let contact = $derived(selectedConversation?.participants[0]);
+   let isChatPinned = $derived(!!selectedConversation?.conversationPinnedAt);
+
+   let conversationName = $derived(
+      selectedConversation?.groupName ||
+         selectedConversation?.participants.find(item => item.id !== session?.user?.id)?.name ||
+         ''
+   );
 
    async function handlePin() {
-      if (!$chatState.selectedConversation) {
+      if (!selectedConversation) {
          console.warn('No conversation was selected.');
          return;
       }
 
-      if (!accessToken) {
+      if (!session?.accessToken) {
          console.warn('No access token was detected.');
          return;
       }
 
-      chatDispatch.handleConversationPin({ conversationId: $chatState.selectedConversation?.id });
+      chatDispatch.handleConversationPin({ conversationId: selectedConversation?.id });
 
-      const conversationId = $chatState.selectedConversation.id;
+      const conversationId = selectedConversation.id;
 
       try {
          if (isChatPinned) {
-            unpinConversationAsync({ conversationId }, { accessToken });
+            unpinConversationAsync({ conversationId }, { accessToken: session?.accessToken });
          } else {
-            pinConversationAsync({ conversationId }, { accessToken });
+            pinConversationAsync({ conversationId }, { accessToken: session?.accessToken });
          }
       } catch (error: any) {
          console.error('Error on trying to handle with pin and unpin chat.', error);
@@ -58,7 +59,7 @@
       <div class="flex flex-col overflow-hidden">
          <strong class="text-white font-light text-lg">{conversationName}</strong>
 
-         {#if !$chatState.selectedConversation?.isGroup}
+         {#if !selectedConversation?.isGroup}
             <span class="text-gray-200 font-light text-sm truncate">{contact?.email}</span>
          {/if}
       </div>
@@ -82,7 +83,7 @@
       </button>
 
       <button
-         on:click={handlePin}
+         onclick={handlePin}
          type="button"
          class="shadow-lg p-2 bg-purple-400 rounded-[8px] hover:brightness-150 transition-all active:scale-90"
          title={`Pin ${conversationName}'s conversation`}
@@ -99,10 +100,10 @@
       </button>
    </div>
 
-   {#if $chatState.selectedConversation?.groupDescription}
+   {#if selectedConversation?.groupDescription}
       <div>
          <span class="text-white font-medium">Description:</span>
-         <p class="text-gray-200 font-light">{$chatState.selectedConversation?.groupDescription}</p>
+         <p class="text-gray-200 font-light">{selectedConversation?.groupDescription}</p>
       </div>
    {/if}
 

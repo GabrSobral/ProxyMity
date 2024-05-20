@@ -1,6 +1,5 @@
 <script lang="ts">
    import { ulid } from 'ulidx';
-   import { onMount } from 'svelte';
    import { page } from '$app/stores';
    import { Send, X } from 'lucide-svelte';
 
@@ -9,18 +8,17 @@
 
    import { chatWorker } from '$lib/modules/chat/workers/db-worker/initializer';
    import { WorkerMethods } from '$lib/modules/chat/workers/db-worker/method-types';
-   import { getChatContext } from '$lib/modules/chat/contexts/chat-context/ChatContext.svelte';
-   import { chatDispatch, chatState } from '$lib/modules/chat/contexts/chat-context/stores/chat';
+   import { typebarRef } from '$lib/modules/chat/contexts/chat-context/stores/typebar-store';
    import { webSocketEmitter } from '$lib/modules/chat/contexts/websocket-context/stores/connection';
 
    import type { ILocalMessage } from '../../../../../../types/message';
    import { EMessageStatuses } from '../../../../../../enums/EMessageStatuses';
+   import { chatDispatch, chatState } from '$lib/modules/chat/contexts/chat-context/stores/chat';
 
-   $: user = $page.data.session?.user;
-   $: conversationId = $chatState.selectedConversation?.id || '';
+   let user = $derived($page.data.session?.user);
+   let conversationId = $derived($chatState.selectedConversation?.id || '');
 
-   let typeValueManaged = '';
-   let { typebarRef } = getChatContext();
+   let typeValueManaged = $state('');
 
    async function sendMessage() {
       if (!user || !$chatState.selectedConversation || !$typebarRef?.value.trim()) return;
@@ -66,7 +64,7 @@
       $webSocketEmitter.sendTyping({ conversationId, typing, authorId: user?.id || '' });
    }
 
-   onMount(() => {
+   $effect(() => {
       $typebarRef?.addEventListener('input', (e: any) => {
          const value = e.target.value as string;
 
@@ -81,7 +79,7 @@
 
       $typebarRef?.addEventListener('keypress', async (e: KeyboardEvent) => {
          if (e.code === 'Enter') {
-            await sendMessage();
+            sendMessage();
          }
       });
    });
@@ -105,7 +103,7 @@
          <button
             type="button"
             title="Cancel reply message"
-            on:click={() => chatDispatch.removeReplyMessageFromConversation({ conversationId })}
+            onclick={() => chatDispatch.removeReplyMessageFromConversation({ conversationId })}
             class="ml-auto bg-gray-900 hover:brightness-125 flex items-center justify-center rounded-full max-w-[2.5rem] min-w-[2.5rem] max-h-[2.5rem] min-h-[2.5rem]"
          >
             <X size={24} color="white" />
@@ -121,7 +119,7 @@
             id="typebar-input-id"
             bind:this={$typebarRef}
             type="text"
-            class="max-h-[20rem] min-h-[3.5rem] resize-none flex flex-1 py-3 focus:outline-none outline-none hover:ring-1 transition-all ring-gray-700 rounded-md bg-gray-900 text-gray-200 focus:outline-purple-500 focus:ring-0 placeholder:text-gray-400 w-full px-4"
+            class="max-h-[20rem] min-h-[3rem] resize-none flex flex-1 py-3 focus:outline-none outline-none hover:ring-1 transition-all ring-gray-700 rounded-md bg-gray-900 text-gray-200 focus:outline-purple-500 focus:ring-0 placeholder:text-gray-400 w-full px-4"
             placeholder="Type your message"
             autoComplete="off"
          />
@@ -129,10 +127,10 @@
          <Button
             type="button"
             title="Send message"
-            on:click={sendMessage}
-            class="p-2 absolute right-3 top-2/4 -translate-y-2/4 min-w-[2.75rem] min-h-[2.75rem] max-w-[2.75rem] max-h-[2.75rem] mt-auto rounded-[10px]"
+            onclick={sendMessage}
+            class="p-2 absolute right-2 top-2/4 -translate-y-2/4 min-w-[2.25rem] min-h-[2.25rem] max-w-[2.75rem] max-h-[2.75rem] mt-auto rounded-[10px]"
          >
-            <Send class="text-white" size={24} />
+            <Send class="text-white" size={18} />
          </Button>
       </Wrapper>
    </InputGroup>

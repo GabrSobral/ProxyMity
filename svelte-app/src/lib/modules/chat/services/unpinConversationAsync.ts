@@ -6,7 +6,7 @@ interface Request {
 }
 
 export async function unpinConversationAsync({ conversationId }: Request, { accessToken }: IServiceOptions): Promise<void> {
-   await api.patch<Response>(`/conversation/${conversationId}/unpin`, null, {
+   await api.patch<Response>(`/conversations/${conversationId}/unpin`, null, {
       headers: {
          Authorization: `Bearer ${accessToken}`,
       },

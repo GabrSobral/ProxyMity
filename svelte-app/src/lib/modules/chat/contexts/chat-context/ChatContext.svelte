@@ -1,6 +1,4 @@
 <script lang="ts" context="module">
-   export let typebarRef = writable<HTMLInputElement | null>(null);
-
    let accessToken: string;
    let chatStateMod: ChatState;
    let chatWorkerMod: Worker | null;
@@ -36,7 +34,7 @@
       });
    }
 
-   async function selectedConversationAsync(conversation: ConversationState) {
+   export async function selectConversationAsync(conversation: ConversationState) {
       if (conversation === chatStateMod.selectedConversation || !userMod) return;
 
       const { id: conversationId, isGroup: isConversationGroup } = conversation;
@@ -60,9 +58,11 @@
       if (!conversation.hasMessagesFetched) {
          try {
             const { messages } = await APIGetConversationMessages({ conversationId }, { accessToken });
+
+            logSuccess(`Messages was successfully loaded from "${conversationId}" conversation`);
             chatDispatch.setConversationMessages({ conversationId, messages, fromServer: true, currentUserId: userMod.id });
          } catch (error) {
-            console.error('🔴 \u001b[31m Error fetching conversations, data will be taken from the cache', error);
+            logError('Error fetching conversations, data will be taken from the cache', error);
 
             const messages = await getConversationsMessagesAsyncDB(conversationId);
             chatDispatch.setConversationMessages({ conversationId, messages, fromServer: false, currentUserId: userMod.id });
@@ -72,24 +72,23 @@
 
    interface ChatContextProps {
       typebarRef: Writable<HTMLInputElement | null>;
-      selectedConversationAsync: (conversation: ConversationState) => Promise<void>;
+      selectConversationAsync: (conversation: ConversationState) => Promise<void>;
    }
 
    export const getChatContext = () => getContext<ChatContextProps>('chat-context');
-   export const setChatContext = () => setContext<ChatContextProps>('chat-context', { typebarRef, selectedConversationAsync });
+   export const setChatContext = () => setContext<ChatContextProps>('chat-context', { typebarRef, selectConversationAsync });
 </script>
 
 <script lang="ts">
    import { page } from '$app/stores';
-   import { toast } from 'svelte-sonner';
    import { browser } from '$app/environment';
-   import { chatDispatch } from './stores/chat';
    import type { Session } from '@auth/sveltekit';
-   import { writable, type Writable } from 'svelte/store';
+   import type { Writable } from 'svelte/store';
    import type { HubConnection } from '@microsoft/signalr';
    import { setContext, getContext, onMount } from 'svelte';
 
-   import { chatState } from './stores/chat';
+   import { typebarRef } from './stores/typebar-store';
+   import { chatState, chatDispatch } from './stores/chat';
    import type { ConversationState, ChatState } from './stores/chat-store-types';
 
    import { APIGetUserConversations } from '../../../../../services/api/get-user-conversations';
@@ -98,27 +97,34 @@
    import { getConversationCacheAsyncDB } from '../../../../../services/database/use-cases/get-conversations-state';
    import { getConversationsMessagesAsyncDB } from '../../../../../services/database/use-cases/get-conversations-messages';
 
-   import { EMessageStatuses } from '../../../../../enums/EMessageStatuses';
-   import type { IServerMessage } from '../../../../../types/message';
-
    import { chatWorker } from '../../workers/db-worker/initializer';
    import { WorkerMethods } from '../../workers/db-worker/method-types';
 
-   import { serverToLocalMessage } from './functions/parse-server-message';
    import type { WebSocketEmitter } from '../websocket-context/WebSocketEmitter';
    import { connection, webSocketEmitter } from '../websocket-context/stores/connection';
    import { showMessageSonner } from '../../../../../contexts/error-context/store';
 
+   import { receiveMessageHandler } from './events/receiveMessageHandler';
+   import { receiveReadMessageHandler } from './events/receiveReadMessageHandler';
+   import { receiveMessageStatusHandler } from './events/receiveMessageStatusHandler';
+   import { receivePendingMessagesHandler } from './events/receivePendingMessagesHandler';
+
+   import { logError, logSuccess } from '../../../../../utils/logging';
+
    setChatContext();
 
-   $: session = $page.data.session;
+   type Props = { children: any };
+   type $$Props = Props;
+
+   let session = $derived($page.data.session);
+   let { children } = $props() as Props;
 
    onMount(() => {
       if (session?.user && session?.accessToken) {
          const userId = session?.user?.id;
 
          if (!userId) {
-            console.error('User Id not found.');
+            logError('User Id not found.');
             showMessageSonner({ message: 'User Id not found.' });
             return;
          }
@@ -127,7 +133,7 @@
 
          APIGetUserConversations({ id: userId }, { accessToken: session.accessToken })
             .then(conversationsData => {
-               console.log('🟢 \u001b[32m Fetching conversations data was successfully.');
+               logSuccess('Fetching conversations data was successfully.');
 
                const filteredData = conversationsData.map(data => ({
                   ...data,
@@ -138,111 +144,28 @@
                $chatWorker?.postMessage({ type: WorkerMethods.SAVE_CONVERSATIONS, payload: filteredData });
             })
             .catch(error => {
-               console.error(
-                  '🔴 \u001b[31m Error on trying to fetch conversations, data will be taken from the cache',
-                  error.message
-               );
+               logError('Error on trying to fetch conversations, data will be taken from the cache', error.message);
 
                getConversationCacheAsyncDB({ userId })
                   .then(conversationsData => {
-                     console.log({ conversationsData });
                      chatDispatch.setConversationInitialState({ conversationsData, currentUserId: userId });
                   })
-                  .catch(console.error);
+                  .catch(logError);
             })
             .finally(() => chatDispatch.setIsFetchingConversations(false));
       }
    });
 
-   // 🔵 Receive Message Handler
-   async function receiveMessageHandler(serverMessage: IServerMessage) {
-      const conversation = $chatState.conversations.find(item => item.id === serverMessage.conversationId);
-      const conversationId = conversation?.id || '';
-      const isConversationGroup = conversation?.isGroup || false;
-      const userId = session?.user?.id || '';
-      const messageId = serverMessage.id;
+   $effect(() => {
+      if ($connection) {
+         $connection?.on('receivemessage', receiveMessageHandler);
+         $connection?.on('receivereadmessage', receiveReadMessageHandler);
+         $connection?.on('receivemessagestatus', receiveMessageStatusHandler);
+         $connection?.on('receivependingmessages', receivePendingMessagesHandler);
 
-      const webSocketsPayload = { userId, conversationId, messageId, isConversationGroup };
-      const localMessage = await serverToLocalMessage(serverMessage, isConversationGroup, userId);
-
-      const targetConversationIsSelectedConversation =
-         $chatState.selectedConversation && $chatState.selectedConversation?.id === serverMessage.conversationId;
-
-      chatDispatch.addMessage({ message: localMessage });
-      chatDispatch.bringToTop(conversationId);
-
-      $chatWorker?.postMessage({ type: WorkerMethods.ADD_MESSAGE, payload: { message: localMessage } });
-
-      $webSocketEmitter.sendReceiveMessage(webSocketsPayload);
-      chatDispatch.updateConversationMessageStatus({
-         messageId,
-         conversationId,
-         userId,
-         status: EMessageStatuses.RECEIVED,
-         appliedForAll: false,
-      });
-
-      if (targetConversationIsSelectedConversation) {
-         $webSocketEmitter.sendReadMessage(webSocketsPayload);
-         chatDispatch.updateConversationMessageStatus({
-            conversationId,
-            status: EMessageStatuses.READ,
-            userId,
-            appliedForAll: false,
-         });
-      } else {
-         toast.message('New message', {
-            id: serverMessage.id,
-            description: serverMessage.content,
-            action: {
-               label: 'Open',
-               onClick: () => conversation && selectedConversationAsync(conversation),
-            },
-         });
+         logSuccess('Connection events created.');
       }
-   }
-
-   // 🔵 Receive Read Message Handler
-   async function receiveReadMessageHandler(...args: [string, string, boolean, boolean]) {
-      if (!session?.user) return;
-
-      const [conversationId, userId, isConversationGroup, readByAll] = args;
-
-      chatDispatch.updateConversationMessageStatus({
-         conversationId,
-         status: EMessageStatuses.READ,
-         userId,
-         appliedForAll: readByAll,
-      });
-      $chatWorker?.postMessage({
-         type: WorkerMethods.READ_CONVERSATION_MESSAGES,
-         payload: { conversationId, myId: session?.user?.id, whoRead: userId, isConversationGroup },
-      });
-   }
-
-   // 🔵 Receive Message Status Handler
-   function receiveMessageStatusHandler(...args: [string, string, string, string, boolean]) {
-      const [messageStatus, messageId, conversationId, userId, appliedForAll] = args;
-
-      const messageDetail = { messageStatus, messageId, conversationId, userId, type: 'message_status', appliedForAll };
-      const messageStatusEvent = new CustomEvent(messageId, { detail: messageDetail });
-
-      dispatchEvent(messageStatusEvent);
-   }
-
-   // 🔵 Receive Pending Messages Handler
-   function receivePendingMessagesHandler(userId: string) {
-      chatDispatch.markAsReceivedMessagesFromConversations({ userId });
-   }
-
-   $: if ($connection) {
-      $connection?.on('receivemessage', receiveMessageHandler);
-      $connection?.on('receivereadmessage', receiveReadMessageHandler);
-      $connection?.on('receivemessagestatus', receiveMessageStatusHandler);
-      $connection?.on('receivependingmessages', receivePendingMessagesHandler);
-
-      console.log('🟢 \u001b[32m  Connection events created.');
-   }
+   });
 </script>
 
-<slot />
+{@render children()}

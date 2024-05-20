@@ -1,13 +1,11 @@
 <script lang="ts">
    import clsx from 'clsx';
-   import { writable } from 'svelte/store';
    import { cubicInOut } from 'svelte/easing';
    import { crossfade } from 'svelte/transition';
 
    import { cn } from '$lib/utils';
 
    import * as Dialog from '$lib/design-system/dialog';
-   import Button from '$lib/design-system/button/button.svelte';
 
    import GroupConversation from './group-conversation.svelte';
    import PrivateConversation from './private-conversation.svelte';
@@ -69,7 +67,7 @@
                         })}
                         in:send={{ key: 'active-sidebar-tab' }}
                         out:receive={{ key: 'active-sidebar-tab' }}
-                     />
+                     ></div>
                   {/if}
 
                   <div class={clsx('relative transition-colors', { 'text-white ': isActive })}>

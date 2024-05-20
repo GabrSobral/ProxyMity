@@ -2,12 +2,12 @@
    import autoAnimate from '@formkit/auto-animate';
 
    import ChatItem from './ChatItem.svelte';
-
-   import { chatState } from '$lib/modules/chat/contexts/chat-context/stores/chat';
    import ChatItemSkeleton from './ChatItemSkeleton.svelte';
 
-   $: pinnedConversations = $chatState.conversations.filter(item => item.conversationPinnedAt).sort();
-   $: unpinnedConversations = $chatState.conversations.filter(item => !item.conversationPinnedAt);
+   import { chatState } from '$lib/modules/chat/contexts/chat-context/stores/chat';
+
+   let pinnedConversations = $derived($chatState.conversations.filter(item => item.conversationPinnedAt).sort());
+   let unpinnedConversations = $derived($chatState.conversations.filter(item => !item.conversationPinnedAt));
 </script>
 
 <section class="flex flex-col gap-3 transition-all relative overflow-hidden flex-1">

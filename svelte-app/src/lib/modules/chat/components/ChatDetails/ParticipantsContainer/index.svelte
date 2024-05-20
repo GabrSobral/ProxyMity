@@ -1,6 +1,5 @@
 <script lang="ts">
    import clsx from 'clsx';
-
    import { ChevronDown, UsersRound } from 'lucide-svelte';
 
    import Heading from '$lib/design-system/Heading.svelte';
@@ -8,15 +7,17 @@
 
    import { chatState } from '$lib/modules/chat/contexts/chat-context/stores/chat';
 
-   let isCollapsed = false;
+   let isCollapsed = $state(false);
+
+   let { selectedConversation } = $chatState;
 </script>
 
 <section class="flex flex-col dark:bg-gray-900 bg-white transition-all h-fit rounded-[10px] overflow-hidden relative shadow-md">
-   <!-- svelte-ignore a11y-click-events-have-key-events -->
+   <!-- svelte-ignore a11y_click_events_have_key_events -->
    <div
       role="button"
       tabindex="-1"
-      on:click={() => {
+      onclick={() => {
          isCollapsed = !isCollapsed;
       }}
    >
@@ -26,7 +27,7 @@
       >
          <span class="flex gap-2 text-gray-700 dark:text-white transition-colors">
             <UsersRound size={24} className="text-gray-700 dark:text-white transition-colors" /> Participants -{' '}
-            {$chatState.selectedConversation?.participants.length}
+            {selectedConversation?.participants.length}
          </span>
 
          <ChevronDown
@@ -48,5 +49,5 @@
    <div
       data-is-collapsed={isCollapsed}
       class="absolute bottom-0 h-10 w-full z-10 bg-gradient-to-t data-[is-collapsed=true]:max-h-0 max-h-10 dark:from-gray-950 from-gray-200 transition-all pointer-events-none"
-   />
+   ></div>
 </section>

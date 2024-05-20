@@ -4,22 +4,23 @@
    import ChatList from './ChatList/index.svelte';
 
    import Heading from '$lib/design-system/Heading.svelte';
-   import Button from '$lib/design-system/button/button.svelte';
    import InputGroup from '$lib/design-system/Input/InputGroup.svelte';
 
-   import { chatState } from '$lib/modules/chat/contexts/chat-context/stores/chat';
    import CreateConversationModal from '$lib/modules/chat/components/CreateConversationModal/index.svelte';
+   import { chatState } from '../../contexts/chat-context/stores/chat';
 
-   let isNewContactModalOpened = false;
+   let { conversations } = $chatState;
+
+   let isNewContactModalOpened = $state(false);
+   let allNotificationsCount = $derived(conversations.reduce((accumulator, curr) => accumulator + curr.notifications, 0));
+
    let closeSettingsModal = () => {
       isNewContactModalOpened = false;
    };
-
-   $: allNotificationsCount = $chatState.conversations.reduce((accumulator, curr) => accumulator + curr.notifications, 0);
 </script>
 
 <aside
-   class="h-full min-w-[340px] rounded-[8px] border border-gray-900 p-2 flex flex-col gap-3 bg-gradient-to-br from-[#136DCE]/50 via-[22%] via-black/20 backdrop-blur"
+   class="h-full min-w-[17rem] rounded-[8px] border border-gray-900 p-2 flex flex-col gap-3 bg-gradient-to-br from-[#136DCE]/50 via-[22%] via-black/20 backdrop-blur"
 >
    <div class="flex gap-4 justify-between px-3">
       <Heading size="lg" class="flex gap-3 items-center">
@@ -36,7 +37,7 @@
 
       <button
          class="p-2 flex items-center rounded-md text-white justify-center bg-purple-500 shadow-purple-500 shadow-[0_0_30px]"
-         on:click={() => {
+         onclick={() => {
             isNewContactModalOpened = true;
          }}
          title="Create a new conversation"

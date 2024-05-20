@@ -3,14 +3,15 @@
    import { User } from 'lucide-svelte';
 
    import Text from '$lib/design-system/Text.svelte';
-
    import { chatState } from '$lib/modules/chat/contexts/chat-context/stores/chat';
 
-   $: user = $page.data.session?.user;
+   let user = $derived($page.data.session?.user);
+
+   let { selectedConversation } = $chatState;
 </script>
 
 <ul class="p-1 flex flex-col gap-1 transition-all overflow-y-scroll">
-   {#each $chatState.selectedConversation?.participants || [] as participant (participant.id)}
+   {#each selectedConversation?.participants || [] as participant (participant.id)}
       <li
          class="w-full relative py-2 px-3 rounded-[6px] flex gap-4 hover:opacity-90 transition-colors group dark:bg-gray-800 bg-white shadow"
       >

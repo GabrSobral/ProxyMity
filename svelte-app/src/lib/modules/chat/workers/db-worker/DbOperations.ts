@@ -10,6 +10,8 @@ import type { IConversationAPI } from '../../../../../services/api/get-user-conv
 import { EMessageStatuses } from '../../../../../enums/EMessageStatuses';
 import type { IChangeMessageStatusParams, IReadContactMessagesParams } from './method-types';
 
+import { logError, logSuccess } from '../../../../../utils/logging';
+
 interface IDbOperations {
    addMessage(payload: { message: ILocalMessage }): Promise<IndexableType>;
    getCurrentUser(): Promise<User | null>;
@@ -52,12 +54,13 @@ export class DbOperations implements IDbOperations {
          isGroup: !!item.conversation.groupId,
          createdAt: item.conversation.createdAt,
          participants: item.participants,
+         conversationPinnedAt: item.conversation.conversationPinnedAt,
       }));
 
       this.database.conversations
          .bulkPut(indexedConversation)
-         .then(() => console.log('🟢 \u001b[32m Local database was successfully synchronized with API data.'))
-         .catch(error => console.error('🔴 \u001b[31m Error on try to synchronize API data with local database', error.message));
+         .then(() => logSuccess('Local database was successfully synchronized with API data.'))
+         .catch(error => logError('Error on trying to synchronize API data with local database', error.message));
    }
 
    async saveUser(payload: User): Promise<IndexableType> {
@@ -69,9 +72,9 @@ export class DbOperations implements IDbOperations {
          await this.database.messages
             .where({ id: messageId })
             .modify({ receivedByAllAt: new Date() })
-            .then(() => console.log(`🟢 \u001b[32m The message status was updated on local database: ${messageId}`))
+            .then(() => logSuccess(`The message status was updated on local database: ${messageId}`))
             .catch(error => {
-               console.error(`🔴 \u001b[31m Error on trying to update the "${messageId}" message status at Indexed DB`, error);
+               logError(`Error on trying to update the "${messageId}" message status at Indexed DB`, error);
             });
       }
 

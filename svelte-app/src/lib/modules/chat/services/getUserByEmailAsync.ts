@@ -14,7 +14,7 @@ interface Response {
 }
 
 export async function getUserByEmailAsync({ userEmail }: Request, { accessToken }: IServiceOptions): Promise<Response> {
-   const { data } = await api.get<Response>(`/user/get-by-email/${userEmail}`, {
+   const { data } = await api.get<Response>(`/users/get-by-email/${userEmail}`, {
       headers: {
          Authorization: `Bearer ${accessToken}`,
       },
