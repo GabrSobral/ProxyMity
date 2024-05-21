@@ -1,4 +1,6 @@
 <script lang="ts">
+   import { page } from '$app/stores';
+
    import Text from '$lib/design-system/Text.svelte';
    import Heading from '$lib/design-system/Heading.svelte';
 
@@ -13,13 +15,14 @@
    let messagesContainer: HTMLUListElement | null = $state(null);
    let firstUnreadMessage: ILocalMessage | null = $state(null);
 
-   let userId = $derived(globalThis.$page.data.session?.user.id);
+   let userId = $derived($page.data.session?.user.id);
    let isFirstAccess = $state(true);
    let conversationMessages = $derived($chatState.selectedConversation?.messages || []);
 
    $effect(() => {
       if (!firstUnreadMessage) {
-         firstUnreadMessage = conversationMessages.find(message => message.read.users.some(user => !user.at)) || null;
+         firstUnreadMessage =
+            $chatState.selectedConversation?.messages.find(message => message.read.users.some(user => !user.at)) || null;
       }
    });
 
@@ -57,12 +60,12 @@
             <Heading size="md" class="opacity-80">No messages have been sent yet...</Heading>
          </div>
       {:else if $chatState.selectedConversation?.messages}
-         {#each conversationMessages as message, i (message.id)}
+         {#each $chatState.selectedConversation?.messages as message, i (message.id)}
             {#if firstUnreadMessage?.id === message.id}
                <div class="w-full h-[1px] bg-red-500 flex justify-center text-white">Unread messages</div>
             {/if}
 
-            <Message {message} previousMessage={conversationMessages?.[i - 1]} messageIndex={i} />
+            <Message {message} previousMessage={$chatState.selectedConversation?.messages?.[i - 1]} messageIndex={i} />
          {/each}
       {/if}
    </ul>

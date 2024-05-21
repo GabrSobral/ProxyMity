@@ -16,7 +16,9 @@
    import { EMessageStatuses } from '../../../../../../enums/EMessageStatuses';
 
    let typing = $state(false);
-   let { conversation } = $props() as { conversation: ConversationState };
+
+   type Props = { conversation: ConversationState };
+   let { conversation }: Props = $props();
 
    let user = $derived($page.data.session?.user);
    let lastMessage = $derived(conversation.messages?.at(-1));

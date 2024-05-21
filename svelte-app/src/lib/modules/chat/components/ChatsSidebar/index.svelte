@@ -9,10 +9,10 @@
    import CreateConversationModal from '$lib/modules/chat/components/CreateConversationModal/index.svelte';
    import { chatState } from '../../contexts/chat-context/stores/chat';
 
-   let { conversations } = $chatState;
-
    let isNewContactModalOpened = $state(false);
-   let allNotificationsCount = $derived(conversations.reduce((accumulator, curr) => accumulator + curr.notifications, 0));
+   let allNotificationsCount = $derived(
+      $chatState.conversations.reduce((accumulator, curr) => accumulator + curr.notifications, 0)
+   );
 
    let closeSettingsModal = () => {
       isNewContactModalOpened = false;

@@ -1,4 +1,5 @@
 import type { HubConnection } from '@microsoft/signalr';
+
 import type { ILocalMessage } from '../../../../../types/message';
 import { localToServerMessage } from '../chat-context/functions/parse-server-message';
 

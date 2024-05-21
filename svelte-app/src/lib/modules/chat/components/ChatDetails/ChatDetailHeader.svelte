@@ -7,20 +7,19 @@
 
    import { chatDispatch, chatState } from '../../contexts/chat-context/stores/chat';
 
-   let { selectedConversation } = $chatState;
    let session = $derived($page.data.session);
 
-   let contact = $derived(selectedConversation?.participants[0]);
-   let isChatPinned = $derived(!!selectedConversation?.conversationPinnedAt);
+   let contact = $derived($chatState.selectedConversation?.participants[0]);
+   let isChatPinned = $derived(!!$chatState.selectedConversation?.conversationPinnedAt);
 
    let conversationName = $derived(
-      selectedConversation?.groupName ||
-         selectedConversation?.participants.find(item => item.id !== session?.user?.id)?.name ||
+      $chatState.selectedConversation?.groupName ||
+         $chatState.selectedConversation?.participants.find(item => item.id !== session?.user?.id)?.name ||
          ''
    );
 
    async function handlePin() {
-      if (!selectedConversation) {
+      if (!$chatState.selectedConversation) {
          console.warn('No conversation was selected.');
          return;
       }
@@ -30,9 +29,9 @@
          return;
       }
 
-      chatDispatch.handleConversationPin({ conversationId: selectedConversation?.id });
+      chatDispatch.handleConversationPin({ conversationId: $chatState.selectedConversation?.id });
 
-      const conversationId = selectedConversation.id;
+      const conversationId = $chatState.selectedConversation.id;
 
       try {
          if (isChatPinned) {
@@ -59,7 +58,7 @@
       <div class="flex flex-col overflow-hidden">
          <strong class="text-white font-light text-lg">{conversationName}</strong>
 
-         {#if !selectedConversation?.isGroup}
+         {#if !$chatState.selectedConversation?.isGroup}
             <span class="text-gray-200 font-light text-sm truncate">{contact?.email}</span>
          {/if}
       </div>
@@ -100,10 +99,10 @@
       </button>
    </div>
 
-   {#if selectedConversation?.groupDescription}
+   {#if $chatState.selectedConversation?.groupDescription}
       <div>
          <span class="text-white font-medium">Description:</span>
-         <p class="text-gray-200 font-light">{selectedConversation?.groupDescription}</p>
+         <p class="text-gray-200 font-light">{$chatState.selectedConversation?.groupDescription}</p>
       </div>
    {/if}
 

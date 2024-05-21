@@ -119,7 +119,14 @@
 </script>
 
 <div class="flex gap-4 h-full">
-   <form action="" class="flex flex-col gap-4 min-w-[25rem]" on:submit|preventDefault={searchUser}>
+   <form
+      action=""
+      class="flex flex-col gap-4 min-w-[25rem]"
+      onsubmit={e => {
+         e.preventDefault();
+         searchUser();
+      }}
+   >
       <InputGroup let:Label let:Input>
          <Label isRequired>Name</Label>
 
@@ -151,7 +158,7 @@
             {@const isSelected = selectedUsers.some(item => item.id === user.id)}
 
             <li
-               on:click={() => {
+               onclick={() => {
                   if (isSelected) {
                      selectedUsers = selectedUsers.filter(item => item.id !== user.id);
                   } else {
@@ -190,7 +197,7 @@
          <ul class="flex flex-col gap-2">
             {#each selectedUsers as user (user.id)}
                <li
-                  on:click={() => {
+                  onclick={() => {
                      selectedUsers = selectedUsers.filter(item => item.id !== user.id);
                   }}
                   title="Click to select account"

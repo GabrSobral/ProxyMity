@@ -87,8 +87,7 @@
    import type { HubConnection } from '@microsoft/signalr';
    import { setContext, getContext, onMount } from 'svelte';
 
-   import { typebarRef } from './stores/typebar-store';
-   import { chatState, chatDispatch } from './stores/chat';
+   import { typebarRef, chatState, chatDispatch } from './stores/chat';
    import type { ConversationState, ChatState } from './stores/chat-store-types';
 
    import { APIGetUserConversations } from '../../../../../services/api/get-user-conversations';
@@ -100,9 +99,9 @@
    import { chatWorker } from '../../workers/db-worker/initializer';
    import { WorkerMethods } from '../../workers/db-worker/method-types';
 
+   import { showMessageSonner } from '../../../../../contexts/error-context/store';
    import type { WebSocketEmitter } from '../websocket-context/WebSocketEmitter';
    import { connection, webSocketEmitter } from '../websocket-context/stores/connection';
-   import { showMessageSonner } from '../../../../../contexts/error-context/store';
 
    import { receiveMessageHandler } from './events/receiveMessageHandler';
    import { receiveReadMessageHandler } from './events/receiveReadMessageHandler';
@@ -114,10 +113,9 @@
    setChatContext();
 
    type Props = { children: any };
-   type $$Props = Props;
+   let { children }: Props = $props();
 
    let session = $derived($page.data.session);
-   let { children } = $props() as Props;
 
    onMount(() => {
       if (session?.user && session?.accessToken) {

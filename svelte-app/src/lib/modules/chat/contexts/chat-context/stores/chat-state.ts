@@ -1,7 +1,8 @@
-import { EMessageStatuses } from '../../../../../../enums/EMessageStatuses';
-import type { TimestampWithAccount } from '../../../../../../types/message';
 import { logDebug } from '../../../../../../utils/logging';
+import { EMessageStatuses } from '../../../../../../enums/EMessageStatuses';
+
 import type { Actions, ChatState } from './chat-store-types';
+import type { TimestampWithAccount } from '../../../../../../types/message';
 
 export let chatState = $state<ChatState>({
    conversations: [],

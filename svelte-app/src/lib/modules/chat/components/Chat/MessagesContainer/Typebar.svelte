@@ -8,12 +8,12 @@
 
    import { chatWorker } from '$lib/modules/chat/workers/db-worker/initializer';
    import { WorkerMethods } from '$lib/modules/chat/workers/db-worker/method-types';
-   import { typebarRef } from '$lib/modules/chat/contexts/chat-context/stores/typebar-store';
+   import { typebarRef } from '$lib/modules/chat/contexts/chat-context/stores/chat';
    import { webSocketEmitter } from '$lib/modules/chat/contexts/websocket-context/stores/connection';
+   import { chatDispatch, chatState } from '$lib/modules/chat/contexts/chat-context/stores/chat';
 
    import type { ILocalMessage } from '../../../../../../types/message';
    import { EMessageStatuses } from '../../../../../../enums/EMessageStatuses';
-   import { chatDispatch, chatState } from '$lib/modules/chat/contexts/chat-context/stores/chat';
 
    let user = $derived($page.data.session?.user);
    let conversationId = $derived($chatState.selectedConversation?.id || '');
@@ -45,7 +45,7 @@
       chatDispatch.addMessage({ message });
       chatDispatch.bringToTop(message.conversationId);
 
-      $webSocketEmitter.sendMessage({ message, isConversationGroup: $chatState.selectedConversation.isGroup });
+      $webSocketEmitter?.sendMessage({ message, isConversationGroup: $chatState.selectedConversation.isGroup });
 
       $chatWorker?.postMessage({
          type: WorkerMethods.CHANGE_MESSAGE_STATUS,
@@ -61,7 +61,7 @@
    }
 
    function handleSpreadTypingStatusToConversation(typing: boolean) {
-      $webSocketEmitter.sendTyping({ conversationId, typing, authorId: user?.id || '' });
+      $webSocketEmitter?.sendTyping({ conversationId, typing, authorId: user?.id || '' });
    }
 
    $effect(() => {

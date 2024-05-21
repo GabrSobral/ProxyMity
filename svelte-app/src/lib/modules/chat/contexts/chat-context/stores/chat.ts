@@ -12,6 +12,8 @@ export const chatState = writable<ChatState>({
    showConversationDetail: false,
 });
 
+export const typebarRef = writable<HTMLInputElement | null>(null);
+
 export const notificationsState = writable<NotificationState>({
    notifications: [],
 });

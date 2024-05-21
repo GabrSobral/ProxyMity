@@ -9,6 +9,7 @@
    import * as Avatar from '$lib/design-system/avatar';
 
    import { chatWorker } from '$lib/modules/chat/workers/db-worker/initializer';
+   import { typebarRef } from '$lib/modules/chat/contexts/chat-context/stores/chat';
    import { WorkerMethods } from '$lib/modules/chat/workers/db-worker/method-types';
    import { getStatusFromMessage } from '$lib/modules/chat/services/getStatusFromMessage';
    import { chatDispatch, chatState } from '$lib/modules/chat/contexts/chat-context/stores/chat';
@@ -16,7 +17,6 @@
    import type { ILocalMessage } from '../../../../../../types/message';
    import { EMessageStatuses } from '../../../../../../enums/EMessageStatuses';
    import { appColor } from '../../../../../../contexts/theme/store';
-   import { typebarRef } from '$lib/modules/chat/contexts/chat-context/stores/typebar-store';
 
    type Props = {
       message: ILocalMessage;

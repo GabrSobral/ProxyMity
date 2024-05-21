@@ -14,6 +14,7 @@
    import { getUserByEmailAsync } from '../../services/getUserByEmailAsync';
    import { showMessageSonner } from '../../../../../contexts/error-context/store';
    import { createPrivateConversationAsync } from '../../services/createPrivateConversationAsync';
+
    import { chatDispatch } from '../../contexts/chat-context/stores/chat';
    import type { ConversationState } from '../../contexts/chat-context/stores/chat-store-types';
 
