@@ -5,10 +5,14 @@
    import Button from '$lib/design-system/button/button.svelte';
    import LoadingSpinning from '$lib/design-system/LoadingSpinning.svelte';
 
-   export let closeDialog: () => void;
-   export let isOpened: boolean;
+   type Props = {
+      closeDialog: () => void;
+      isOpened: boolean;
+   };
 
-   let isLoading = false;
+   const { closeDialog, isOpened }: Props = $props();
+
+   let isLoading = $state(false);
 
    async function handleSignOut() {
       isLoading = true;
@@ -25,11 +29,11 @@
       </Dialog.Description>
 
       <div class="flex gap-4">
-         <Button type="button" isOutlined on:click={closeDialog}>Cancel</Button>
+         <Button type="button" isOutlined onclick={closeDialog} disabled={isLoading}>Cancel</Button>
 
-         <Button type="button" on:click={handleSignOut}>
+         <Button type="button" onclick={handleSignOut} disabled={isLoading}>
             {#if isLoading}
-               <LoadingSpinning size={32} lineSize={2} color="white" />
+               <LoadingSpinning size={24} lineSize={2} color="white" />
             {:else}
                Sign out
             {/if}</Button

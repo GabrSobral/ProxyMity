@@ -26,13 +26,15 @@
    let isMine = $derived(lastMessage?.author?.id === user?.id);
    let draft = $derived(conversation.typeMessage);
    let status = $derived.by(() => {
-      if (!lastMessage) {
+      let lastMessageScoped = conversation.messages?.at(-1);
+
+      if (!lastMessageScoped) {
          return;
       }
 
-      if (lastMessage.read.byAllAt !== null) return EMessageStatuses.READ;
-      if (lastMessage.received.byAllAt !== null) return EMessageStatuses.RECEIVED;
-      if (lastMessage.sentAt !== null) return EMessageStatuses.SENT;
+      if (lastMessageScoped.read.byAllAt !== null) return EMessageStatuses.READ;
+      if (lastMessageScoped.received.byAllAt !== null) return EMessageStatuses.RECEIVED;
+      if (lastMessageScoped.sentAt !== null) return EMessageStatuses.SENT;
 
       return EMessageStatuses.WROTE;
    });

@@ -39,15 +39,21 @@
    let isMine = $derived(message.author?.id === session?.user?.id);
    let timeToShow = $derived(formatter.format(new Date(message.writtenAt)));
 
-   let status: EMessageStatuses = $state(EMessageStatuses.WROTE);
+   let status: EMessageStatuses = $derived.by(() => {
+      if (message.read.byAllAt !== null) return EMessageStatuses.READ;
+      if (message.received.byAllAt !== null) return EMessageStatuses.RECEIVED;
+      if (message.sentAt !== null) return EMessageStatuses.SENT;
 
-   $effect(() => {
-      if (message.read.byAllAt !== null) status = EMessageStatuses.READ;
-      if (message.received.byAllAt !== null) status = EMessageStatuses.RECEIVED;
-      if (message.sentAt !== null) status = EMessageStatuses.SENT;
-
-      status = EMessageStatuses.WROTE;
+      return EMessageStatuses.WROTE;
    });
+
+   // $effect(() => {
+   //    if (message.read.byAllAt !== null) status = EMessageStatuses.READ;
+   //    if (message.received.byAllAt !== null) status = EMessageStatuses.RECEIVED;
+   //    if (message.sentAt !== null) status = EMessageStatuses.SENT;
+
+   //    status = EMessageStatuses.WROTE;
+   // });
 
    type EventHandler = CustomEventInit<
       | {
@@ -71,7 +77,7 @@
          const { messageId, messageStatus, conversationId, userId, appliedForAll } = event.detail;
 
          if (messageStatus && messageId && conversationId) {
-            status = messageStatus;
+            // status = messageStatus;
 
             chatDispatch.updateConversationMessageStatus({
                conversationId,
