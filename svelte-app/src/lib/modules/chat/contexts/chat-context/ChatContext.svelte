@@ -3,7 +3,10 @@
    let chatStateMod: ChatState;
    let chatWorkerMod: Worker | null;
    let connectionMod: HubConnection | null;
+
    let typebarRefMod: HTMLInputElement | null;
+   let messagesContainerRefMod: HTMLUListElement | null;
+
    let userMod: Session['user'] | undefined;
    let webSocketEmitterMod: WebSocketEmitter;
 
@@ -21,6 +24,10 @@
 
    chatWorker.subscribe(value => {
       chatWorkerMod = value;
+   });
+
+   messagesContainer.subscribe(value => {
+      messagesContainerRefMod = value;
    });
 
    if (browser) {
@@ -50,6 +57,7 @@
          typebarRefMod.value = conversation.typeMessage;
       }
 
+      // Post a message to chat worker to change the pending message status to READ.
       chatWorkerMod?.postMessage({
          type: WorkerMethods.READ_CONVERSATION_MESSAGES,
          payload: { conversationId, whoRead: userMod.id, myId: userMod.id, isConversationGroup },
@@ -57,6 +65,7 @@
 
       if (!conversation.hasMessagesFetched) {
          try {
+            // Get messages from API and set to state
             const { messages } = await APIGetConversationMessages({ conversationId }, { accessToken });
 
             logSuccess(`Messages was successfully loaded from "${conversationId}" conversation`);
@@ -64,6 +73,7 @@
          } catch (error) {
             logError('Error fetching conversations, data will be taken from the cache', error);
 
+            // Get messages from cache and set to state
             const messages = await getConversationsMessagesAsyncDB(conversationId);
             chatDispatch.setConversationMessages({ conversationId, messages, fromServer: false, currentUserId: userMod.id });
          }
@@ -87,7 +97,7 @@
    import type { HubConnection } from '@microsoft/signalr';
    import { setContext, getContext, onMount } from 'svelte';
 
-   import { typebarRef, chatState, chatDispatch } from './stores/chat';
+   import { typebarRef, chatState, chatDispatch, messagesContainer } from './stores/chat';
    import type { ConversationState, ChatState } from './stores/chat-store-types';
 
    import { APIGetUserConversations } from '../../../../../services/api/get-user-conversations';

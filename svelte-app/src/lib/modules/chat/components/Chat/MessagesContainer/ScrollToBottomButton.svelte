@@ -2,23 +2,24 @@
    import { scale } from 'svelte/transition';
    import { ChevronDown } from 'lucide-svelte';
 
-   export let container: HTMLUListElement;
+   import { messagesContainer } from '$lib/modules/chat/contexts/chat-context/stores/chat';
 
    let isVisible = false;
 
    $: handleScroll = () => {
-      if (container) {
-         const isScrolledToBottom = container.scrollHeight - container.clientHeight <= container.scrollTop + 1;
+      if ($messagesContainer) {
+         const isScrolledToBottom =
+            $messagesContainer.scrollHeight - $messagesContainer.clientHeight <= $messagesContainer.scrollTop + 1;
          isVisible = !isScrolledToBottom;
       }
    };
 
-   $: if (container) {
-      container?.addEventListener('scroll', handleScroll);
+   $: if ($messagesContainer) {
+      $messagesContainer?.addEventListener('scroll', handleScroll);
    }
 
    function scrollToBottom() {
-      container.scroll({ top: container.scrollHeight, behavior: 'smooth' });
+      $messagesContainer?.scroll({ top: $messagesContainer.scrollHeight, behavior: 'smooth' });
    }
 </script>
 

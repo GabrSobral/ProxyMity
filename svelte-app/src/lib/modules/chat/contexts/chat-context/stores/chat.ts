@@ -13,6 +13,7 @@ export const chatState = writable<ChatState>({
 });
 
 export const typebarRef = writable<HTMLInputElement | null>(null);
+export const messagesContainer = writable<HTMLUListElement | null>(null);
 
 export const notificationsState = writable<NotificationState>({
    notifications: [],

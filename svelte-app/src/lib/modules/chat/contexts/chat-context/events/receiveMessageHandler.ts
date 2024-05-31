@@ -9,7 +9,7 @@ import { WorkerMethods } from '$lib/modules/chat/workers/db-worker/method-types'
 import type { IServerMessage } from '../../../../../../types/message';
 import { EMessageStatuses } from '../../../../../../enums/EMessageStatuses';
 
-import { chatDispatch, chatState } from '../stores/chat';
+import { chatDispatch, chatState, messagesContainer } from '../stores/chat';
 
 import { serverToLocalMessage } from '../functions/parse-server-message';
 
@@ -19,10 +19,11 @@ import type { ChatState } from '../stores/chat-store-types';
 
 import { selectConversationAsync } from '../ChatContext.svelte';
 
-let chatStateMod: ChatState;
-let chatWorkerMod: Worker | null;
-let webSocketEmitterMod: WebSocketEmitter;
-let sessionMod: Session | null | undefined;
+let chatStateMod: ChatState | null = null;
+let chatWorkerMod: Worker | null = null;
+let webSocketEmitterMod: WebSocketEmitter | null = null;
+let sessionMod: Session | null = null;
+let messagesContainerMod: HTMLUListElement | null = null;
 
 webSocketEmitter.subscribe(state => {
    webSocketEmitterMod = state;
@@ -42,9 +43,13 @@ chatState.subscribe(state => {
    chatStateMod = state;
 });
 
+messagesContainer.subscribe(state => {
+   messagesContainerMod = state;
+});
+
 // 🔵 Receive Message Handler
 export async function receiveMessageHandler(serverMessage: IServerMessage) {
-   const conversation = chatStateMod.conversations.find(item => item.id === serverMessage.conversationId);
+   const conversation = chatStateMod?.conversations.find(item => item.id === serverMessage.conversationId);
    const conversationId = conversation?.id || '';
    const isConversationGroup = conversation?.isGroup || false;
    const userId = sessionMod?.user?.id || '';
@@ -54,14 +59,14 @@ export async function receiveMessageHandler(serverMessage: IServerMessage) {
    const localMessage = await serverToLocalMessage(serverMessage, isConversationGroup, userId);
 
    const targetConversationIsSelectedConversation =
-      chatStateMod.selectedConversation && chatStateMod.selectedConversation?.id === serverMessage.conversationId;
+      chatStateMod?.selectedConversation && chatStateMod.selectedConversation?.id === serverMessage.conversationId;
 
    chatDispatch.addMessage({ message: localMessage });
    chatDispatch.bringToTop(conversationId);
 
    chatWorkerMod?.postMessage({ type: WorkerMethods.ADD_MESSAGE, payload: { message: localMessage } });
 
-   webSocketEmitterMod.sendReceiveMessage(webSocketsPayload);
+   webSocketEmitterMod?.sendReceiveMessage(webSocketsPayload);
    chatDispatch.updateConversationMessageStatus({
       messageId,
       conversationId,
@@ -71,13 +76,15 @@ export async function receiveMessageHandler(serverMessage: IServerMessage) {
    });
 
    if (targetConversationIsSelectedConversation) {
-      webSocketEmitterMod.sendReadMessage(webSocketsPayload);
+      webSocketEmitterMod?.sendReadMessage(webSocketsPayload);
       chatDispatch.updateConversationMessageStatus({
          conversationId,
          status: EMessageStatuses.READ,
          userId,
          appliedForAll: false,
       });
+
+      messagesContainerMod?.scroll({ top: 99999, behavior: 'smooth' });
    } else {
       toast.message('New message', {
          id: serverMessage.id,

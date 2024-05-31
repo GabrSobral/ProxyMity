@@ -8,7 +8,7 @@
 
    import { chatWorker } from '$lib/modules/chat/workers/db-worker/initializer';
    import { WorkerMethods } from '$lib/modules/chat/workers/db-worker/method-types';
-   import { typebarRef } from '$lib/modules/chat/contexts/chat-context/stores/chat';
+   import { messagesContainer, typebarRef } from '$lib/modules/chat/contexts/chat-context/stores/chat';
    import { webSocketEmitter } from '$lib/modules/chat/contexts/websocket-context/stores/connection';
    import { chatDispatch, chatState } from '$lib/modules/chat/contexts/chat-context/stores/chat';
 
@@ -58,6 +58,8 @@
       typeValueManaged = '';
 
       chatDispatch.removeReplyMessageFromConversation({ conversationId: $chatState.selectedConversation.id });
+
+      $messagesContainer?.scroll({ top: $messagesContainer.scrollHeight + 160, behavior: 'smooth' });
    }
 
    function handleSpreadTypingStatusToConversation(typing: boolean) {
