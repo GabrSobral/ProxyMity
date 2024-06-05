@@ -99,7 +99,7 @@
          })}
       >
          {#if typing}
-            <span class="text-white dark:text-purple-300 font-semibold">Typing...</span>
+            <span class="text-purple-300 dark:text-purple-300 font-semibold">Typing...</span>
          {:else if lastMessage && !draft}
             <span class="flex gap-4 w-full truncate">
                {lastMessage.content}

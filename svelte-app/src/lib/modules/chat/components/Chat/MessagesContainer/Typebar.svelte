@@ -14,6 +14,7 @@
 
    import type { ILocalMessage } from '../../../../../../types/message';
    import { EMessageStatuses } from '../../../../../../enums/EMessageStatuses';
+   import { notificationsDispatch } from '$lib/modules/chat/contexts/chat-context/stores/notification';
 
    let user = $derived($page.data.session?.user);
    let conversationId = $derived($chatState.selectedConversation?.id || '');
@@ -60,6 +61,8 @@
       chatDispatch.removeReplyMessageFromConversation({ conversationId: $chatState.selectedConversation.id });
 
       $messagesContainer?.scroll({ top: $messagesContainer.scrollHeight + 160, behavior: 'smooth' });
+
+      notificationsDispatch.clearLastMessagesHistoryFromConversation($chatState.selectedConversation);
    }
 
    function handleSpreadTypingStatusToConversation(typing: boolean) {

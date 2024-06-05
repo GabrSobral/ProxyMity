@@ -9,30 +9,24 @@
    import ScrollToBottomButton from './ScrollToBottomButton.svelte';
 
    import { chatState, messagesContainer } from '$lib/modules/chat/contexts/chat-context/stores/chat';
-
-   import type { ILocalMessage } from '../../../../../../types/message';
-
-   let firstUnreadMessage: ILocalMessage | null = $state(null);
+   import { notificationsState } from '$lib/modules/chat/contexts/chat-context/stores/notification';
 
    let userId = $derived($page.data.session?.user.id);
+
+   let firstUnreadMessageId = $derived(
+      $notificationsState.lastMessagesHistory.find(
+         item => item.conversationId === $chatState.selectedConversation?.id && item.authorId !== userId
+      )?.messageId || null
+   );
 
    $effect(() => {
       $chatState.selectedConversation?.messages;
 
       // Scroll the messages container to bottom using the "auto" behavior
-      $messagesContainer?.scroll({ top: 99999, behavior: 'auto' });
-   });
-
-   $effect(() => {
-      if (!firstUnreadMessage) {
-         firstUnreadMessage =
-            $chatState.selectedConversation?.messages.find(message => message.read.users.some(user => !user.at)) || null;
-      }
+      $messagesContainer?.scroll({ top: $messagesContainer.scrollHeight, behavior: 'auto' });
    });
 </script>
 
-<!-- svelte-ignore non_reactive_update -->
-<!-- svelte-ignore non_reactive_update -->
 <div class="overflow-hidden w-full flex-1 h-full flex flex-col p-1 relative max-w-5xl mx-auto">
    <ul class="flex flex-col gap-2 overflow-auto p-4" bind:this={$messagesContainer}>
       {#if !$chatState.selectedConversation?.hasMessagesFetched}
@@ -46,8 +40,12 @@
          </div>
       {:else if $chatState.selectedConversation?.messages}
          {#each $chatState.selectedConversation?.messages as message, i (message.id)}
-            {#if firstUnreadMessage?.id === message.id}
-               <div class="w-full h-[1px] bg-red-500 flex justify-center text-white">Unread messages</div>
+            {#if firstUnreadMessageId === message.id}
+               <div class="flex items-center gap-4 w-full">
+                  <div class="w-full h-[2px] rounded-sm bg-purple-300"></div>
+                  <span class="text-purple-300 whitespace-nowrap">Unread messages</span>
+                  <div class="w-full h-[2px] rounded-sm bg-purple-300"></div>
+               </div>
             {/if}
 
             <Message {message} previousMessage={$chatState.selectedConversation?.messages?.[i - 1]} messageIndex={i} />

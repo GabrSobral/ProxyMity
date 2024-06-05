@@ -22,6 +22,11 @@ export type ChatState = {
 
 export type NotificationState = {
    notifications: INotification[];
+   lastMessagesHistory: {
+      messageId: ILocalMessage['id'] | null;
+      authorId: string;
+      conversationId: Conversation['id'];
+   }[];
 };
 
 export type Actions = {

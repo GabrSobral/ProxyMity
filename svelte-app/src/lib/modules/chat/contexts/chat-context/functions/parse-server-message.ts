@@ -1,3 +1,4 @@
+import { getConversationByIdAsyncDB } from '../../../../../../services/database/use-cases/get-conversation-by-id';
 import { getMessageByIdAsyncDB } from '../../../../../../services/database/use-cases/get-message-by-id';
 import type { ILocalMessage, IServerMessage } from '../../../../../../types/message';
 
@@ -11,7 +12,15 @@ export async function serverToLocalMessage(
       content: message.content,
       conversationId: message.conversationId,
       writtenAt: message.writtenAt,
-      author: { id: message.authorId, name: 'name' },
+      author: {
+         id: message.authorId,
+         name: await (async () => {
+            const conversationCache = await getConversationByIdAsyncDB(message.conversationId);
+            const author = conversationCache?.participants.find(item => item.id === message.authorId);
+
+            return author?.name || '-';
+         })(),
+      },
       repliedMessage: message.repliedMessageId
          ? {
               id: message.repliedMessageId,
@@ -32,11 +41,7 @@ export async function serverToLocalMessage(
       sentAt: message.sentAt,
       read: {
          byAllAt: message.readByAllAt,
-         users: conversationIsGroup
-            ? []
-            : message.readByAllAt
-              ? [{ at: message.readByAllAt!, userId: currentUserId }]
-              : [],
+         users: conversationIsGroup ? [] : message.readByAllAt ? [{ at: message.readByAllAt!, userId: currentUserId }] : [],
       },
    };
 }

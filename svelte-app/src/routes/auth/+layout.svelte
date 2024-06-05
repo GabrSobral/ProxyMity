@@ -1,14 +1,13 @@
 <script lang="ts">
    import { page } from '$app/stores';
-   import { afterUpdate } from 'svelte';
    import { goto } from '$app/navigation';
    import { signIn } from '@auth/sveltekit/client';
 
-   import LoadingSpinning from '$lib/design-system/LoadingSpinning.svelte';
+   let { children } = $props();
 
-   let isSignInPage = $page.url.pathname.includes('sign-in');
+   let isSignInPage = $state($page.url.pathname.includes('sign-in'));
 
-   afterUpdate(() => {
+   $effect(() => {
       isSignInPage = $page.url.pathname.includes('sign-in');
    });
 
@@ -26,7 +25,7 @@
    class="flex-1 flex-col gap-4 flex items-center justify-center bg-[url('/sign-background.svg')] bg-no-repeat bg-cover relative bg-black"
 >
    <div
-      class="p-4 duration-300 rounded-[1rem] ring-1 ring-gray-700 w-96 flex flex-col gap-4 shadow-lg bg-gray-800/40 backdrop-blur-sm transition-all max-h-full"
+      class="p-4 duration-300 rounded-[1rem] mt-12 ring-1 ring-gray-700 w-96 flex flex-col gap-4 shadow-lg bg-gray-800/40 backdrop-blur-sm transition-all max-h-full"
    >
       <header class="flex items-center justify-center relative h-[80px]">
          <img src="/Logo.svg" alt="ProxyMity Logo" width={170} height={170} class="absolute -top-[5rem]" />
@@ -37,7 +36,7 @@
             data-signin={isSignInPage}
             data-signup={!isSignInPage}
             class="absolute h-[80%] -translate-y-2/4 top-2/4 w-[calc(50%-12px)] rounded-full z-20 gradient transition-all shadow-lg duration-300 data-[signin=true]:left-[6px] data-[signup=true]:left-[calc(50%+6px)]"
-         />
+         ></div>
 
          <a
             tabindex="-1"
@@ -61,19 +60,17 @@
       </div>
 
       <div class="overflow-hidden p-1 flex items-center justify-center flex-1 flex-col">
-         <slot>
-            <LoadingSpinning />
-         </slot>
+         {@render children()}
 
          <div class="flex flex-col gap-4 w-full m-4">
             <span class="flex w-full items-center gap-2 whitespace-nowrap text-white">
-               <div class="w-full h-[1px] bg-gray-500" />
+               <div class="w-full h-[1px] bg-gray-500"></div>
                Or sign in with
-               <div class="w-full h-[1px] bg-gray-500" />
+               <div class="w-full h-[1px] bg-gray-500"></div>
             </span>
 
             <button
-               on:click={() => {
+               onclick={() => {
                   oauthProvider('github');
                }}
                type="button"

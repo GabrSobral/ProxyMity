@@ -91,8 +91,6 @@ export const chatDispatch: Actions = {
    },
 
    addMessage({ message }) {
-      logDebug('chat store -> addMessage');
-
       const index = chatState.conversations.findIndex(conversation => conversation.id === message.conversationId);
 
       if (index >= 0) {

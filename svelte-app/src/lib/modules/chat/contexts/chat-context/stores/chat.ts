@@ -1,8 +1,10 @@
 import { writable } from 'svelte/store';
 
-import type { Actions, ChatState, NotificationState } from './chat-store-types';
+import type { Actions, ChatState } from './chat-store-types';
+
 import { EMessageStatuses } from '../../../../../../enums/EMessageStatuses';
 import type { TimestampWithAccount } from '../../../../../../types/message';
+
 import { logDebug } from '../../../../../../utils/logging';
 
 export const chatState = writable<ChatState>({
@@ -14,10 +16,6 @@ export const chatState = writable<ChatState>({
 
 export const typebarRef = writable<HTMLInputElement | null>(null);
 export const messagesContainer = writable<HTMLUListElement | null>(null);
-
-export const notificationsState = writable<NotificationState>({
-   notifications: [],
-});
 
 export const chatDispatch: Actions = {
    handleConversationPin({ conversationId }) {

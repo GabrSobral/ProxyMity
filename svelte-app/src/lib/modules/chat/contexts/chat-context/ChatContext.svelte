@@ -49,6 +49,8 @@
       if (conversation.notifications > 0 && connectionMod)
          webSocketEmitterMod.sendReadMessage({ userId: userMod.id, conversationId, isConversationGroup });
 
+      const unreadMessagesCount = conversation.notifications;
+
       chatDispatch.selectConversation({ conversation, typeMessage: typebarRefMod?.value || '', currentUserId: userMod.id });
 
       document.title = `ProxyMity - Chat | ${conversation.groupName || conversation.participants[0].name}`;
@@ -78,6 +80,8 @@
             chatDispatch.setConversationMessages({ conversationId, messages, fromServer: false, currentUserId: userMod.id });
          }
       }
+
+      notificationsDispatch.updateLastMessagesHistory({ ...conversation, notifications: unreadMessagesCount }, userMod?.id);
    }
 
    interface ChatContextProps {
@@ -119,6 +123,7 @@
    import { receivePendingMessagesHandler } from './events/receivePendingMessagesHandler';
 
    import { logError, logSuccess } from '../../../../../utils/logging';
+   import { notificationsDispatch, notificationsState } from './stores/notification';
 
    setChatContext();
 
