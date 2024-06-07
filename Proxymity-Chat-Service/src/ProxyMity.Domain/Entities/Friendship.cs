@@ -1,6 +1,6 @@
 ﻿namespace ProxyMity.Domain.Entities;
 
-[Table("Friendship")]
+[Table("friendship")]
 public class Friendship
 {
     public Ulid RequesterId { get; set; }

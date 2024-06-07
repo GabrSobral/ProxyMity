@@ -32,7 +32,7 @@ export interface IConversationAPI {
 export type GetUserConversationsResponse = IConversationAPI[];
 
 export async function APIGetUserConversations({ id }: Request, { accessToken }: IServiceOptions) {
-   const { data } = await api.get<GetUserConversationsResponse>(`/conversation/user/${id}`, {
+   const { data } = await api.get<GetUserConversationsResponse>(`/conversations/user/${id}`, {
       headers: {
          Authorization: `Bearer ${accessToken}`,
       },
