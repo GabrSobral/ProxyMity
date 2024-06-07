@@ -3,7 +3,7 @@
 [Authorize]
 [ApiController]
 [Route("friendships")]
-public class FriendshipController(ISender sender, HttpContext httpContext) : ControllerBase
+public class FriendshipController(ISender sender, IHttpContextAccessor httpContextAccessor) : ControllerBase
 {
     /// <summary>
     /// Create a friendship invite
@@ -48,7 +48,7 @@ public class FriendshipController(ISender sender, HttpContext httpContext) : Con
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> AcceptFriendshipInvite([FromRoute] Ulid requesterId)
     {
-        var currentUserId = HttpUserClaims.GetId(httpContext);
+        var currentUserId = HttpUserClaims.GetId(httpContextAccessor.HttpContext);
         AcceptFriendshipInviteCommand command = new(currentUserId, requesterId);
         
         await sender.Send(command);
@@ -72,7 +72,7 @@ public class FriendshipController(ISender sender, HttpContext httpContext) : Con
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> DenyFriendshipInvite([FromRoute] Ulid requesterId)
     {
-        var currentUserId = HttpUserClaims.GetId(httpContext);
+        var currentUserId = HttpUserClaims.GetId(httpContextAccessor.HttpContext);
         DenyFriendshipInviteCommand command = new(currentUserId, requesterId);
         
         await sender.Send(command);

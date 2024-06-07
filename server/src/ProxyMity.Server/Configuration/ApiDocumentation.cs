@@ -18,12 +18,14 @@ public static class ApiDocumentation
 
         services.AddSwaggerGen(options =>
         {
-            options.SwaggerDoc("v1", new OpenApiInfo { 
-                Title = "ProxyMity.Server", 
-                Version = "v1", 
-                Contact = new OpenApiContact() {
+            options.SwaggerDoc("v1", new OpenApiInfo
+            {
+                Title = "ProxyMity.Server",
+                Version = "v1",
+                Contact = new OpenApiContact()
+                {
                     Name = "ProxyMity",
-                    Email = "gabriel.sobral1367@gmail.com"
+                    Email = "Gabriel.Sobral1367@gmail.com"
                 },
                 Description = "The ProxyMity API that handles with user endpoints, conversation endpoints, and message endpoints. It is used for web socket connections and real time events.",
                 License = new OpenApiLicense() { Name = "MIT", Url = new Uri("https://www.mit.edu/~amini/LICENSE.md") },
@@ -42,11 +44,11 @@ public static class ApiDocumentation
 
     public static IApplicationBuilder ConfigureApiDocumentationUI(this IApplicationBuilder app, bool isDevelopment)
     {
+        app.UseDeveloperExceptionPage();
+        app.UseSwagger();
+        app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "ProxyMity.Server v1"));
         if (isDevelopment)
         {
-            app.UseDeveloperExceptionPage();
-            app.UseSwagger();
-            app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "ProxyMity.Server v1"));
         }
 
         return app;

@@ -3,7 +3,7 @@
 [Authorize]
 [ApiController]
 [Route("conversations")]
-public class ConversationController(ISender sender, HttpContext httpContext) : ControllerBase
+public class ConversationController(ISender sender, IHttpContextAccessor httpContextAccessor) : ControllerBase
 {
     [HttpPost("group")]
     public async Task<IActionResult> CreateGroupConversation([FromBody] CreateGroupConversationRequest model)
@@ -11,7 +11,7 @@ public class ConversationController(ISender sender, HttpContext httpContext) : C
         var command = new CreateGroupConversationCommand(
             Name: model.Name,
             Description: model.Description,
-            CreatorId: HttpUserClaims.GetId(httpContext),
+            CreatorId: HttpUserClaims.GetId(httpContextAccessor?.HttpContext),
             Participants: model.Participants.Select(Ulid.Parse)
         );
 
@@ -24,7 +24,7 @@ public class ConversationController(ISender sender, HttpContext httpContext) : C
     public async Task<IActionResult> CreatePrivateConversation([FromBody] CreatePrivateConversationRequest model)
     {
         var command = new CreatePrivateConversationCommand(
-            RequesterId: HttpUserClaims.GetId(httpContext),
+            RequesterId: HttpUserClaims.GetId(httpContextAccessor?.HttpContext),
             ParticipantId: Ulid.Parse(model.ParticipantId)
         );
 
@@ -55,7 +55,7 @@ public class ConversationController(ISender sender, HttpContext httpContext) : C
     {
         var command = new PinConversationCommand(
             ConversationId: conversationId,
-            UserId: HttpUserClaims.GetId(httpContext)
+            UserId: HttpUserClaims.GetId(httpContextAccessor?.HttpContext)
         );
 
         await sender.Send(command);
@@ -68,7 +68,7 @@ public class ConversationController(ISender sender, HttpContext httpContext) : C
     {
         var command = new UnpinConversationCommand(
             ConversationId: conversationId,
-            UserId: HttpUserClaims.GetId(httpContext)
+            UserId: HttpUserClaims.GetId(httpContextAccessor?.HttpContext)
         );
 
         await sender.Send(command);
