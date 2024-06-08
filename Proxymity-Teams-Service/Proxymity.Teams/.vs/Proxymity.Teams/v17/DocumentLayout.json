@@ -1,0 +1,37 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\gabri\\www\\ProxyMity\\Proxymity-Teams-Service\\Proxymity.Teams\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{1B089EDC-0B58-4F96-AC8C-60A30F067811}|Proxymity.Teams.csproj|c:\\users\\gabri\\www\\proxymity\\proxymity-teams-service\\proxymity.teams\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{1B089EDC-0B58-4F96-AC8C-60A30F067811}|Proxymity.Teams.csproj|solutionrelative:program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 1,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedHeight": 200,
+          "SelectedChildIndex": 0,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "Program.cs",
+              "DocumentMoniker": "C:\\Users\\gabri\\www\\ProxyMity\\Proxymity-Teams-Service\\Proxymity.Teams\\Program.cs",
+              "RelativeDocumentMoniker": "Program.cs",
+              "ToolTip": "C:\\Users\\gabri\\www\\ProxyMity\\Proxymity-Teams-Service\\Proxymity.Teams\\Program.cs",
+              "RelativeToolTip": "Program.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAgAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-06-07T15:46:19.114Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -11,7 +11,7 @@ Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "..\docker
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProxyMity.Unit", "..\tests\ProxyMity.Tests\ProxyMity.Unit.csproj", "{5EA1781F-9E3D-4DF5-940E-B312B5EBE63B}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProxyMity.Server", "ProxyMity.Server\ProxyMity.Server.csproj", "{64E4A8DF-BE01-420F-91FF-F79845E583E7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProxyMity.Chat", "ProxyMity.Chat\ProxyMity.Chat.csproj", "{64E4A8DF-BE01-420F-91FF-F79845E583E7}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProxyMity.Domain", "ProxyMity.Domain\ProxyMity.Domain.csproj", "{1FD97011-5BEF-4228-B999-2258F54EEDBB}"
 EndProject

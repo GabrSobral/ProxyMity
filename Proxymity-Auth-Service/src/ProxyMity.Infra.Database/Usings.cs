@@ -1,0 +1,9 @@
+﻿global using Microsoft.Extensions.Configuration;
+global using Microsoft.Extensions.DependencyInjection;
+global using ProxyMity.Infra.Database.Contexts;
+global using Microsoft.EntityFrameworkCore;
+global using ProxyMity.Infra.Database.Wrappers;
+global using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+global using ProxyMity.Domain.Entities;
+global using ProxyMity.Domain.Interfaces.Repositories.UserRepository;
+global using ProxyMity.Infra.Database.Repositories;

@@ -1,0 +1,35 @@
+﻿namespace ProxyMity.Auth.Configuration;
+
+public static class Authentication
+{
+    public static IServiceCollection ConfigureAuthentication(this IServiceCollection services)
+    {
+        services
+            .AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+            }).AddJwtBearer(options =>
+            {
+                options.Events = new JwtBearerEvents
+                {
+                    OnMessageReceived = context =>
+                    {
+                        var accessToken = context.Request.Query["access_token"];
+                        var path = context.HttpContext.Request.Path;
+
+                        if (!string.IsNullOrEmpty(accessToken) && (path.StartsWithSegments("/chat")))
+                            context.Token = accessToken;
+
+                        return Task.CompletedTask;
+                    }
+                };
+            });
+
+        services.AddAuthorization();
+
+        services.ConfigureOptions<JwtOptionsSetup>();
+        services.ConfigureOptions<JwtBearerOptionsSetup>();
+
+        return services;
+    }
+}
