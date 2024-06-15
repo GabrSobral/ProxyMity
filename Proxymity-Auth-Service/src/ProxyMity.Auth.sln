@@ -19,6 +19,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProxyMity.Domain", "ProxyMi
 EndProject
 Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "..\docker\docker-compose.dcproj", "{7BA4F122-267E-4F43-B4C3-835D97BA9F2F}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProxyMity.Infra.Messaging", "ProxyMity.Infra.Messaging\ProxyMity.Infra.Messaging.csproj", "{C993EF97-C00F-401F-BBBF-34784A9E7629}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProxyMity.Infra.Email", "ProxyMity.Infra.Email\ProxyMity.Infra.Email.csproj", "{BCFBE3F7-C3F3-42C4-BF95-B56B5ED31BAE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -49,6 +53,14 @@ Global
 		{7BA4F122-267E-4F43-B4C3-835D97BA9F2F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7BA4F122-267E-4F43-B4C3-835D97BA9F2F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7BA4F122-267E-4F43-B4C3-835D97BA9F2F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C993EF97-C00F-401F-BBBF-34784A9E7629}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C993EF97-C00F-401F-BBBF-34784A9E7629}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C993EF97-C00F-401F-BBBF-34784A9E7629}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C993EF97-C00F-401F-BBBF-34784A9E7629}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BCFBE3F7-C3F3-42C4-BF95-B56B5ED31BAE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BCFBE3F7-C3F3-42C4-BF95-B56B5ED31BAE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BCFBE3F7-C3F3-42C4-BF95-B56B5ED31BAE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BCFBE3F7-C3F3-42C4-BF95-B56B5ED31BAE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -59,6 +71,8 @@ Global
 		{0D8CF3FF-5754-4A81-B17C-B988F1619572} = {9C3DFFEF-29B3-42EB-A4EC-30EBEE3C962E}
 		{028ACBCC-757F-431F-9E94-CC9D138A54D3} = {9C3DFFEF-29B3-42EB-A4EC-30EBEE3C962E}
 		{1FD032CD-85F6-4DDE-9D47-197C13FA780E} = {9C3DFFEF-29B3-42EB-A4EC-30EBEE3C962E}
+		{C993EF97-C00F-401F-BBBF-34784A9E7629} = {9C3DFFEF-29B3-42EB-A4EC-30EBEE3C962E}
+		{BCFBE3F7-C3F3-42C4-BF95-B56B5ED31BAE} = {9C3DFFEF-29B3-42EB-A4EC-30EBEE3C962E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {29195BAF-C722-43E6-A97C-6DD8595CA5CA}

@@ -19,6 +19,8 @@
   <ItemGroup>
     <ProjectReference Include="..\ProxyMity.Domain\ProxyMity.Domain.csproj" />
     <ProjectReference Include="..\ProxyMity.Infra.Database\ProxyMity.Infra.Database.csproj" />
+    <ProjectReference Include="..\ProxyMity.Infra.Email\ProxyMity.Infra.Email.csproj" />
+    <ProjectReference Include="..\ProxyMity.Infra.Messaging\ProxyMity.Infra.Messaging.csproj" />
   </ItemGroup>
 
 </Project>

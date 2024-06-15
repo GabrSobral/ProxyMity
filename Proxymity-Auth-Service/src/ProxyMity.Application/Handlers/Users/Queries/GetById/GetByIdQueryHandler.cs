@@ -1,8 +1,8 @@
-﻿namespace ProxyMity.Application.Handlers.Users.GetById;
+﻿namespace ProxyMity.Application.Handlers.Users.Queries.GetById;
 
 public class GetByIdQueryHandler(
     ILogger<GetByIdQueryHandler> logger,
-    IUserRepository userRepository
+    DataContext dbContext
 ) : IQueryHandler<GetByIdQuery, GetByIdResponse>
 {
     public async Task<GetByIdResponse> Handle(GetByIdQuery query, CancellationToken cancellationToken)
@@ -11,8 +11,11 @@ public class GetByIdQueryHandler(
 
         logger.LogInformation($"Searching for user ID: {userId}");
 
-        var user = await userRepository.FindByIdAsync(userId, cancellationToken)
-            ?? throw new UserNotFoundException(userId);
+        var user = await dbContext.Users
+            .AsNoTracking()
+            .Include(x => x.UserProfile)
+            .FirstOrDefaultAsync(x => x.Id == userId, cancellationToken)
+        ?? throw new UserNotFoundException(userId);
 
         return new GetByIdResponse(user);
     }

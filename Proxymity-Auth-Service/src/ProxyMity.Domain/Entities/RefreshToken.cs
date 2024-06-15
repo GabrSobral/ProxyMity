@@ -10,7 +10,7 @@ public class RefreshToken
     [Key]
     public required Ulid Id { get; set; }
     public required Ulid UserId { get; set; }
-    public required string Token { get; set; }
+    public required ushort AvailableRefreshes { get; set; }
     public required DateTime ExpiryDate { get; set; }
     public required DateTime CreatedAt { get; set; }
 
@@ -21,13 +21,13 @@ public class RefreshToken
 
     #endregion
 
-    public static RefreshToken Create(string token, Ulid userId, DateTime expiryDate)
+    public static RefreshToken Create(ushort availableRefreshes, Ulid userId, DateTime expiryDate)
     {
         return new RefreshToken
         {
             Id = Ulid.NewUlid(),
             UserId = userId,
-            Token = token,
+            AvailableRefreshes = availableRefreshes,
             ExpiryDate = expiryDate,
             CreatedAt = DateTime.UtcNow
         };

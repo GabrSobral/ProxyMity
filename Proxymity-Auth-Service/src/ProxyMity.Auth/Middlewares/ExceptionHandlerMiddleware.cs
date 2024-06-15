@@ -1,4 +1,6 @@
-﻿namespace ProxyMity.Auth.Middlewares;
+﻿using ProxyMity.Infra.Messaging.Core.Exceptions;
+
+namespace ProxyMity.Auth.Middlewares;
 
 public sealed class ExceptionHandlerMiddleware(RequestDelegate next, ILogger<ExceptionHandlerMiddleware> logger)
 {
@@ -33,9 +35,34 @@ public sealed class ExceptionHandlerMiddleware(RequestDelegate next, ILogger<Exc
     {
         switch (error)
         {
-            case Exception:
+            case MessagingServiceConnectionException:
+                response.StatusCode = (int)HttpStatusCode.InternalServerError;
+                logger.LogError($"[Messaging service error] {error.Message}");
+                break;
+
+            case UserNotFoundException:
+                response.StatusCode = (int)HttpStatusCode.NotFound;
+                logger.LogError($"[User not found] {error.Message}");
+                break;
+
+            case UserAlreadyExistException:
                 response.StatusCode = (int)HttpStatusCode.BadRequest;
-                logger.LogError($"[Message not found] {error.Message}");
+                logger.LogError($"[User already exist] {error.Message}");
+                break;
+
+            case UserNotActiveException:
+                response.StatusCode = (int)HttpStatusCode.BadRequest;
+                logger.LogError($"[User account are inactive] {error.Message}");
+                break;
+
+            case CurrentPasswordNotMatchWithStoredException:
+                response.StatusCode = (int)HttpStatusCode.Forbidden;
+                logger.LogError($"[Current password not match with stored password] {error.Message}");
+                break;
+
+            case UserEmailNotConfirmedYetException:
+                response.StatusCode = (int)HttpStatusCode.Forbidden;
+                logger.LogError($"[User email not confirmed yet] {error.Message}");
                 break;
 
             default:

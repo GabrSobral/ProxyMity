@@ -5,10 +5,14 @@ internal class Program
         var builder = WebApplication.CreateBuilder(args);
 
         builder.Services
+            .ConfigureOptions(builder.Configuration)
             .AddApplication()
             .AddInfraDatabase(builder.Configuration)
+            .AddInfraMessaging(builder.Configuration)
+            .AddInfraEmailService()
             .AddPresentation()
             .ConfigureCors()
+            .ConfigureController()
             .ConfigureAuthentication()
             .ConfigureApiDocumentation();
 

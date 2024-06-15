@@ -7,8 +7,6 @@ public static class DependenyInjection
 
         string connectionString = configuration.GetConnectionString("PostgreSql")!;
 
-        services.AddScoped<IUserRepository, UserRepository>();
-
         services.AddDbContext<DataContext>(options => options.UseNpgsql(connectionString));
 
         return services;

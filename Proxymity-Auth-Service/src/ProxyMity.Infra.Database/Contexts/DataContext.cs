@@ -6,12 +6,29 @@ public class DataContext : DbContext
 
     public DataContext(DbContextOptions<DataContext> options) : base(options) { }
 
-    public virtual DbSet<User> Users { get; set; }
-    public virtual DbSet<RefreshToken> RefreshTokens { get; set; }
-    
+    public DbSet<User> Users { get; set; }
+    public DbSet<UserProfile> UserProfiles { get; set; }
+    public DbSet<PasswordResetToken> PasswordResetTokens { get; set; }
+    public DbSet<RefreshToken> RefreshTokens { get; set; }
+    public DbSet<EmailConfirmation> EmailConfirmations { get; set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        base.OnModelCreating(modelBuilder);
 
+        // Unique index on Email
+        modelBuilder.Entity<User>()
+            .HasIndex(u => u.Email)
+            .IsUnique();
+
+        modelBuilder.Entity<PasswordResetToken>()
+            .HasIndex(prt => prt.Token);
+
+        modelBuilder.Entity<RefreshToken>()
+            .HasIndex(rt => rt.UserId);
+
+        modelBuilder.Entity<EmailConfirmation>()
+            .HasIndex(ec => ec.Token);
     }
 
     /// <summary>

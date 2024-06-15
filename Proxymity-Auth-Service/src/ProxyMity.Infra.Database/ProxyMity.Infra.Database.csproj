@@ -22,4 +22,8 @@
     <ProjectReference Include="..\ProxyMity.Domain\ProxyMity.Domain.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Migrations\" />
+  </ItemGroup>
+
 </Project>

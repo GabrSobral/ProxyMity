@@ -40,3 +40,8 @@ global using ProxyMity.Infra.Database.Contexts;
 #region Presentation
 global using ProxyMity.Presentation;
 #endregion
+
+global using ProxyMity.Infra.Messaging;
+global using ProxyMity.Infra.Messaging.Core;
+
+global using ProxyMity.Infra.Email;

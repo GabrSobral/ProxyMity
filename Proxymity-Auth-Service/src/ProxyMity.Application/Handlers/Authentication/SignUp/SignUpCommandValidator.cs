@@ -5,7 +5,7 @@
 /// </summary>
 internal sealed class SignUpCommandValidator : AbstractValidator<SignUpCommand>
 {
-    public SignUpCommandValidator(IUserRepository userRepository)
+    public SignUpCommandValidator(DataContext dbContext)
     {
         RuleFor(x => x.Email)
             .NotNull().WithMessage("Email address cannot be null")
@@ -14,9 +14,9 @@ internal sealed class SignUpCommandValidator : AbstractValidator<SignUpCommand>
 
         RuleFor(x => x.Email)
             .MustAsync(async (email, cancellationToken) => {
-                var existantUser = await userRepository.FindByEmailAsync(email.ToLower(), cancellationToken);
+                var existantUser = await dbContext.Users.AnyAsync(x => x.Email == email.ToLower(), cancellationToken);
 
-                if (existantUser is not null)
+                if (existantUser)
                     throw new UserAlreadyExistException();
 
                 return true;

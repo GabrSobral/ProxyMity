@@ -1,4 +1,4 @@
-﻿namespace ProxyMity.Application.Handlers.Users.GetById;
+﻿namespace ProxyMity.Application.Handlers.Users.Queries.GetById;
 
 public record GetByIdQuery(
     Ulid Id
@@ -12,16 +12,14 @@ public record GetByIdResponse
     public string Email { get; set; }
     public string? PhotoUrl { get; set; }
     public DateTime CreatedAt { get; set; }
-    public DateTime? LastOnline { get; set; }
 
     public GetByIdResponse(User user)
     {
         Id = user.Id;
-        FirstName = user.FirstName;
-        LastName = user.LastName;
+        FirstName = user.UserProfile.FirstName;
+        LastName = user.UserProfile.LastName;
         Email = user.Email;
-        PhotoUrl = user.PhotoUrl;
+        PhotoUrl = user.UserProfile.PhotoUrl;
         CreatedAt = user.CreatedAt;
-        LastOnline = user.LastOnline;
     }
 };

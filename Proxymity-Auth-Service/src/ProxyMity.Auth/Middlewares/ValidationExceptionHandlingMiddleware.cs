@@ -12,6 +12,8 @@ public sealed class ValidationExceptionHandlingMiddleware(
         }
         catch (ValidationException exception)
         {
+            logger.LogError("An exception occured.");
+
             var problemDetails = new ProblemDetails
             {
                 Status = StatusCodes.Status400BadRequest,

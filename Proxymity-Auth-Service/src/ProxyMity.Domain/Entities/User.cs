@@ -1,4 +1,8 @@
-﻿namespace ProxyMity.Domain.Entities;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
+namespace ProxyMity.Domain.Entities;
 
 /// <summary>
 /// The user entity, this entity represents each user at application.
@@ -8,30 +12,42 @@ public class User
 {
     [Key]
     public required Ulid Id { get; set; }
-    public required string FirstName { get; set; }
-    public string LastName { get; set; }
-    public required string Email { get; set; }
+
+    [Required]
+    [MaxLength(255)]
+    public string Email { get; set; }
+
+    [Required]
+    [MaxLength(255)]
     public required string PasswordHash { get; set; }
-    public DateTime? LastOnline { get; set; }
-    public required DateTime CreatedAt { get; set; }
-    public string? PhotoUrl { get; set; }
+
+    public DateTime CreatedAt { get; set; }
+    public DateTime? UpdatedAt { get; set; }
+    public bool IsActive { get; set; }
+    public bool IsEmailConfirmed { get; set; }
+    public bool TwoFactorEnabled { get; set; }
+    public string TwoFactorSecret { get; set; } = string.Empty;
+
+
 
     #region Foreign Keys
 
+    public UserProfile UserProfile { get; set; }
+    public IEnumerable<PasswordResetToken> PasswordResetTokens { get; set; }
     public IEnumerable<RefreshToken> RefreshTokens { get; set; }
+    public IEnumerable<EmailConfirmation> EmailConfirmations { get; set; }
 
     #endregion
 
-    public static User Create(string firstName, string lastName, string email, string passwordHash)
+    public static User Create(string email, string passwordHash)
     {
         return new User
         {
             Id = Ulid.NewUlid(),
-            FirstName = firstName,
-            LastName = lastName,
             Email = email,
             PasswordHash = passwordHash,
             CreatedAt = DateTime.UtcNow,
+            IsActive = true,
         };
     }
 }

@@ -3,14 +3,16 @@ global using FluentValidation;
 global using System.Reflection;
 global using Microsoft.Extensions.Options;
 global using Microsoft.Extensions.Logging;
+global using Microsoft.EntityFrameworkCore;
 global using Microsoft.IdentityModel.Tokens;
 global using Konscious.Security.Cryptography;
 global using Microsoft.Extensions.DependencyInjection;
 
+
 global using ProxyMity.Domain.Entities;
 global using ProxyMity.Domain.Exceptions;
+global using ProxyMity.Domain.Interfaces;
 global using ProxyMity.Domain.Interfaces.Authentication;
-global using ProxyMity.Domain.Interfaces.Repositories.UserRepository;
 
 global using ProxyMity.Application.Core;
 global using ProxyMity.Application.Core.Exceptions;

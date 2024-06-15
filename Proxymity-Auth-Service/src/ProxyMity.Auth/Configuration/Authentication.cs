@@ -27,9 +27,6 @@ public static class Authentication
 
         services.AddAuthorization();
 
-        services.ConfigureOptions<JwtOptionsSetup>();
-        services.ConfigureOptions<JwtBearerOptionsSetup>();
-
         return services;
     }
 }

@@ -9,19 +9,20 @@ public record SignInResponse
 {
     public UserResponse User { get; set; }
     public string AccessToken { get; set; }
+    public string RefreshToken { get; set; }
 
-    public SignInResponse(User user, string token)
+    public SignInResponse(User user, string token, string refreshToken)
     {
         User = new UserResponse(
             user.Id,
-            user.FirstName,
-            user.LastName ?? "",
+            user.UserProfile.FirstName,
+            user.UserProfile.LastName ?? "",
             user.Email,
             user.CreatedAt,
-            user.LastOnline,
-            user.PhotoUrl
+            user.UserProfile.PhotoUrl
         );
         AccessToken = token;
+        RefreshToken = refreshToken;
     }
 };
 
@@ -31,6 +32,5 @@ public record UserResponse(
     string LastName,
     string Email,
     DateTime CreatedAt,
-    DateTime? LastOnline,
     string? PhotoUrl
 );

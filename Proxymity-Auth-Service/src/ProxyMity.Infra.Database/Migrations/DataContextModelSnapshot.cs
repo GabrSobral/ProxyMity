@@ -22,7 +22,7 @@ namespace ProxyMity.Infra.Database.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("ProxyMity.Domain.Entities.RefreshToken", b =>
+            modelBuilder.Entity("ProxyMity.Domain.Entities.EmailConfirmation", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("character varying(26)");
@@ -30,12 +30,72 @@ namespace ProxyMity.Infra.Database.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<DateTime>("ExpiryDate")
+                    b.Property<DateTime>("ExpiresAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsUsed")
+                        .HasColumnType("boolean");
+
+                    b.Property<Guid>("Token")
+                        .HasMaxLength(255)
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("character varying(26)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Token");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("email_confirmation");
+                });
+
+            modelBuilder.Entity("ProxyMity.Domain.Entities.PasswordResetToken", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("ExpiresAt")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Token")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("character varying(26)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Token");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("password_reset_token");
+                });
+
+            modelBuilder.Entity("ProxyMity.Domain.Entities.RefreshToken", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("character varying(26)");
+
+                    b.Property<int>("AvailableRefreshes")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("ExpiryDate")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("UserId")
                         .IsRequired()
@@ -58,29 +118,88 @@ namespace ProxyMity.Infra.Database.Migrations
 
                     b.Property<string>("Email")
                         .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsEmailConfirmed")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("PasswordHash")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<bool>("TwoFactorEnabled")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("TwoFactorSecret")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Email")
+                        .IsUnique();
+
+                    b.ToTable("user");
+                });
+
+            modelBuilder.Entity("ProxyMity.Domain.Entities.UserProfile", b =>
+                {
+                    b.Property<string>("UserId")
+                        .HasColumnType("character varying(26)");
+
+                    b.Property<string>("Address")
                         .HasColumnType("text");
 
                     b.Property<string>("FirstName")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
 
                     b.Property<string>("LastName")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
 
-                    b.Property<DateTime?>("LastOnline")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("PasswordHash")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<string>("PhoneNumber")
+                        .HasMaxLength(15)
+                        .HasColumnType("character varying(15)");
 
                     b.Property<string>("PhotoUrl")
                         .HasColumnType("text");
 
-                    b.HasKey("Id");
+                    b.HasKey("UserId");
 
-                    b.ToTable("user");
+                    b.ToTable("user_profile");
+                });
+
+            modelBuilder.Entity("ProxyMity.Domain.Entities.EmailConfirmation", b =>
+                {
+                    b.HasOne("ProxyMity.Domain.Entities.User", "User")
+                        .WithMany("EmailConfirmations")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("ProxyMity.Domain.Entities.PasswordResetToken", b =>
+                {
+                    b.HasOne("ProxyMity.Domain.Entities.User", "User")
+                        .WithMany("PasswordResetTokens")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("ProxyMity.Domain.Entities.RefreshToken", b =>
@@ -94,9 +213,27 @@ namespace ProxyMity.Infra.Database.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("ProxyMity.Domain.Entities.UserProfile", b =>
+                {
+                    b.HasOne("ProxyMity.Domain.Entities.User", "User")
+                        .WithOne("UserProfile")
+                        .HasForeignKey("ProxyMity.Domain.Entities.UserProfile", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("ProxyMity.Domain.Entities.User", b =>
                 {
+                    b.Navigation("EmailConfirmations");
+
+                    b.Navigation("PasswordResetTokens");
+
                     b.Navigation("RefreshTokens");
+
+                    b.Navigation("UserProfile")
+                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }
