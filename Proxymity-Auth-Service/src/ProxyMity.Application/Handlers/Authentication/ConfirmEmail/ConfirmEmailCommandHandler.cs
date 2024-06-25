@@ -9,13 +9,13 @@ public sealed class ConfirmEmailCommandHandler(
     {
         var emailVerification = await dbContext.EmailConfirmations
             .FirstOrDefaultAsync(x => x.Token == command.Token, cancellationToken)
-        ?? throw new Exception("Confirmation token was invalid.");
+        ?? throw new ConfirmationTokenInvalidException(command.Token);
 
         if (emailVerification.ExpiresAt.CompareTo(DateTime.Now) <= 0)
-            throw new Exception("The confirmation token was already expired.");
+            throw new ConfirmationTokenAlreadyExpiredException(command.Token);
 
         if (emailVerification.IsUsed == true)
-            throw new Exception("The confirmation token was already used.");
+            throw new ConfirmationTokenAlreadyUsedException(command.Token);
 
         emailVerification.IsUsed = true;
 

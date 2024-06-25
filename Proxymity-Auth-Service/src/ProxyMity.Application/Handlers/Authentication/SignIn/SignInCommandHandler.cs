@@ -30,6 +30,10 @@ public class SignInCommandHandler(
         DateTime currentDate = DateTime.Now;
         DateTime futureDate = currentDate.AddDays(7).ToUniversalTime();
 
+        await dbContext.RefreshTokens
+            .Where(x => x.UserId == user.Id)
+            .ExecuteDeleteAsync(cancellationToken);
+
         RefreshToken refreshToken = RefreshToken.Create(
             availableRefreshes: 5,
             userId: user.Id,

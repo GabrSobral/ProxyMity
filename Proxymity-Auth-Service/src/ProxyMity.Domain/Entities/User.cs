@@ -15,7 +15,7 @@ public class User
 
     [Required]
     [MaxLength(255)]
-    public string Email { get; set; }
+    public required string Email { get; set; }
 
     [Required]
     [MaxLength(255)]
@@ -23,9 +23,9 @@ public class User
 
     public DateTime CreatedAt { get; set; }
     public DateTime? UpdatedAt { get; set; }
-    public bool IsActive { get; set; }
-    public bool IsEmailConfirmed { get; set; }
-    public bool TwoFactorEnabled { get; set; }
+    public bool IsActive { get; set; } = true;
+    public bool IsEmailConfirmed { get; set; } = false;
+    public bool TwoFactorEnabled { get; set; } = false;
     public string TwoFactorSecret { get; set; } = string.Empty;
 
 
@@ -48,6 +48,8 @@ public class User
             PasswordHash = passwordHash,
             CreatedAt = DateTime.UtcNow,
             IsActive = true,
+            IsEmailConfirmed = false,
+            TwoFactorEnabled = false,
         };
     }
 }

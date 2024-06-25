@@ -23,7 +23,7 @@ public sealed class SignUpCommandHandler(
             Email = command.Email.ToLower(),
             PasswordHash = passwordEncrypter.Encrypt(command.Password, userId),
             CreatedAt = DateTime.UtcNow,
-            UpdatedAt = null
+            UpdatedAt = null,
         };
 
         UserProfile userProfile = new()

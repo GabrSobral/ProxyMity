@@ -11,27 +11,27 @@ public sealed class RevokeAccessTokenCommandHandler(
         RevokeAccessTokenCommand command, 
         CancellationToken cancellationToken)
     {
-        RevokeTokenClient decryptedToken = _jsonWebToken.DecryptToken<RevokeTokenClient>(command.RefreshToken)
-            ?? throw new Exception("Error on trying to descrypt refresh token");
+        var decryptedToken = _jsonWebToken.DecryptToken<RevokeTokenClient>(command.RefreshToken)
+            ?? throw new RefreshTokenDecryptException();
 
         var userIdFromToken = Ulid.Parse(decryptedToken.userIdentifier);
 
         var refreshToken = await dbContext.RefreshTokens
             .FirstOrDefaultAsync(x => x.UserId == userIdFromToken, cancellationToken)
-        ?? throw new Exception("User do not have any refresh token available.");
+        ?? throw new RefreshTokenUnavailableForUserException();
 
         if (refreshToken.AvailableRefreshes < 1)
         {
             dbContext.RefreshTokens.Remove(refreshToken);
             await dbContext.SaveChangesAsync(cancellationToken);
-            throw new Exception("Your refresh token was expired.");
+            throw new RefreshTokenExpiredException();
         }
 
         if (refreshToken.ExpiryDate.CompareTo(DateTime.Now) < 0)
         {
             dbContext.RefreshTokens.Remove(refreshToken);
             await dbContext.SaveChangesAsync(cancellationToken);
-            throw new Exception("Your refresh token was expired.");
+            throw new RefreshTokenExpiredException();
         }
 
         var user = await dbContext.Users
