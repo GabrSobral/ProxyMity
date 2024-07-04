@@ -1,4 +1,4 @@
-import { api } from './config';
+import { chatApi } from './config';
 
 import type { IServerMessage } from '../../types/message';
 import type { IServiceOptions } from '../../types/utils/IServiceOptions';
@@ -32,7 +32,7 @@ export interface IConversationAPI {
 export type GetUserConversationsResponse = IConversationAPI[];
 
 export async function APIGetUserConversations({ id }: Request, { accessToken }: IServiceOptions) {
-   const { data } = await api.get<GetUserConversationsResponse>(`/conversations/user/${id}`, {
+   const { data } = await chatApi.get<GetUserConversationsResponse>(`/conversations/user/${id}`, {
       headers: {
          Authorization: `Bearer ${accessToken}`,
       },

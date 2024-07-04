@@ -4,23 +4,28 @@
 
    import WarningAlert from '../components/WarningAlert.svelte';
 
+   import { goto } from '$app/navigation';
+
    import Button from '$lib/design-system/button/button.svelte';
    import InputGroup from '$lib/design-system/Input/InputGroup.svelte';
    import LoadingSpinning from '$lib/design-system/LoadingSpinning.svelte';
-   import { goto } from '$app/navigation';
+
+   import { logError } from '../../../../utils/logging';
 
    //#region States
-   let email = '';
-   let password = '';
+   let email = $state('');
+   let password = $state('');
 
-   let showPassword = false;
-   let isLoading = false;
+   let showPassword = $state(false);
+   let isLoading = $state(false);
 
-   let errorAlertConfig = '';
+   let errorAlertConfig = $state('');
    //#endregion
 
    //#region Functions
-   async function handleSubmit() {
+   async function handleSubmit(e: SubmitEvent) {
+      e.preventDefault();
+
       isLoading = true;
 
       try {
@@ -29,7 +34,7 @@
 
          goto('/chat');
       } catch (error: any) {
-         console.log({ error });
+         logError(error);
 
          errorAlertConfig = JSON.stringify(error);
       }
@@ -48,7 +53,7 @@
    />
 {/if}
 
-<form on:submit|preventDefault={handleSubmit} class="flex flex-col gap-4 w-full">
+<form onsubmit={handleSubmit} class="flex flex-col gap-4 w-full">
    <InputGroup let:Label let:Wrapper let:Input let:ErrorMessage>
       <Label className="text-white">E-mail</Label>
 
@@ -84,7 +89,7 @@
          <button
             type="button"
             aria-label={showPassword ? 'Hide password' : 'Show Password'}
-            on:click={() => (showPassword = !showPassword)}
+            onclick={() => (showPassword = !showPassword)}
             class="absolute right-4 -translate-y-2/4 top-2/4"
             title={showPassword ? 'Hide password' : 'Show Password'}
          >
@@ -96,6 +101,14 @@
          </button>
       </Wrapper>
    </InputGroup>
+
+   <a
+      href="/auth/forgot-password"
+      data-sveltekit-preload-data="hover"
+      class="text-purple-300 mx-auto text-sm hover:underline underline-offset-2"
+   >
+      Forgot password
+   </a>
 
    <Button type="submit" class="w-full" disabled={!(email && password) || isLoading} title={isLoading ? 'Loading...' : 'Sign In'}>
       {#if isLoading}

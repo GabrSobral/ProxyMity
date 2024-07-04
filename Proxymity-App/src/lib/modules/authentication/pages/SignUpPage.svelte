@@ -9,26 +9,31 @@
 
    import WarningAlert from '../components/WarningAlert.svelte';
    import StrongPasswordModal from '../components/StrongPasswordModal.svelte';
+   import { logError } from '../../../../utils/logging';
 
-   let name = '';
-   let email = '';
-   let password = '';
+   let firstName = $state('');
+   let lastName = $state('');
+   let email = $state('');
+   let password = $state('');
 
-   let showPassword = false;
-   let isLoading = false;
+   let showPassword = $state(false);
+   let isLoading = $state(false);
 
-   let isStrongPasswordModalVisible = false;
-   let errorAlertConfig = '';
+   let isStrongPasswordModalVisible = $state(false);
+   let errorAlertConfig = $state('');
 
-   async function handleSubmit() {
+   async function handleSubmit(e: SubmitEvent) {
+      e.preventDefault();
+
       isLoading = true;
+      errorAlertConfig = '';
 
       try {
-         await signIn('credentials', { name, email, password, command: 'sign-up', redirect: false });
+         await signIn('credentials', { firstName, lastName, email, password, command: 'sign-up', redirect: false });
 
          goto('/chat');
       } catch (error: any) {
-         console.log(error?.response?.data || error?.message);
+         logError(error?.response?.data || error?.message);
          errorAlertConfig = error?.response?.data.message || error?.message;
       }
 
@@ -45,20 +50,37 @@
    />
 {/if}
 
-<form on:submit|preventDefault={handleSubmit} class="flex flex-col gap-4 w-full">
+<form onsubmit={handleSubmit} class="flex flex-col gap-4 w-full">
    <InputGroup let:Label let:Wrapper let:Input let:ErrorMessage>
-      <Label className="text-white">Name</Label>
+      <Label className="text-white">First Name</Label>
 
       <Wrapper className="w-full">
          <Input
             tabindex={1}
             type="text"
-            name="name"
-            placeholder="Type your name"
+            name="firstName"
+            placeholder="Type your first name"
             autoComplete="name"
-            title="Type your name"
-            bind:value={name}
+            title="Type your first name"
+            bind:value={firstName}
             required
+            className="bg-white/10 ring-gray-700 text-white placeholder:text-gray-100"
+         />
+      </Wrapper>
+   </InputGroup>
+
+   <InputGroup let:Label let:Wrapper let:Input let:ErrorMessage>
+      <Label className="text-white">Last Name</Label>
+
+      <Wrapper className="w-full">
+         <Input
+            tabindex={1}
+            type="text"
+            name="lastName"
+            placeholder="Type your last name"
+            autoComplete="name"
+            title="Type your last name"
+            bind:value={lastName}
             className="bg-white/10 ring-gray-700 text-white placeholder:text-gray-100"
          />
       </Wrapper>
@@ -102,7 +124,7 @@
             tabindex={4}
             type="button"
             aria-label={showPassword ? 'Hide password' : 'Show Password'}
-            on:click={() => (showPassword = !showPassword)}
+            onclick={() => (showPassword = !showPassword)}
             class="absolute right-4 -translate-y-2/4 top-2/4"
             title={showPassword ? 'Hide password' : 'Show Password'}
          >

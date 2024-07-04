@@ -1,5 +1,5 @@
 import type { User } from '../../../../types/user';
-import { api } from '../../../../services/api/config';
+import { authApi } from '../../../../services/api/config';
 
 interface Request {
    email: string;
@@ -12,7 +12,7 @@ export interface SignInResponse {
 }
 
 export async function signInAsync({ email, password }: Request): Promise<SignInResponse> {
-   const { data } = await api.post<SignInResponse>('/auth/sign-in', {
+   const { data } = await authApi.post<SignInResponse>('/auth/sign-in', {
       email,
       password,
    });

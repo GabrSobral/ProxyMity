@@ -3,13 +3,15 @@
 
    import * as Dialog from '$lib/design-system/dialog';
 
-   export let setPasswordValue: (newPassword: string) => void;
+   // export let setPasswordValue: (newPassword: string) => void;
 
-   let strongPassword = generatePassword();
-   let isPasswordVisible = false;
-   let isCopied = false;
+   let { setPasswordValue }: { setPasswordValue: (newPassword: string) => void } = $props();
 
-   let isModalOpened = false;
+   let strongPassword = $state(generatePassword());
+   let isPasswordVisible = $state(false);
+   let isCopied = $state(false);
+
+   let isModalOpened = $state(false);
 
    function generatePassword(): string {
       const passwordLength = 18;
@@ -37,7 +39,7 @@
 <button
    type="button"
    class="text-purple-300 text-sm hover:underline underline-offset-2"
-   on:click={() => {
+   onclick={() => {
       isModalOpened = true;
    }}
 >
@@ -81,7 +83,7 @@
          <div class="flex items-center gap-3">
             <button
                type="button"
-               on:click={() => {
+               onclick={() => {
                   isPasswordVisible = !isPasswordVisible;
                }}
                title="Show password"
@@ -96,7 +98,7 @@
 
             <button
                type="button"
-               on:click={() => {
+               onclick={() => {
                   strongPassword = generatePassword();
                }}
                title="Regenerate the password"
@@ -110,7 +112,7 @@
       <div class="flex gap-2 ml-auto">
          <button
             type="button"
-            on:click={copyToClipboard}
+            onclick={copyToClipboard}
             class="p-2 px-3 transition-all flex items-center gap-2 text-purple-300 tracking-wider text-md rounded-[6px] border-1 border-solid border-purple-500 hover:bg-purple-500 hover:text-white w-fit group"
          >
             {#if isCopied}
@@ -124,7 +126,7 @@
 
          <button
             type="button"
-            on:click={() => {
+            onclick={() => {
                setPasswordValue(strongPassword);
                isModalOpened = false;
             }}
