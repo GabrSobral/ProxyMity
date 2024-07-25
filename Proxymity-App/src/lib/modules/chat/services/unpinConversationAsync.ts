@@ -1,4 +1,4 @@
-import { api } from '../../../../services/api/config';
+import { chatApi } from '../../../../services/api/config';
 import type { IServiceOptions } from '../../../../types/utils/IServiceOptions';
 
 interface Request {
@@ -6,7 +6,7 @@ interface Request {
 }
 
 export async function unpinConversationAsync({ conversationId }: Request, { accessToken }: IServiceOptions): Promise<void> {
-   await api.patch<Response>(`/conversations/${conversationId}/unpin`, null, {
+   await chatApi.patch<Response>(`/conversations/${conversationId}/unpin`, null, {
       headers: {
          Authorization: `Bearer ${accessToken}`,
       },

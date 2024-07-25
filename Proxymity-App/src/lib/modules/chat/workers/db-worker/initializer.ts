@@ -4,11 +4,11 @@ import { writable, type Writable } from 'svelte/store';
 export const chatWorker: Writable<Worker | null> = writable(null);
 
 export const loadWorker = async () => {
-    const SyncWorker = await import('$lib/modules/chat/workers/db-worker/worker?worker');
-    chatWorker.set(new SyncWorker.default());
- };
+   const SyncWorker = await import('$lib/modules/chat/workers/db-worker/db-worker?worker');
+   chatWorker.set(new SyncWorker.default());
+};
 
-if(browser) {
-    loadWorker();
-    console.log("⚙️ \u001b[32m Web Worker was initialized.");
+if (browser) {
+   loadWorker();
+   console.log('⚙️ \u001b[32m Web Worker was initialized.');
 }

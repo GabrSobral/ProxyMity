@@ -1,5 +1,5 @@
 <script lang="ts">
-   import EmailConfirmationPage from '$lib/modules/authentication/pages/EmailConfirmationPage.svelte';
+   import EmailConfirmationPage from '$lib/modules/authentication/pages/email-confirmation-page.svelte';
 </script>
 
 <svelte:head>

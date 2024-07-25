@@ -1,5 +1,5 @@
 <script>
-   import ResetPasswordPage from '$lib/modules/authentication/pages/ResetPasswordPage.svelte';
+   import ResetPasswordPage from '$lib/modules/authentication/pages/reset-password-page.svelte';
 </script>
 
 <svelte:head>

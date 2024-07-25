@@ -1,4 +1,4 @@
-import { api } from '../../../../services/api/config';
+import { chatApi } from '../../../../services/api/config';
 import type { IServiceOptions } from '../../../../types/utils/IServiceOptions';
 
 interface Request {
@@ -19,7 +19,7 @@ export async function createGroupConversationAsync(
    { name, description, participants }: Request,
    { accessToken }: IServiceOptions
 ): Promise<Response> {
-   const { data } = await api.post<Response>(
+   const { data } = await chatApi.post<Response>(
       '/conversations/group',
       {
          name,

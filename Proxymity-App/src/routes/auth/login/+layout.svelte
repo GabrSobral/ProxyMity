@@ -4,6 +4,8 @@
    import { page } from '$app/stores';
    import { goto } from '$app/navigation';
 
+   import { logError } from '../../../utils/logging';
+
    let { children } = $props();
 
    let isSignInPage = $state($page.url.pathname.includes('sign-in'));
@@ -14,10 +16,9 @@
 
    async function oauthProvider(provider: 'github') {
       try {
-         await signIn(provider, { redirect: false, callbackUrl: '/chat' });
-         goto('/chat');
+         await signIn(provider, { redirect: true, callbackUrl: '/chat' });
       } catch (error: any) {
-         console.log({ error });
+         logError(error);
       }
    }
 </script>

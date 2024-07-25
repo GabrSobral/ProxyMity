@@ -14,10 +14,10 @@ import { chatDispatch, chatState, messagesContainer } from '../stores/chat';
 import { serverToLocalMessage } from '../functions/parse-server-message';
 
 import { webSocketEmitter } from '../../websocket-context/stores/connection';
-import type { WebSocketEmitter } from '../../websocket-context/WebSocketEmitter';
+import type { WebSocketEmitter } from '../../websocket-context/webSocket-emitter';
 import type { ChatState } from '../stores/chat-store-types';
 
-import { selectConversationAsync } from '../ChatContext.svelte';
+import { selectConversationAsync } from '../chat-context.svelte';
 
 let chatStateMod: ChatState | null = null;
 let chatWorkerMod: Worker | null = null;

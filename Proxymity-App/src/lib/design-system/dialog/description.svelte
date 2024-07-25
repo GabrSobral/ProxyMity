@@ -1,5 +1,5 @@
 <script lang="ts">
-   import Text from '../Text.svelte';
+   import Text from '../text.svelte';
    import { cn } from '$lib/utils';
 
    let className: HTMLDivElement['className'] | undefined = undefined;

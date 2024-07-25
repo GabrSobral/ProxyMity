@@ -176,7 +176,7 @@ export const chatDispatch: Actions = {
                   content: message.content,
                   author: {
                      id: message.authorId,
-                     name: conversation.participants.find(item => item.id === message.authorId)?.name || '',
+                     name: conversation.participants.find(item => item.id === message.authorId)?.firstName || '',
                   },
                   writtenAt: message.writtenAt,
                   sentAt: message.sentAt,
@@ -221,7 +221,7 @@ export const chatDispatch: Actions = {
                   content: message.content,
                   author: {
                      id: message.authorId,
-                     name: participants.find(user => user.id === message.authorId)?.name || 'You',
+                     name: participants.find(user => user.id === message.authorId)?.firstName || 'You',
                   },
                   writtenAt: message.writtenAt,
                   read: {

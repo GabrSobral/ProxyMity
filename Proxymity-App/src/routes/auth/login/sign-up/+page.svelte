@@ -1,5 +1,5 @@
 <script>
-   import SignUpPage from '$lib/modules/authentication/pages/SignUpPage.svelte';
+   import SignUpPage from '$lib/modules/authentication/pages/sign-up-page.svelte';
 </script>
 
 <svelte:head>

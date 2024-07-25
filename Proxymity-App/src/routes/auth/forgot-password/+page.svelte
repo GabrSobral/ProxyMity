@@ -1,5 +1,5 @@
 <script>
-   import ForgotPasswordPage from '$lib/modules/authentication/pages/ForgotPasswordPage.svelte';
+   import ForgotPasswordPage from '$lib/modules/authentication/pages/forgot-password-page.svelte';
 </script>
 
 <svelte:head>

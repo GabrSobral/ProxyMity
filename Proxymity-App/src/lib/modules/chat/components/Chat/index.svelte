@@ -1,6 +1,6 @@
 <script lang="ts">
-   import ChatHeader from './ChatHeader.svelte';
-   import MessagesContainer from './MessagesContainer/index.svelte';
+   import ChatHeader from './chat-header.svelte';
+   import MessagesContainer from './messages-container/index.svelte';
 </script>
 
 <section

@@ -1,6 +1,7 @@
 export interface User {
    id: string;
-   name: string;
+   firstName: string;
+   lastName: string | null;
    email: string;
    photoUrl: string;
    createdAt: Date;
@@ -10,7 +11,8 @@ export interface User {
 
 export interface UserApi {
    id: string;
-   name: string;
+   firstName: string;
+   lastName: string | null;
    email: string;
    photoUrl: string;
    createdAt: Date;

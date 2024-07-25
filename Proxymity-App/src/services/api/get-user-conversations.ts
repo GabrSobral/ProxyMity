@@ -19,7 +19,8 @@ export interface IConversationAPI {
    unreadMessagesCount: number;
    participants: {
       id: string;
-      name: string;
+      firstName: string;
+      lastName: string;
       email: string;
       photoUrl: string | null;
       lastOnline: null | Date;

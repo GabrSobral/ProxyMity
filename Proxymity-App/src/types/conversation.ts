@@ -9,7 +9,8 @@ export interface Conversation {
    conversationPinnedAt: Date | null;
    participants: {
       id: string;
-      name: string;
+      firstName: string;
+      lastName: string | null;
       email: string;
       photoUrl: string | null;
       lastOnline: Date | null;

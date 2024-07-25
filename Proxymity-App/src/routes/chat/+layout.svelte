@@ -1,20 +1,14 @@
 <script lang="ts">
-   import { Header } from '$lib/application/Header';
+   import { Header } from '$lib/application/header';
 
-   import NavigationBar from '$lib/application/NavigationBar/index.svelte';
-   import ChatContext from '$lib/modules/chat/contexts/chat-context/ChatContext.svelte';
-   import WebsocketContext from '$lib/modules/chat/contexts/websocket-context/WebsocketContext.svelte';
+   import NavigationBar from '$lib/application/navigation-bar/index.svelte';
 </script>
 
-<WebsocketContext>
-   <ChatContext>
-      <div class="max-h-screen h-screen">
-         <Header />
+<div class="max-h-screen h-screen">
+   <Header />
 
-         <div class="flex w-full max-h-[calc(100%-3.75rem)] h-full">
-            <NavigationBar />
-            <slot />
-         </div>
-      </div>
-   </ChatContext>
-</WebsocketContext>
+   <div class="flex w-full max-h-[calc(100%-3.75rem)] h-full">
+      <NavigationBar />
+      <slot />
+   </div>
+</div>

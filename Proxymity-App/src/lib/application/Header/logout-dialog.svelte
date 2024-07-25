@@ -3,7 +3,7 @@
 
    import * as Dialog from '$lib/design-system/dialog';
    import Button from '$lib/design-system/button/button.svelte';
-   import LoadingSpinning from '$lib/design-system/LoadingSpinning.svelte';
+   import LoadingSpinning from '$lib/design-system/loading-spinning.svelte';
 
    type Props = {
       closeDialog: () => void;
@@ -16,7 +16,7 @@
 
    async function handleSignOut() {
       isLoading = true;
-      signOut({ callbackUrl: '/auth/sign-in', redirect: true });
+      signOut({ callbackUrl: '/auth/login/sign-in', redirect: true });
    }
 </script>
 
@@ -28,7 +28,7 @@
          If you logout, all your data saved data will be deleted, and you will must to Login again.
       </Dialog.Description>
 
-      <div class="flex gap-4">
+      <div class="flex gap-4 ml-auto">
          <Button type="button" isOutlined onclick={closeDialog} disabled={isLoading}>Cancel</Button>
 
          <Button type="button" onclick={handleSignOut} disabled={isLoading}>

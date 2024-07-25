@@ -1,12 +1,12 @@
 <script lang="ts">
-   import * as Tabs from '$lib/components/ui/tabs';
-   import * as Avatar from '$lib/components/ui/avatar';
-   import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
+   // import * as Tabs from '$lib/design-system/tabs';
+   import * as Avatar from '$lib/design-system/avatar';
+   import * as DropdownMenu from '$lib/design-system/dropdown-menu';
 
-   import Text from '$lib/design-system/Text.svelte';
+   import Text from '$lib/design-system/text.svelte';
 
    import { Bell, CheckCheck, Settings } from 'lucide-svelte';
-   import Button from '$lib/components/ui/button/button.svelte';
+   import Button from '$lib/design-system/button/button.svelte';
 </script>
 
 <DropdownMenu.Root>
@@ -18,8 +18,11 @@
    <DropdownMenu.Content>
       <DropdownMenu.Group>
          <DropdownMenu.Label class="text-lg flex gap-4 w-full items-center">
-            Notifications 
-            <span class="font-semibold text-sm flex items-center justify-center min-w-[22px] min-h-[22px] max-w-[22px] max-h-[22px] dark:bg-white dark:text-black bg-black text-white rounded-full p-1">17</span>
+            Notifications
+            <span
+               class="font-semibold text-sm flex items-center justify-center min-w-[22px] min-h-[22px] max-w-[22px] max-h-[22px] dark:bg-white dark:text-black bg-black text-white rounded-full p-1"
+               >17</span
+            >
          </DropdownMenu.Label>
 
          <Tabs.Root value="all-notifications">

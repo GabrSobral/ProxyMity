@@ -9,7 +9,7 @@ interface Request {
 export type GetConversationMessagesResponse = IServerMessage[];
 
 export async function APIGetConversationMessages({ conversationId }: Request, { accessToken }: IServiceOptions) {
-   const { data } = await chatApi.get<GetConversationMessagesResponse>(`/conversation/messages/${conversationId}`, {
+   const { data } = await chatApi.get<GetConversationMessagesResponse>(`/conversations/${conversationId}/messages`, {
       headers: { Authorization: `Bearer ${accessToken}` },
    });
 

@@ -2,10 +2,10 @@
    import { page } from '$app/stores';
    import { Info, LogOut, Settings, User } from 'lucide-svelte';
 
-   import Text from '$lib/design-system/Text.svelte';
+   import Text from '$lib/design-system/text.svelte';
    import * as DropdownMenu from '$lib/design-system/dropdown-menu/';
 
-   import SettingsModal from '../SettingsModal/SettingsModal.svelte';
+   import SettingsModal from '../settings-modal/settings-modal.svelte';
 
    import LogoutDialog from './logout-dialog.svelte';
 
@@ -24,14 +24,14 @@
 
 <div class="flex items-center">
    <div class="flex flex-col gap-1 mr-3">
-      <Text size="md">Good Morning, {user?.name}</Text>
+      <Text size="md">Good Morning, {user?.firstName} {user?.lastName}</Text>
       <Text size="sm" class="text-xs text-gray-300">{user?.email}</Text>
    </div>
 
    <SettingsModal isOpened={isSettingsModalOpened} closeModal={closeSettingsModal} />
 
    <DropdownMenu.Root>
-      <DropdownMenu.Trigger class="flex p-3 rounded-md bg-black border border-gray-900" aria-label="Profile">
+      <DropdownMenu.Trigger class="flex p-2 rounded-md bg-black border border-gray-900" aria-label="Profile">
          <span class="sr-only">User</span>
          <User size={24} class="text-white" />
       </DropdownMenu.Trigger>

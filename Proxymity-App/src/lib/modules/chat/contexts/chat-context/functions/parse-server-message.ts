@@ -17,8 +17,8 @@ export async function serverToLocalMessage(
          name: await (async () => {
             const conversationCache = await getConversationByIdAsyncDB(message.conversationId);
             const author = conversationCache?.participants.find(item => item.id === message.authorId);
-
-            return author?.name || '-';
+            console.log({ author });
+            return author?.firstName || '-';
          })(),
       },
       repliedMessage: message.repliedMessageId

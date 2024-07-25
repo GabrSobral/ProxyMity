@@ -1,5 +1,5 @@
 <script lang="ts">
-   import Heading from '../Heading.svelte';
+   import Heading from '../heading.svelte';
 </script>
 
 <Heading size="lg">
