@@ -5,6 +5,11 @@ public sealed class ConfirmEmailCommandValidator: AbstractValidator<ConfirmEmail
     public ConfirmEmailCommandValidator()
     {
         RuleFor(x => x.Token)
-            .NotNull();
+            .NotNull()
+            .WithMessage("The confirmation token can not be null.");
+
+        RuleFor(x => x.Token)
+            .NotEmpty()
+            .WithMessage("The confirmation token can not be empty.");
     }
 }

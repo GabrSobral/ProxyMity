@@ -1,8 +1,4 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-
-namespace ProxyMity.Domain.Entities;
+﻿namespace ProxyMity.Domain.Entities;
 
 /// <summary>
 /// The user entity, this entity represents each user at application.
@@ -17,15 +13,15 @@ public class User
     [MaxLength(255)]
     public required string Email { get; set; }
 
-    [Required]
     [MaxLength(255)]
-    public required string PasswordHash { get; set; }
+    public string? PasswordHash { get; set; }
 
     public DateTime CreatedAt { get; set; }
     public DateTime? UpdatedAt { get; set; }
     public bool IsActive { get; set; } = true;
     public bool IsEmailConfirmed { get; set; } = false;
     public bool TwoFactorEnabled { get; set; } = false;
+
     public string TwoFactorSecret { get; set; } = string.Empty;
 
 
@@ -34,6 +30,7 @@ public class User
 
     public UserProfile UserProfile { get; set; }
     public IEnumerable<PasswordResetToken> PasswordResetTokens { get; set; }
+    public IEnumerable<ExternalLogin> ExternalLogins { get; set; }
     public IEnumerable<RefreshToken> RefreshTokens { get; set; }
     public IEnumerable<EmailConfirmation> EmailConfirmations { get; set; }
 

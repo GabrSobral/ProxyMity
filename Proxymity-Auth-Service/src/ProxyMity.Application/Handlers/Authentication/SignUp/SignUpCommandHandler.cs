@@ -1,4 +1,6 @@
-﻿namespace ProxyMity.Application.Handlers.Authentication.SignUp;
+﻿using ProxyMity.Infra.Messaging.Messages;
+
+namespace ProxyMity.Application.Handlers.Authentication.SignUp;
 
 public sealed class SignUpCommandHandler(
     ILogger<SignUpCommandHandler> logger,
@@ -65,6 +67,7 @@ public sealed class SignUpCommandHandler(
             newUser.Id,
             userProfile.FirstName ?? "-",
             userProfile.LastName,
+            newUser.Email,
             newUser.CreatedAt
         ), cancellationToken);
 

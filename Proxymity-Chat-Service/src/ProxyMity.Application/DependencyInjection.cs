@@ -14,9 +14,6 @@ public static class DependencyInjection
     /// <returns>The same service collection.</returns>
     public static IServiceCollection AddApplication(this IServiceCollection services)
     {
-        services.AddScoped<IJsonWebToken, JsonWebToken>();
-        services.AddSingleton<IPasswordEncrypter, PasswordEncrypter>();
-
         services.AddMediatR(config =>
         {
             config.RegisterServicesFromAssembly(ApplicationAssemblyReference.Assembly);

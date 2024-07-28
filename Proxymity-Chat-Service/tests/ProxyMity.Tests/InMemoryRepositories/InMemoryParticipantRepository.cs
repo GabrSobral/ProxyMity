@@ -66,7 +66,8 @@ internal class InMemoryParticipantRepository(
 
             var result = new GetParticipantsByConversationIdQuery(
                 user.Id,
-                user.Name,
+                user.FirstName,
+                user.LastName,
                 user.Email,
                 user.PhotoUrl,
                 user.LastOnline,

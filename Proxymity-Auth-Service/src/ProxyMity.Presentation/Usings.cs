@@ -17,4 +17,8 @@ global using ProxyMity.Application.Handlers.Users.Commands.UpdateUserData;
 global using ProxyMity.Application.Handlers.Users.Commands.ChangePassword;
 global using ProxyMity.Application.Handlers.Authentication.RevokeAccessToken;
 
+global using ProxyMity.Application.Handlers.Authentication.ConfirmEmail;
+global using ProxyMity.Application.Handlers.Authentication.ForgotPassword;
+global using ProxyMity.Application.Handlers.Authentication.ForgotPasswordSendMail;
+
 global using ProxyMity.Presentation.Http.Utils;

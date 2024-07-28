@@ -68,7 +68,7 @@ namespace ProxyMity.Infra.Database.Migrations
 
                     b.HasIndex("RequesterId");
 
-                    b.ToTable("Friendship");
+                    b.ToTable("friendship");
                 });
 
             modelBuilder.Entity("ProxyMity.Domain.Entities.Group", b =>
@@ -237,16 +237,16 @@ namespace ProxyMity.Infra.Database.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("LastName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<DateTime?>("LastOnline")
                         .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("Password")
-                        .IsRequired()
-                        .HasColumnType("text");
 
                     b.Property<string>("PhotoUrl")
                         .HasColumnType("text");

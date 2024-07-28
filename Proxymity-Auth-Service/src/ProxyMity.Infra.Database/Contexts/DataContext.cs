@@ -8,6 +8,7 @@ public class DataContext : DbContext
 
     public DbSet<User> Users { get; set; }
     public DbSet<UserProfile> UserProfiles { get; set; }
+    public DbSet<ExternalLogin> ExternalLogins { get; set; }
     public DbSet<PasswordResetToken> PasswordResetTokens { get; set; }
     public DbSet<RefreshToken> RefreshTokens { get; set; }
     public DbSet<EmailConfirmation> EmailConfirmations { get; set; }
@@ -29,6 +30,10 @@ public class DataContext : DbContext
 
         modelBuilder.Entity<EmailConfirmation>()
             .HasIndex(ec => ec.Token);
+
+        modelBuilder.Entity<ExternalLogin>()
+            .HasIndex(el => new { el.Provider, el.ProviderKey })
+            .IsUnique();
     }
 
     /// <summary>

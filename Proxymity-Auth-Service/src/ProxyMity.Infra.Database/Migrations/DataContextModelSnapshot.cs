@@ -53,6 +53,34 @@ namespace ProxyMity.Infra.Database.Migrations
                     b.ToTable("email_confirmation");
                 });
 
+            modelBuilder.Entity("ProxyMity.Domain.Entities.ExternalLogin", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("Provider")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("ProviderKey")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("character varying(26)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.HasIndex("Provider", "ProviderKey")
+                        .IsUnique();
+
+                    b.ToTable("external_login");
+                });
+
             modelBuilder.Entity("ProxyMity.Domain.Entities.PasswordResetToken", b =>
                 {
                     b.Property<Guid>("Id")
@@ -128,7 +156,6 @@ namespace ProxyMity.Infra.Database.Migrations
                         .HasColumnType("boolean");
 
                     b.Property<string>("PasswordHash")
-                        .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)");
 
@@ -191,6 +218,17 @@ namespace ProxyMity.Infra.Database.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("ProxyMity.Domain.Entities.ExternalLogin", b =>
+                {
+                    b.HasOne("ProxyMity.Domain.Entities.User", "User")
+                        .WithMany("ExternalLogins")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("ProxyMity.Domain.Entities.PasswordResetToken", b =>
                 {
                     b.HasOne("ProxyMity.Domain.Entities.User", "User")
@@ -227,6 +265,8 @@ namespace ProxyMity.Infra.Database.Migrations
             modelBuilder.Entity("ProxyMity.Domain.Entities.User", b =>
                 {
                     b.Navigation("EmailConfirmations");
+
+                    b.Navigation("ExternalLogins");
 
                     b.Navigation("PasswordResetTokens");
 

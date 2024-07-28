@@ -9,11 +9,10 @@ public class User
     [Key]
     public required Ulid Id { get; set; }
 
-    public required string Name { get; set; }
+    public required string FirstName { get; set; }
+    public required string LastName { get; set; }
 
     public required string Email { get; set; }
-
-    public required string Password { get; set; }
 
     public DateTime? LastOnline { get; set; }
 
@@ -29,14 +28,14 @@ public class User
 
     #endregion
 
-    public static User Create(string name, string email, string password)
+    public static User Create(string firstName, string lastName, string email)
     {
         return new User
         {
             Id = Ulid.NewUlid(),
-            Name = name,
+            FirstName = firstName,
+            LastName = lastName,
             Email = email,
-            Password = password,
             CreatedAt = DateTime.UtcNow,
         };
     }

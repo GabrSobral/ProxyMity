@@ -41,7 +41,7 @@ public class ConversationController(ISender sender, IHttpContextAccessor httpCon
         return Ok(response);
     }
 
-    [HttpGet("messages/{conversationId}")]
+    [HttpGet("{conversationId}/messages")]
     public async Task<IActionResult> GetConversationMessages(Ulid conversationId)
     {
         var query = new GetConversationMessagesQuery(conversationId);

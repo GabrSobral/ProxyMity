@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using ProxyMity.Infra.Messaging.Messages;
+using RabbitMQ.Client;
 
 namespace ProxyMity.Infra.Messaging;
 
@@ -6,9 +7,6 @@ public static class DependenyInjection
 {
     public static IServiceCollection AddInfraMessaging(this IServiceCollection services, IConfiguration configuration)
     {
-
-        string connectionString = configuration.GetConnectionString("PostgreSql")!;
-
         services.AddMassTransit(busConfigurator =>
         {
             busConfigurator.SetKebabCaseEndpointNameFormatter();
@@ -20,27 +18,18 @@ public static class DependenyInjection
                 var username = configuration.GetSection("MessageBroker:Username").Value ?? "";
                 var password = configuration.GetSection("MessageBroker:Password").Value ?? "";
 
-                try
+                config.Host(new Uri(host), hostConfig =>
                 {
-                    config.Host(new Uri(host), hostConfig =>
-                    {
-                        hostConfig.Username(username);
-                        hostConfig.Password(password);
-                        hostConfig.ConnectionName("proxymity-auth-rabbitmq");
-                    });
+                    hostConfig.Username(username);
+                    hostConfig.Password(password);
+                });
 
-                    config.ConfigureEndpoints(context);
+                config.ConfigureEndpoints(context);
 
-                    config.UseMessageRetry(retryConfig =>
-                    {
-                        retryConfig.Interval(5, TimeSpan.FromSeconds(10));
-                    });
-                }
-                catch (Exception ex)
+                config.UseMessageRetry(retryConfig =>
                 {
-                    throw;
-                }
-
+                    retryConfig.Interval(5, TimeSpan.FromSeconds(10));
+                });
             });
         });
 

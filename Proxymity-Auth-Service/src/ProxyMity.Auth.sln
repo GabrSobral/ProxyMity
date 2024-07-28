@@ -21,7 +21,9 @@ Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "..\docker
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProxyMity.Infra.Messaging", "ProxyMity.Infra.Messaging\ProxyMity.Infra.Messaging.csproj", "{C993EF97-C00F-401F-BBBF-34784A9E7629}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProxyMity.Infra.Email", "ProxyMity.Infra.Email\ProxyMity.Infra.Email.csproj", "{BCFBE3F7-C3F3-42C4-BF95-B56B5ED31BAE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProxyMity.Infra.Email", "ProxyMity.Infra.Email\ProxyMity.Infra.Email.csproj", "{BCFBE3F7-C3F3-42C4-BF95-B56B5ED31BAE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProxyMity.Auth.Integration", "ProxyMity.Auth.Integration\ProxyMity.Auth.Integration.csproj", "{5EFAFA56-8709-43EF-8CF8-D955B5DD0C80}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -61,6 +63,10 @@ Global
 		{BCFBE3F7-C3F3-42C4-BF95-B56B5ED31BAE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BCFBE3F7-C3F3-42C4-BF95-B56B5ED31BAE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BCFBE3F7-C3F3-42C4-BF95-B56B5ED31BAE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5EFAFA56-8709-43EF-8CF8-D955B5DD0C80}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5EFAFA56-8709-43EF-8CF8-D955B5DD0C80}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5EFAFA56-8709-43EF-8CF8-D955B5DD0C80}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5EFAFA56-8709-43EF-8CF8-D955B5DD0C80}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -73,6 +79,7 @@ Global
 		{1FD032CD-85F6-4DDE-9D47-197C13FA780E} = {9C3DFFEF-29B3-42EB-A4EC-30EBEE3C962E}
 		{C993EF97-C00F-401F-BBBF-34784A9E7629} = {9C3DFFEF-29B3-42EB-A4EC-30EBEE3C962E}
 		{BCFBE3F7-C3F3-42C4-BF95-B56B5ED31BAE} = {9C3DFFEF-29B3-42EB-A4EC-30EBEE3C962E}
+		{5EFAFA56-8709-43EF-8CF8-D955B5DD0C80} = {3E84C586-7DC1-4B9D-B632-859AC176192E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {29195BAF-C722-43E6-A97C-6DD8595CA5CA}

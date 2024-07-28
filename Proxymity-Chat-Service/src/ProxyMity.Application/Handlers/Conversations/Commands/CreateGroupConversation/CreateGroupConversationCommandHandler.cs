@@ -31,7 +31,7 @@ public class CreateGroupConversationCommandHandler(
         {
             var participantId = command.Participants.ElementAt(i);
 
-            _ = await userRepository.FindByIdAsync(participantId, cancellationToken) ?? throw new UserNotFoundException(participantId);
+             _ = await userRepository.FindByIdAsync(participantId, cancellationToken) ?? throw new UserNotFoundException(participantId);
             var existentParticipation = await participantRepository.GetByIdAsync(participantId, conversation.Id, cancellationToken);
 
             if (existentParticipation is null)

@@ -47,7 +47,8 @@ public sealed class ParticipantRepository(DataContext dbContext) : IParticipantR
             .Where(x => x.ConversationId == conversationId)
             .Select(x => new GetParticipantsByConversationIdQuery(
                 x.UserId,
-                x.User.Name,
+                x.User.FirstName,
+                x.User.LastName,
                 x.User.Email,
                 x.User.PhotoUrl,
                 x.User.LastOnline,

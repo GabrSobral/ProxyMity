@@ -1,0 +1,107 @@
+version: "3.4"
+
+services:
+  proxymity.auth:
+    container_name: "ProxyMity.Auth"
+    image: ${DOCKER_REGISTRY-}proxymity-auth
+    restart: always
+    build:
+      context: ./Proxymity-Auth-Service/src
+      dockerfile: ./Proxymity-Auth-Service/src/ProxyMity.Auth/Dockerfile
+    ports:
+      - "5001:5001"
+    environment:
+      ASPNETCORE_URLS: "http://+:5001"
+    deploy:
+      resources:
+        limits:
+          cpus: "2"
+          memory: "512MB"
+    depends_on:
+      - postgres-auth
+      - rabbitmq
+    networks:
+      - proxymity-network
+
+  postgres-auth:
+    container_name: "ProxyMity.Auth.Database"
+    command: postgres -c 'max_connections=10'
+    image: postgres:16.1
+    restart: always
+    environment:
+      - POSTGRES_USER=proxymity_root
+      - POSTGRES_PASSWORD=proxymity123
+      - POSTGRES_DB=proxymitydb
+    deploy:
+      resources:
+        limits:
+          cpus: "2"
+          memory: "512MB"
+    volumes:
+      - ./volumes/postgres_data_auth:/var/lib/postgresql/data
+    ports:
+      - "5431:5432"
+    networks:
+      - proxymity-network
+
+  proxymity.chat:
+    container_name: "ProxyMity.Chat"
+    image: ${DOCKER_REGISTRY-}proxymity-chat
+    restart: always
+    build:
+      context: ./Proxymity-Chat-Service/src
+      dockerfile: ./Proxymity-Chat-Service/src/ProxyMity.Chat/Dockerfile
+    ports:
+      - "5000:5000"
+    environment:
+      ASPNETCORE_URLS: "http://+:5000"
+    deploy:
+      resources:
+        limits:
+          cpus: "2"
+          memory: "512MB"
+    depends_on:
+      - postgres-chat
+      - rabbitmq
+    networks:
+      - proxymity-network
+
+  postgres-chat:
+    container_name: "ProxyMity.Chat.Database"
+    command: postgres -c 'max_connections=10'
+    image: postgres:16.1
+    restart: always
+    environment:
+      - POSTGRES_USER=proxymity_root
+      - POSTGRES_PASSWORD=proxymity123
+      - POSTGRES_DB=proxymitydb
+    deploy:
+      resources:
+        limits:
+          cpus: "2"
+          memory: "512MB"
+    volumes:
+      - ./volumes/postgres_data_chat:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
+    networks:
+      - proxymity-network
+
+  rabbitmq:
+    container_name: "ProxyMity.Auth.RabbitMQ"
+    image: rabbitmq:3.12-management
+    environment:
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASS=guest
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - ./volumes/queue/data/:/var/lib/rabbitmq
+      - ./volumes/queue/log/:/var/log/rabbitmq
+    networks:
+      - proxymity-network
+
+networks:
+  proxymity-network:
+    driver: bridge

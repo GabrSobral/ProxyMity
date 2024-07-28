@@ -15,9 +15,9 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\ProxyMity.Application.Authentication\ProxyMity.Application.Authentication.csproj" />
         <ProjectReference Include="..\ProxyMity.Domain\ProxyMity.Domain.csproj" />
         <ProjectReference Include="..\ProxyMity.Infra.Database\ProxyMity.Infra.Database.csproj" />
+        <ProjectReference Include="..\ProxyMity.Infra.Messaging\ProxyMity.Infra.Messaging.csproj" />
     </ItemGroup>
 
     <ItemGroup>

@@ -2,7 +2,8 @@
 
 public record GetParticipantsByConversationIdQuery(
     Ulid Id,
-    string Name,
+    string FirstName,
+    string LastName,
     string Email,
     string? PhotoUrl,
     DateTime? LastOnline,

@@ -7,15 +7,14 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <Folder Include="Interfaces\Repositories\ConversationRepository\CustomQueries\"/>
-        <Folder Include="Interfaces\Repositories\GroupRepository\CustomQueries\"/>
-        <Folder Include="Interfaces\Repositories\MessageRepository\CustomQueries\"/>
-        <Folder Include="Interfaces\Repositories\MessageStatusRepository\CustomQueries\"/>
-        <Folder Include="Interfaces\Repositories\UserRepository\CustomQueries\"/>
+        <Folder Include="Interfaces\Repositories\ConversationRepository\CustomQueries\" />
+        <Folder Include="Interfaces\Repositories\GroupRepository\CustomQueries\" />
+        <Folder Include="Interfaces\Repositories\MessageRepository\CustomQueries\" />
+        <Folder Include="Interfaces\Repositories\MessageStatusRepository\CustomQueries\" />
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Ulid" Version="1.3.3"/>
+        <PackageReference Include="Ulid" Version="1.3.3" />
     </ItemGroup>
 
 </Project>

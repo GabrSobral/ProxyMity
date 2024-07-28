@@ -1,4 +1,7 @@
-﻿namespace ProxyMity.Presentation;
+﻿using ProxyMity.Application.Handlers.Users.Queries.GetByProviderId;
+using ProxyMity.Domain.Entities;
+
+namespace ProxyMity.Presentation;
 
 [Authorize]
 [ApiController]
@@ -24,6 +27,32 @@ public class UserController(ISender sender, IHttpContextAccessor httpContextAcce
         var response = await sender.Send(query);
 
         if(response == null) 
+            return NotFound();
+
+        return Ok(response);
+    }
+
+    /// <summary>
+    /// Search an user by provider user ID.
+    /// </summary>
+    /// <param name="provider">Provider Enum</param>
+    /// <param name="providerKey">Provider key from user</param>
+    /// <response code="200">Returns the user searched</response>
+    /// <response code="400">If the "Id" is null</response>
+    /// <response code="404">If the user was not found</response>
+    /// <response code="500">Internal server error</response>
+    [AllowAnonymous]
+    [HttpGet("get-by-id/provider/{provider}/{providerKey}", Name = nameof(GetUserByProviderKey))]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(GetByProviderIdResponse))]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> GetUserByProviderKey([FromRoute] EAuthProviders provider, [FromRoute] string providerKey)
+    {
+        var query = new GetByProviderIdQuery(provider, providerKey);
+        var response = await sender.Send(query);
+
+        if (response == null)
             return NotFound();
 
         return Ok(response);
