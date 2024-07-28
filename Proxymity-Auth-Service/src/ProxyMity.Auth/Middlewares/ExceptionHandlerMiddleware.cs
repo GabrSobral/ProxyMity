@@ -100,6 +100,16 @@ public sealed class ExceptionHandlerMiddleware(RequestDelegate next, ILogger<Exc
                 logger.LogError($"[Email or password is invalid] {error.Message}");
                 break;
 
+            case PasswordResetTokenNotFoundException:
+                response.StatusCode = (int)HttpStatusCode.BadRequest;
+                logger.LogError($"[Password reset token not found] {error.Message}");
+                break;
+
+            case PasswordResetTokenDontMatchException:
+                response.StatusCode = (int)HttpStatusCode.BadRequest;
+                logger.LogError($"[Password reset token do not match] {error.Message}");
+                break;
+
             default:
                 response.StatusCode = (int)HttpStatusCode.InternalServerError;
                 logger.LogError($"[Internal error request] {error.Message}");
