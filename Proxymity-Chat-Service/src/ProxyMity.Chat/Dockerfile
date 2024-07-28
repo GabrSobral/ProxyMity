@@ -13,7 +13,6 @@ WORKDIR /src
 COPY ["ProxyMity.Chat/ProxyMity.Chat.csproj", "ProxyMity.Chat/"]
 COPY ["ProxyMity.Domain/ProxyMity.Domain.csproj", "ProxyMity.Domain/"]
 COPY ["ProxyMity.Application/ProxyMity.Application.csproj", "ProxyMity.Application/"]
-COPY ["ProxyMity.Application.Authentication/ProxyMity.Application.Authentication.csproj", "ProxyMity.Application.Authentication/"]
 COPY ["ProxyMity.Presentation/ProxyMity.Presentation.csproj", "ProxyMity.Presentation/"]
 COPY ["ProxyMity.Infra.Database/ProxyMity.Infra.Database.csproj", "ProxyMity.Infra.Database/"]
 

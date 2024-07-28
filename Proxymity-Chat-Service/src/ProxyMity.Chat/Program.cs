@@ -1,3 +1,5 @@
+using ProxyMity.Infra.Messaging;
+
 internal class Program
 {
     private static void Main(string[] args)
@@ -7,6 +9,7 @@ internal class Program
         builder.Services
             .AddApplication()
             .AddInfraDatabase(builder.Configuration)
+            .AddInfraMessaging(builder.Configuration)
             .AddPresentation()
             .ConfigureCors()
             .ConfigureAuthentication()
