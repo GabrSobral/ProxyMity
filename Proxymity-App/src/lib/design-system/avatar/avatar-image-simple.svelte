@@ -1,6 +1,12 @@
 <script lang="ts">
-   export let src: string | undefined;
-   export let username: string | undefined = 'Anonymous';
+   interface Props {
+      src: string | undefined;
+      username: string | undefined;
+      size?: number;
+   }
+   type $$Props = Props;
+
+   let { src, username = 'Anonymous', size = 36 } = $props() as Props;
 
    function getInitials(name: string) {
       const hasSpace = name.indexOf(' ') !== -1;
@@ -12,7 +18,15 @@
 
 <div class="flex items-center justify-center z-10" title={username}>
    {#if src}
-      <img {src} alt={username} class="size-9 min-w-[2.25rem] min-h-[2.25rem] rounded-full" />
+      <img
+         {src}
+         alt={username}
+         style:width={`${size}px`}
+         style:height={`${size}px`}
+         style:min-height={`${size}px`}
+         style:min-width={`${size}px`}
+         class={`rounded-full`}
+      />
    {:else}
       <span class="font-semibold text-lg">{initials}</span>
    {/if}

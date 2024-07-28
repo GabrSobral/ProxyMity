@@ -5,7 +5,7 @@
 </script>
 
 {#if $chatState.selectedConversation && $chatState.showConversationDetail}
-   <aside class="h-full w-[280px] rounded-[10px] flex flex-col gap-4">
+   <aside class="h-full w-[280px] rounded-[10px] flex flex-col gap-4 m-2">
       <ChatDetailHeader />
 
       {#if $chatState.selectedConversation.isGroup}

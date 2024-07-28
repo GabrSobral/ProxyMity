@@ -5,9 +5,9 @@
 
 <div class="w-full p-4 flex flex-col justify-between">
    <div class="flex flex-1 flex-wrap gap-3 justify-center items-center">
-      <ParticipantCard isSpeaking isMuted={false} isCalling={false} />
-      <ParticipantCard isSpeaking={false} isMuted isCalling={false} />
-      <ParticipantCard isSpeaking={false} isMuted isCalling={true} />
+      <ParticipantCard isSpeaking isMuted={false} isCalling={false} user={null} />
+      <ParticipantCard isSpeaking={false} isMuted isCalling={false} user={null} />
+      <ParticipantCard isSpeaking={false} isMuted isCalling={true} user={null} />
    </div>
 
    <footer class="flex gap-3 w-fit mx-auto px-4 py-3 rounded-md justify-center mt-4 bg-black/50 backdrop-blur-sm">

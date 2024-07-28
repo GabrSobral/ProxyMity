@@ -10,7 +10,7 @@
    <title>ProxyMity - Chat</title>
 </svelte:head>
 
-<main class="flex flex-1 p-4 h-full gap-4 overflow-hidden m-auto max-w-[1980px] w-full">
+<main class="flex flex-1 h-full overflow-hidden w-full bg-[url('/chat-background.svg')] bg-cover bg-no-repeat">
    <ChatsSidebar />
 
    {#if $chatState.selectedConversation}

@@ -2,16 +2,18 @@
    import { clsx } from 'clsx';
    import Text from '$lib/design-system/text.svelte';
    import { CameraOff, MicOff, Mic } from 'lucide-svelte';
+   import type { ConversationState } from '$lib/modules/chat/contexts/chat-context/stores/chat-store-types';
 
    interface Props {
       isCalling: boolean;
       isSpeaking: boolean;
       isMuted: boolean;
+      user: ConversationState['participants'][0] | null;
    }
 
    type $$Props = Props;
 
-   let { isCalling, isSpeaking, isMuted }: Props = $props();
+   let { isCalling, isSpeaking, isMuted, user }: Props = $props();
 </script>
 
 <div

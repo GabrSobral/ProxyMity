@@ -185,7 +185,7 @@
       </ul>
 
       {#if selectedUsers.length && groupName}
-         <Button type="button" on:click={createChat} class="ml-auto" title={`Create "${groupName}" group.`}>
+         <Button type="button" onclick={createChat} class="ml-auto" title={`Create "${groupName}" group.`}>
             Create "{groupName.slice(0, 15)}{groupName.length > 15 ? '...' : ''}" group
          </Button>
       {/if}

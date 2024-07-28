@@ -20,7 +20,7 @@
 </script>
 
 <aside
-   class="h-full min-w-[17rem] rounded-[8px] border border-gray-900 p-2 flex flex-col gap-3 bg-gradient-to-br from-[#136DCE]/50 via-[22%] via-black/20 backdrop-blur"
+   class="h-full min-w-[17rem] border-r border-gray-900 p-2 flex flex-col gap-3 bg-gradient-to-br from-[#136DCE]/50 via-[22%] via-black/20 backdrop-blur"
 >
    <div class="flex gap-4 justify-between px-3">
       <Heading size="lg" class="flex gap-3 items-center">

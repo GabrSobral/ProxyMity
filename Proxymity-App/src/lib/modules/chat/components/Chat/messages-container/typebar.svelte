@@ -90,7 +90,7 @@
    });
 </script>
 
-<div class="flex flex-col gap-2 m-1 mt-auto">
+<div class="flex flex-col gap-2 m-1 mt-auto z-[21]">
    {#if $chatState.selectedConversation?.replyMessage}
       <div class="w-full p-2 flex gap-2 bg-black rounded-lg">
          <div class="bg-gray-950 w-full p-2 rounded-md flex flex-col gap-1">

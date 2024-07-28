@@ -26,6 +26,7 @@ export async function externalLoginAsync({
    provider,
    providerKey,
 }: Request): Promise<SignInResponse> {
+   console.log('kqwkamoiwdjqiojeoiqj2oiejqoiwjeoiqjeoiqjwdoqjdoiqjdoiqjdoqiwjdoiqjdoqijwdoqiwjdoqijdqowijd');
    const { data } = await authApi.post<SignInResponse>('/auth/external-provider', {
       email,
       provider,

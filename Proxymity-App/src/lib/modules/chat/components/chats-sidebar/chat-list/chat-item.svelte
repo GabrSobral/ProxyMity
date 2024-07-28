@@ -42,8 +42,7 @@
    $connection?.on('receiveTyping', (typingWs, authorId, conversationId) => {
       if (conversationId === conversation.id) {
          typing = typingWs;
-
-         const author = conversation.participants.find(item => item.id === authorId);
+         // const author = conversation.participants.find(item => item.id === authorId);
       }
    });
 

@@ -21,19 +21,6 @@ const authOptions: SvelteKitAuthConfig = {
       signIn: '/auth/login/sign-in',
       newUser: '/auth/login/sign-up',
    },
-   events: {
-      async signIn(message) {
-         if (message.account?.provider !== 'credentials') {
-            await externalLoginAsync({
-               email: message.profile?.email ?? '',
-               firstName: message.profile?.name?.split(' ')[0] ?? '',
-               lastName: message.profile?.name?.split(' ')[1] ?? '',
-               provider: message.account?.provider === 'github' ? EExternalProvider.GITHUB : EExternalProvider.GOOGLE,
-               providerKey: (message.profile?.node_id as string) ?? '',
-            });
-         }
-      },
-   },
    cookies: {
       pkceCodeVerifier: {
          name: 'authjs.pkce.code_verifier',
@@ -114,6 +101,14 @@ const authOptions: SvelteKitAuthConfig = {
          if (trigger !== 'update' && user) {
             if (account?.provider === 'github') {
                const currentUser = (user as any).user;
+
+               await externalLoginAsync({
+                  email: currentUser?.email?.toLowerCase() ?? '',
+                  firstName: currentUser?.name?.split(' ')[0] ?? '',
+                  lastName: currentUser?.name?.split(' ')[1] ?? '',
+                  provider: account?.provider === 'github' ? EExternalProvider.GITHUB : EExternalProvider.GOOGLE,
+                  providerKey: (currentUser?.id as string) ?? '',
+               });
 
                const userData = await APIGetUserByProviderId({
                   provider: EExternalProvider.GITHUB,
