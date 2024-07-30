@@ -175,6 +175,10 @@
          $connection?.on('receivemessagestatus', receiveMessageStatusHandler);
          $connection?.on('receivependingmessages', receivePendingMessagesHandler);
 
+         $connection?.on('receiveTyping', (isTyping, authorId, conversationId) => {
+            chatDispatch.handleIsConversationTyping({ conversationId, isTyping, authorId });
+         });
+
          logSuccess('Connection events created.');
       }
    });

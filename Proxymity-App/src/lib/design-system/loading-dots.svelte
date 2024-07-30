@@ -9,7 +9,7 @@
    const { color = '#F12646', size = 56 } = $props() as Props;
 </script>
 
-<div class="flex space-x-2 justify-center items-center">
+<div class="flex space-x-[6px] justify-center items-center">
    <span class="sr-only">Loading...</span>
    <div
       style:width={`${size}px`}

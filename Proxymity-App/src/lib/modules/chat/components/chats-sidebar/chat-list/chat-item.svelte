@@ -1,21 +1,20 @@
 <script lang="ts">
    import clsx from 'clsx';
    import { page } from '$app/stores';
+   import colors from 'tailwindcss/colors';
    import { twMerge } from 'tailwind-merge';
    import { Clock, Pin } from 'lucide-svelte';
 
    import { cn } from '$lib/utils';
 
    import * as Avatar from '$lib/design-system/avatar';
+   import LoadingDots from '$lib/design-system/loading-dots.svelte';
 
    import { chatState } from '$lib/modules/chat/contexts/chat-context/stores/chat';
-   import { connection } from '$lib/modules/chat/contexts/websocket-context/stores/connection';
    import { selectConversationAsync } from '$lib/modules/chat/contexts/chat-context/chat-context.svelte';
    import type { ConversationState } from '$lib/modules/chat/contexts/chat-context/stores/chat-store-types';
 
    import { EMessageStatuses } from '../../../../../../enums/EMessageStatuses';
-
-   let typing = $state(false);
 
    type Props = { conversation: ConversationState };
    let { conversation }: Props = $props();
@@ -37,13 +36,6 @@
       if (lastMessageScoped.sentAt !== null) return EMessageStatuses.SENT;
 
       return EMessageStatuses.WROTE;
-   });
-
-   $connection?.on('receiveTyping', (typingWs, authorId, conversationId) => {
-      if (conversationId === conversation.id) {
-         typing = typingWs;
-         // const author = conversation.participants.find(item => item.id === authorId);
-      }
    });
 
    const formatLastMessageDate = Intl.DateTimeFormat('pt-br', { hour: 'numeric', minute: 'numeric' });
@@ -94,12 +86,17 @@
 
       <div
          class={cn('truncate flex justify-between gap-4 text-gray-200 text-sm max-w-[17rem]', {
-            'text-purple-500': typing && !isSelectedContact,
+            'text-purple-500': conversation.typing.length > 0 && !isSelectedContact,
             'text-white': isSelectedContact,
          })}
       >
-         {#if typing}
-            <span class="text-purple-300 dark:text-purple-300 font-semibold">Typing...</span>
+         {#if conversation.typing.length > 0}
+            <div class="flex items-end">
+               <span class="text-purple-300 dark:text-purple-300 font-semibold">Typing</span>
+               <span class="mb-[2px]">
+                  <LoadingDots size={4} color={colors.purple[500]} />
+               </span>
+            </div>
          {:else if lastMessage && !draft}
             <span class="flex gap-4 w-full truncate">
                {lastMessage.content}

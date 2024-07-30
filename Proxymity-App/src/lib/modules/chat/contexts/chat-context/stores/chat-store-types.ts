@@ -11,6 +11,10 @@ export interface ConversationState extends Conversation {
    typeMessage: string;
    replyMessage: ILocalMessage | null;
    hasMessagesFetched: boolean;
+   typing: {
+      authorId: string;
+      isTyping: boolean;
+   }[];
 }
 
 export type ChatState = {
@@ -37,6 +41,7 @@ export type Actions = {
    setIsFetchingConversations(value: boolean): void;
    addMessage(payload: { message: ILocalMessage }): void;
    handleConversationPin(payload: { conversationId: string }): void;
+   handleIsConversationTyping(payload: { conversationId: string; isTyping: boolean; authorId: string }): void;
    setConversationMessages(
       payload:
          | { conversationId: string; messages: IServerMessage[]; fromServer: true; currentUserId: string }

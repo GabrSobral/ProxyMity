@@ -31,6 +31,23 @@ export const chatDispatch: Actions = {
       }));
    },
 
+   handleIsConversationTyping({ conversationId, isTyping, authorId }) {
+      chatState.update(store => ({
+         ...store,
+         conversations: store.conversations.map(conversation => {
+            if (conversation.id === conversationId) {
+               if (isTyping) {
+                  conversation.typing.push({ authorId, isTyping });
+               } else {
+                  conversation.typing = conversation.typing.filter(item => item.authorId !== authorId);
+               }
+            }
+
+            return conversation;
+         }),
+      }));
+   },
+
    setIsFetchingConversations(value) {
       chatState.update(store => ({
          ...store,
@@ -215,6 +232,7 @@ export const chatDispatch: Actions = {
                groupName: conversation.conversation.groupName,
                isGroup: !!conversation.conversation.groupId,
                conversationPinnedAt: conversation.conversation.conversationPinnedAt,
+               typing: [],
                messages: conversation.lastMessages
                   .map(message => ({
                      id: message.id,
