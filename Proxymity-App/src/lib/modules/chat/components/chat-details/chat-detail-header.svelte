@@ -7,6 +7,7 @@
 
    import { chatDispatch, chatState } from '../../contexts/chat-context/stores/chat';
    import CallConfirmationModal from './call-confirmation-modal.svelte';
+   import { callWebSocketEmitter } from '../../contexts/websocket-context/stores/connection';
 
    let isConfirmationCallModalOpened = $state(false);
 

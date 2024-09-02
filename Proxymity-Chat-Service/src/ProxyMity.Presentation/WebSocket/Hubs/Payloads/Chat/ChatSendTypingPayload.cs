@@ -1,4 +1,4 @@
-﻿namespace ProxyMity.Presentation.WebSocket.Hubs.Payloads;
+﻿namespace ProxyMity.Presentation.WebSocket.Hubs.Payloads.Chat;
 
 public record ChatSendTypingPayload(
     bool Typing,

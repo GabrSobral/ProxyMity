@@ -20,7 +20,7 @@ services:
     depends_on:
       - postgres
     networks:
-      - proxymity-network
+      - proxymity-chat-network
 
   postgres:
     container_name: "ProxyMity.Chat.Database"
@@ -39,10 +39,10 @@ services:
     volumes:
       - ../volumes/postgres_data:/var/lib/postgresql/data
     ports:
-      - "5433:5432"
+      - "5431:5432"
     networks:
-      - proxymity-network
+      - proxymity-chat-network
 
 networks:
-  proxymity-network:
+  proxymity-chat-network:
     driver: bridge

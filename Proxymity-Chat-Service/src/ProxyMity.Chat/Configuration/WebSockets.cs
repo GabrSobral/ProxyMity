@@ -2,11 +2,11 @@
 
 public static class WebSockets
 {
-    public const string HubName = "chat";
+    public const string ChatHubName = "chat";
 
     public static WebApplication ConfigureWebSockets(this WebApplication app)
     {
-        app.MapHub<ChatHub>(HubName);
+        app.MapHub<ChatHub>(ChatHubName);
 
         return app;
     }

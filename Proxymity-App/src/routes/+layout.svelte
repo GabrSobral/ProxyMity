@@ -8,6 +8,7 @@
 
    import ChatContext from '$lib/modules/chat/contexts/chat-context/chat-context.svelte';
    import WebsocketContext from '$lib/modules/chat/contexts/websocket-context/websocket-context.svelte';
+   import CallContext from '$lib/modules/chat/contexts/call-context/call-context.svelte';
 
    let { children } = $props();
 </script>
@@ -15,9 +16,11 @@
 <ThemeContext>
    <WebsocketContext>
       <ChatContext>
+         <!-- <CallContext> -->
          <Toaster position="bottom-left" closeButton />
 
          {@render children()}
+         <!-- </CallContext> -->
       </ChatContext>
    </WebsocketContext>
 </ThemeContext>

@@ -1,6 +1,5 @@
 <script lang="ts">
    import { Header } from '$lib/application/header';
-
    import NavigationBar from '$lib/application/navigation-bar/index.svelte';
 </script>
 

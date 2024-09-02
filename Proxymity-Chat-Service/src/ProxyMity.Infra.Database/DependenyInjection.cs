@@ -16,7 +16,7 @@ public static class DependenyInjection
 
         string connectionString = configuration.GetConnectionString("PostgreSql")!;
 
-        services.AddDbContext<DataContext>(options =>
+        services.AddDbContextPool<DataContext>(options =>
             options.UseNpgsql(connectionString));
 
         return services;

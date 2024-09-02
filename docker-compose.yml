@@ -102,6 +102,14 @@ services:
     networks:
       - proxymity-network
 
+  peerjs:
+    container_name: "ProxyMity.Call.Peer"
+    image: peerjs/peerjs-server
+    ports:
+      - "9000:9000"
+    networks:
+      - proxymity-network
+
 networks:
   proxymity-network:
     driver: bridge

@@ -1,8 +1,8 @@
-﻿namespace ProxyMity.Presentation.WebSocket.Hubs.Payloads;
+﻿namespace ProxyMity.Presentation.WebSocket.Hubs.Payloads.Chat;
 
 public record ChatSendReceiveMessagePayload(
     Ulid ConversationId,
     Ulid UserId,
     Ulid MessageId,
-    Boolean IsConversationGroup
+    bool IsConversationGroup
 );

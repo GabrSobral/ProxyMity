@@ -26,4 +26,8 @@
         </AssemblyAttribute>
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Handlers\Calls\Queries\" />
+    </ItemGroup>
+
 </Project>

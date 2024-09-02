@@ -30,4 +30,5 @@ public class Conversation
 
     public IEnumerable<Participant> Participants { get; set; }
     public IEnumerable<Notification> Notifications { get; set; }
+    public IEnumerable<Call> Call { get; set; }
 }

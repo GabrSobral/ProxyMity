@@ -3,7 +3,10 @@
 
    import * as Dialog from '$lib/design-system/dialog';
    import Button from '$lib/design-system/button/button.svelte';
+
    import { chatState } from '../../contexts/chat-context/stores/chat';
+   import { callWebSocketEmitter } from '../../contexts/websocket-context/stores/connection';
+   import { peerState } from '../../contexts/call-context/stores/peer';
 
    type Props = {
       closeDialog: () => void;
@@ -14,7 +17,17 @@
 
    function confirmCall() {
       closeDialog();
-      goto(`/call/${$chatState.selectedConversation?.id}`);
+      setTimeout(() => {
+         if ($chatState.selectedConversation?.id) {
+            $chatState.selectedConversation.participants.forEach(item => {
+               $peerState?.onUserConnected(item.id);
+            });
+
+            $callWebSocketEmitter.callChat({ callId: $chatState.selectedConversation?.id });
+         }
+
+         goto(`/call/${$chatState.selectedConversation?.id}`);
+      }, 3000);
    }
 </script>
 

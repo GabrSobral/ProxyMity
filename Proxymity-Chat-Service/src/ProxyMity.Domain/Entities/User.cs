@@ -26,6 +26,8 @@ public class User
     public IEnumerable<Participant> Participations { get; set; }
     public IEnumerable<Notification> Notifications { get; set; }
 
+    public IEnumerable<CallSession> CallSessions { get; set; }
+
     #endregion
 
     public static User Create(string firstName, string lastName, string email)

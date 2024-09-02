@@ -1,0 +1,9 @@
+GET http://localhost:3000/health HTTP/1.1
+Host: localhost:3000
+Content-type: application/json
+
+### List Users
+
+GET http://localhost:3000/conversations/user/aa1b4d4c-b9f6-4cee-811d-e8a26159459a HTTP/1.1
+Host: localhost:3000
+Content-type: application/json

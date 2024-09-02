@@ -7,7 +7,6 @@
 
 <script lang="ts">
    import { setContext } from 'svelte';
-   import { writable, type Writable } from 'svelte/store';
    import { twMerge } from 'tailwind-merge';
 
    import Label from './Label.svelte';
@@ -15,10 +14,10 @@
    import InputComponent from './Input.svelte';
    import ErrorMessage from './ErrorMessage.svelte';
 
-   export let className = '';
+   let { class: className = '', ...rest } = $props();
 
-   const context = writable<InputContextProps>({
-      inputId: crypto.randomUUID(),
+   let context = $state<InputContextProps>({
+      inputId: crypto.getRandomValues(new Uint32Array(10)).toString(),
       hasError: false,
    });
 
@@ -29,9 +28,10 @@
       ErrorMessage,
    };
 
-   setContext<Writable<InputContextProps>>('@design-system:inputContext', context);
+   setContext<InputContextProps>('@design-system:inputContext', context);
 </script>
 
-<div class={twMerge('flex flex-col gap-2 w-full', className)} {...$$restProps}>
+<!-- svelte-ignore slot_element_deprecated -->
+<div class={twMerge('flex flex-col gap-2 w-full', className)} {...rest}>
    <slot {...components} />
 </div>

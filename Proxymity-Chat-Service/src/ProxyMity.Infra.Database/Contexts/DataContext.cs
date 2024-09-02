@@ -7,9 +7,11 @@ public class DataContext : DbContext
     public DataContext(DbContextOptions<DataContext> options) : base(options) { }
 
     public virtual DbSet<User> Users { get; set; }
+    public virtual DbSet<Call> Calls { get; set; }
     public virtual DbSet<Group> Groups { get; set; }
     public virtual DbSet<Message> Messages { get; set; }
     public virtual DbSet<Friendship> Friendships { get; set; }
+    public virtual DbSet<CallSession> CallSessions { get; set; }
     public virtual DbSet<Participant> Participants { get; set; }
     public virtual DbSet<Conversation> Conversations { get; set; }
     public virtual DbSet<MessageStatus> MessageStatuses { get; set; }
@@ -24,6 +26,9 @@ public class DataContext : DbContext
         
         modelBuilder.Entity<Friendship>()
             .HasKey(x => new { x.TargetId, x.RequesterId });
+
+        modelBuilder.Entity<Call>()
+            .HasIndex(x => new { x.Id, x.State });
     }
 
     /// <summary>

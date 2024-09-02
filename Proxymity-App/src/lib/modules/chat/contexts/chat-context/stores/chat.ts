@@ -43,7 +43,7 @@ export const chatDispatch: Actions = {
                }
             }
 
-            return conversation;
+            return { ...conversation };
          }),
       }));
    },

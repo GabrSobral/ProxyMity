@@ -1,4 +1,4 @@
-﻿namespace ProxyMity.Domain.Entities;
+﻿emailnamespace ProxyMity.Domain.Entities;
 
 /// <summary>
 /// The user entity, this entity represents each user at application.

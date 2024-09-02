@@ -1,7 +1,7 @@
 <script lang="ts" context="module">
    export interface IDropdownContext {
       isPanelOpened: Writable<boolean>;
-      triggerId: `${string}-${string}-${string}-${string}-${string}`;
+      triggerId: string;
    }
 </script>
 
@@ -11,7 +11,7 @@
    import { clickOutside } from '../dialog/click-outside';
 
    let isPanelOpened = writable(false);
-   let triggerId = crypto.randomUUID();
+   let triggerId = crypto.getRandomValues(new Uint32Array(10)).toString();
 
    setContext<IDropdownContext>('dropdown-context', {
       isPanelOpened,

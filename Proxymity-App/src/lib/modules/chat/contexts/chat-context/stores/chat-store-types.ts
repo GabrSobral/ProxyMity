@@ -24,6 +24,12 @@ export type ChatState = {
    showConversationDetail: boolean;
 };
 
+export type CallState = {
+   id: string;
+   conversationId: Conversation['id'];
+   status: 'pending' | 'rejected' | 'accepted';
+};
+
 export type NotificationState = {
    notifications: INotification[];
    lastMessagesHistory: {
