@@ -5,7 +5,7 @@ public sealed class UserProfile
 {
     [Key]
     [ForeignKey("User")]
-    public Ulid UserId { get; set; }
+    public Guid UserId { get; set; }
 
     [MaxLength(255)]
     public required string FirstName { get; set; }

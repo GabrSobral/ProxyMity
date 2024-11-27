@@ -38,7 +38,7 @@ public sealed class ExternalLoginProviderCommandHandler(
 
         if (user is null)
         {
-            var userId = Ulid.NewUlid();
+            var userId = Guid.CreateVersion7();
 
             user = new User
             {

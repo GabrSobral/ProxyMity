@@ -109,6 +109,11 @@ public sealed class ExceptionHandlerMiddleware(RequestDelegate next, ILogger<Exc
                 response.StatusCode = (int)HttpStatusCode.BadRequest;
                 logger.LogError($"[Password reset token do not match] {error.Message}");
                 break;
+            
+            case UserWithoutPasswordException:
+                response.StatusCode = (int)HttpStatusCode.BadRequest;
+                logger.LogError($"[User without password] {error.Message}");
+                break;
 
             default:
                 response.StatusCode = (int)HttpStatusCode.InternalServerError;

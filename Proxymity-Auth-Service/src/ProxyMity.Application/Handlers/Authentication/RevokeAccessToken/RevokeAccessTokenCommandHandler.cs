@@ -14,7 +14,7 @@ public sealed class RevokeAccessTokenCommandHandler(
         var decryptedToken = _jsonWebToken.DecryptToken<RevokeTokenClient>(command.RefreshToken)
             ?? throw new RefreshTokenDecryptException();
 
-        var userIdFromToken = Ulid.Parse(decryptedToken.userIdentifier);
+        var userIdFromToken = Guid.Parse(decryptedToken.userIdentifier);
 
         var refreshToken = await dbContext.RefreshTokens
             .FirstOrDefaultAsync(x => x.UserId == userIdFromToken, cancellationToken)

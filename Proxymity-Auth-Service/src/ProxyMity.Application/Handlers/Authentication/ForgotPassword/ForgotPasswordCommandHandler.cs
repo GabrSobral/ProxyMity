@@ -20,7 +20,7 @@ public sealed class ForgotPasswordCommandHandler(
         var user = await dbContext.Users.FirstOrDefaultAsync(x => x.Id == passwordResetToken.UserId, cancellationToken)
             ?? throw new UserNotFoundException(passwordResetToken.UserId);
 
-        user.PasswordHash = passwordEncrypter.Encrypt<Ulid>(command.NewPassword, user.Id);
+        user.PasswordHash = passwordEncrypter.Encrypt<Guid>(command.NewPassword, user.Id);
 
         await dbContext.RefreshTokens
             .Where(x => x.UserId == user.Id)

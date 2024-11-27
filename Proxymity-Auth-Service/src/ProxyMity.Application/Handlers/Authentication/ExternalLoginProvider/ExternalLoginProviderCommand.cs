@@ -9,7 +9,7 @@ public record ExternalLoginProviderCommand(
 ): ICommand<ExternalLoginProviderResponse>;
 
 public record ExternalLoginProviderResponse(
-    Ulid Id,
+    Guid Id,
     string FirstName,
     string? LastName,
     string Email,

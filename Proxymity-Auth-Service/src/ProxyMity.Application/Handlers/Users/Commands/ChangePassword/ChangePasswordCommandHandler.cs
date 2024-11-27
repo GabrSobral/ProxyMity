@@ -10,6 +10,9 @@ public sealed class ChangePasswordCommandHandler(
     {
         var user = await dbContext.Users.FirstOrDefaultAsync(x => x.Id == command.UserId, cancellationToken)
             ?? throw new UserNotFoundException(command.UserId);
+        
+        if(user.PasswordHash == null)
+            throw new UserWithoutPasswordException(user.Id);
 
         var isCurrentPasswordMatch = passwordEncrypter.Compare(user.PasswordHash, command.CurrentPassword, user.Id);
 

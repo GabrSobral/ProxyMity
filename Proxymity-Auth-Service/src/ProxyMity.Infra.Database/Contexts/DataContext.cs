@@ -42,8 +42,8 @@ public class DataContext : DbContext
     /// <param name="configurationBuilder"></param>
     protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
     {
-        configurationBuilder
-            .Properties<Ulid>()
-            .HaveConversion<UlidToStringConverter>();
+        // configurationBuilder
+        //     .Properties<Ulid>()
+        //     .HaveConversion<UlidToStringConverter>();
     }
 }

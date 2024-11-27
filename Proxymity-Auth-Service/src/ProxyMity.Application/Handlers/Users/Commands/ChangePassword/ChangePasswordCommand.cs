@@ -1,7 +1,7 @@
 ﻿namespace ProxyMity.Application.Handlers.Users.Commands.ChangePassword;
 
 public record ChangePasswordCommand(
-    Ulid UserId,
+    Guid UserId,
     string CurrentPassword,
     string NewPassword
 ): ICommand;

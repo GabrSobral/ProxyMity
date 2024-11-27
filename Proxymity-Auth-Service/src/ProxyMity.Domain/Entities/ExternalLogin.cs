@@ -11,7 +11,7 @@ public class ExternalLogin
     public Guid Id { get; set; }
 
     [Required]
-    public Ulid UserId { get; set; }
+    public Guid UserId { get; set; }
 
     [Required]
     public EAuthProviders Provider { get; set; } // e.g., "GitHub", "Google"

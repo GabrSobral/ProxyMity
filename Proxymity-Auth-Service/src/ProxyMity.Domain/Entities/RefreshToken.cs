@@ -8,8 +8,8 @@
 public class RefreshToken
 {
     [Key]
-    public required Ulid Id { get; set; }
-    public required Ulid UserId { get; set; }
+    public required Guid Id { get; set; }
+    public required Guid UserId { get; set; }
     public required ushort AvailableRefreshes { get; set; }
     public required DateTime ExpiryDate { get; set; }
     public required DateTime CreatedAt { get; set; }
@@ -21,11 +21,11 @@ public class RefreshToken
 
     #endregion
 
-    public static RefreshToken Create(ushort availableRefreshes, Ulid userId, DateTime expiryDate)
+    public static RefreshToken Create(ushort availableRefreshes, Guid userId, DateTime expiryDate)
     {
         return new RefreshToken
         {
-            Id = Ulid.NewUlid(),
+            Id = Guid.CreateVersion7(),
             UserId = userId,
             AvailableRefreshes = availableRefreshes,
             ExpiryDate = expiryDate,

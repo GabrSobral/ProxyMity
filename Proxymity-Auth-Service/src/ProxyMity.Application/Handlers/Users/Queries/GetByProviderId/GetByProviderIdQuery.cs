@@ -5,7 +5,7 @@ public record GetByProviderIdQuery(
     string ProviderKey): IQuery<GetByProviderIdResponse>;
 
 public record GetByProviderIdResponse(
-    Ulid Id,
+    Guid Id,
     string FirstName,
     string? LastName,
     string Email,

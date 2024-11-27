@@ -4,10 +4,10 @@
 public class EmailConfirmation
 {
     [Key]
-    public Ulid Id { get; set; }
+    public Guid Id { get; set; }
 
     [Required]
-    public required Ulid UserId { get; set; }
+    public required Guid UserId { get; set; }
 
     [Required]
     [MaxLength(255)]
@@ -21,13 +21,13 @@ public class EmailConfirmation
     [ForeignKey("UserId")]
     public User User { get; set; }
 
-    public static EmailConfirmation Create(Ulid userId)
+    public static EmailConfirmation Create(Guid userId)
     {
         var currentDate = DateTime.UtcNow;
 
         return new EmailConfirmation()
         {
-            Id = Ulid.NewUlid(),
+            Id = Guid.CreateVersion7(),
             CreatedAt = currentDate,
             ExpiresAt = currentDate.AddMinutes(30),
             Token = Guid.NewGuid(),

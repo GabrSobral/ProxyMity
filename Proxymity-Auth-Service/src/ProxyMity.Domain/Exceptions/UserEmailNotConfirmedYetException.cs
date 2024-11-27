@@ -2,5 +2,5 @@
 
 public class UserEmailNotConfirmedYetException : Exception
 {
-    public UserEmailNotConfirmedYetException(Ulid userId) : base($"The user e-mail was not confirmed yet: {userId}") { }
+    public UserEmailNotConfirmedYetException(Guid userId) : base($"The user e-mail was not confirmed yet: {userId}") { }
 }

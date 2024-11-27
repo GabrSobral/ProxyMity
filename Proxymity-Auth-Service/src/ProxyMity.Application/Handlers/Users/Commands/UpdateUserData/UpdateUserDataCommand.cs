@@ -1,7 +1,7 @@
 ﻿namespace ProxyMity.Application.Handlers.Users.Commands.UpdateUserData;
 
 public record UpdateUserDataCommand(
-    Ulid UserId,
+    Guid UserId,
     
     string? FirstName,
     string? LastName

@@ -2,7 +2,7 @@
 
 [EntityName("user-created")]
 public record UserCreatedEvent(
-    Ulid Id,
+    Guid Id,
     string FirstName,
     string? LastName,
     string Email,

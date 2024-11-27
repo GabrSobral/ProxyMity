@@ -1,7 +1,7 @@
 ﻿namespace ProxyMity.Domain.Interfaces.Authentication;
 
 public record JsonWebTokenPayload(
-    Ulid UserId,
+    Guid UserId,
     string Email,
     string FirstName,
     string? LastName

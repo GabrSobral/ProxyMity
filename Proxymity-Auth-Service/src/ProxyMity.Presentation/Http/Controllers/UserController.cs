@@ -1,7 +1,7 @@
 ﻿using ProxyMity.Application.Handlers.Users.Queries.GetByProviderId;
 using ProxyMity.Domain.Entities;
 
-namespace ProxyMity.Presentation;
+namespace ProxyMity.Presentation.Http.Controllers;
 
 [Authorize]
 [ApiController]
@@ -9,11 +9,11 @@ namespace ProxyMity.Presentation;
 public class UserController(ISender sender, IHttpContextAccessor httpContextAccessor) : ControllerBase
 {
     /// <summary>
-    /// Search an user by Id.
+    /// Search a user by ID.
     /// </summary>
     /// <param name="userId">User Id</param>
     /// <response code="200">Returns the user searched</response>
-    /// <response code="400">If the "Id" is null</response>
+    /// <response code="400">If the "ID" is null</response>
     /// <response code="404">If the user was not found</response>
     /// <response code="500">Internal server error</response>
     [HttpGet("get-by-id/{userId}", Name = nameof(GetUserById))]
@@ -21,7 +21,7 @@ public class UserController(ISender sender, IHttpContextAccessor httpContextAcce
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> GetUserById([FromRoute] Ulid userId)
+    public async Task<IActionResult> GetUserById([FromRoute] Guid userId)
     {
         var query = new GetByIdQuery(userId);
         var response = await sender.Send(query);
@@ -33,7 +33,7 @@ public class UserController(ISender sender, IHttpContextAccessor httpContextAcce
     }
 
     /// <summary>
-    /// Search an user by provider user ID.
+    /// Search a user by provider user ID.
     /// </summary>
     /// <param name="provider">Provider Enum</param>
     /// <param name="providerKey">Provider key from user</param>
@@ -59,7 +59,7 @@ public class UserController(ISender sender, IHttpContextAccessor httpContextAcce
     }
 
     /// <summary>
-    /// Search an user by e-mail.
+    /// Search a user by e-mail.
     /// </summary>
     /// <param name="email">User email</param>
     /// <response code="200">Returns the user searched</response>
@@ -83,7 +83,7 @@ public class UserController(ISender sender, IHttpContextAccessor httpContextAcce
     }
 
     /// <summary>
-    /// Update an user by Id.
+    /// Update a user by Id.
     /// </summary>
     /// <param name="userId">User Id</param>
     /// <param name="request">Request body</param>
@@ -97,7 +97,7 @@ public class UserController(ISender sender, IHttpContextAccessor httpContextAcce
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> UpdateUserData(
-        [FromRoute] Ulid userId, 
+        [FromRoute] Guid userId, 
         [FromBody] UpdateUserDataRequest request)
     {
         var command = new UpdateUserDataCommand(

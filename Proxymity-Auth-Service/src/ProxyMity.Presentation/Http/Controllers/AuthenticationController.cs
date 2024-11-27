@@ -1,6 +1,6 @@
 ﻿using ProxyMity.Application.Handlers.Authentication.ExternalLoginProvider;
 
-namespace ProxyMity.Presentation;
+namespace ProxyMity.Presentation.Http.Controllers;
 
 [ApiController]
 [Route("auth")]

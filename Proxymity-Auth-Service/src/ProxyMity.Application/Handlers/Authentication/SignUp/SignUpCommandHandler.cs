@@ -17,7 +17,7 @@ public sealed class SignUpCommandHandler(
 {
     public async Task<SignInResponse> Handle(SignUpCommand command, CancellationToken cancellationToken)
     {
-        var userId = Ulid.NewUlid();
+        var userId = Guid.CreateVersion7();
 
         User newUser = new()
         {

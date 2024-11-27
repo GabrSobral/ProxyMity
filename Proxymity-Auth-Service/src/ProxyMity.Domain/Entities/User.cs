@@ -1,4 +1,4 @@
-﻿emailnamespace ProxyMity.Domain.Entities;
+﻿namespace ProxyMity.Domain.Entities;
 
 /// <summary>
 /// The user entity, this entity represents each user at application.
@@ -7,7 +7,7 @@
 public class User
 {
     [Key]
-    public required Ulid Id { get; set; }
+    public required Guid Id { get; set; }
 
     [Required]
     [MaxLength(255)]
@@ -40,7 +40,7 @@ public class User
     {
         return new User
         {
-            Id = Ulid.NewUlid(),
+            Id = Guid.CreateVersion7(),
             Email = email,
             PasswordHash = passwordHash,
             CreatedAt = DateTime.UtcNow,
