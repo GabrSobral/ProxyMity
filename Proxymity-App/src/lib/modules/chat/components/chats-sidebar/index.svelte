@@ -11,6 +11,7 @@
    import { chatState } from '../../contexts/chat-context/stores/chat';
    import { twMerge } from 'tailwind-merge';
    import clsx from 'clsx';
+   import Text from '$lib/design-system/text.svelte';
 
    let isNewContactModalOpened = $state(false);
    let allNotificationsCount = $derived(
@@ -36,7 +37,9 @@
 >
    <div class="flex gap-4 justify-between px-1 transition-all">
       {#if !isCollapsed}
-         <Heading size="lg" class="flex gap-3 items-center">
+         <Heading size="lg" class="flex gap-3 items-center pt-2">
+            <div class="w-2 rounded-[1pxd] h-[1.75rem] bg-purple-600"></div>
+
             Messages
 
             {#if allNotificationsCount > 0}
@@ -94,5 +97,13 @@
 
    <CreateConversationModal closeModal={closeSettingsModal} isOpened={isNewContactModalOpened} />
 
-   <ChatList />
+   {#if $chatState.conversations.length === 0 && !isCollapsed}
+      <div class="flex flex-col items-center justify-center">
+         <img src="no-messages.svg" alt="No chat was selected." width="200" height="200" />
+
+         <Text size="md" class="text-center">No chats found. <br /> Start a conversation with someone!</Text>
+      </div>
+   {:else}
+      <ChatList />
+   {/if}
 </aside>

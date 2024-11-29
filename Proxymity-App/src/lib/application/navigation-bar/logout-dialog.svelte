@@ -36,8 +36,8 @@
                <LoadingSpinning size={24} lineSize={2} color="white" />
             {:else}
                Sign out
-            {/if}</Button
-         >
+            {/if}
+         </Button>
       </div>
    </Dialog.Panel>
 </Dialog.Root>

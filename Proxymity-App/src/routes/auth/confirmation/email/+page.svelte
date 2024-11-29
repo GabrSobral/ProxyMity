@@ -3,7 +3,7 @@
 </script>
 
 <svelte:head>
-   <title>ProxyMity - Email Confirmation</title>
+   <title>Email Confirmation - ProxyMity</title>
 </svelte:head>
 
 <EmailConfirmationPage />

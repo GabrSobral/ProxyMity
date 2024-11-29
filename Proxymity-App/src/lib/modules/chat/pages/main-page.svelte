@@ -6,10 +6,6 @@
    import { chatState } from '../contexts/chat-context/stores/chat';
 </script>
 
-<svelte:head>
-   <title>ProxyMity - Chat</title>
-</svelte:head>
-
 <main class="flex flex-1 h-full overflow-hidden w-full bg-[url('/chat-background.svg')] bg-cover bg-no-repeat">
    <ChatsSidebar />
 

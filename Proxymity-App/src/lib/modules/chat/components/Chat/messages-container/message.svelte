@@ -3,9 +3,8 @@
    import { onMount } from 'svelte';
    import { page } from '$app/stores';
    import { fly } from 'svelte/transition';
-   import { Clock, Info, Share } from 'lucide-svelte';
+   import { Clock, InfoIcon, Share } from 'lucide-svelte';
 
-   import Text from '$lib/design-system/text.svelte';
    import * as Avatar from '$lib/design-system/avatar';
 
    import { chatWorker } from '$lib/modules/chat/workers/db-worker/initializer';
@@ -22,9 +21,10 @@
       message: ILocalMessage;
       previousMessage: ILocalMessage;
       messageIndex: number;
+      selectMessage: () => void;
    };
 
-   let { message, messageIndex, previousMessage }: Props = $props();
+   let { message, messageIndex, previousMessage, selectMessage }: Props = $props();
 
    let messageRef: HTMLLIElement;
 
@@ -119,9 +119,9 @@
          chatDispatch.updateUsersFromMessageStatus({ message, users: [] });
       }
 
-      setTimeout(() => {
-         showMessageStatus = false;
-      }, 5000);
+      // setTimeout(() => {
+      //    showMessageStatus = false;
+      // }, 5000);
    }
 
    function scrollToRepliedMessage() {
@@ -147,6 +147,7 @@
    data-highlight={isHighlighting}
    class="flex flex-col gap-1 rounded-[1rem] w-full data-[highlight=true]:animate-pulse data-[highlight=true]:bg-gray-800 data-[highlight=true]:p-3 transition-all"
    bind:this={messageRef}
+   oncontextmenu={() => selectMessage()}
    onfocus={() => {
       isMessageConfigVisible = true;
    }}
@@ -234,41 +235,19 @@
          >
             <Share size={12} color="white" />
          </button>
-
-         <button
-            type="button"
-            transition:fly={{ duration: 300, x: isMine ? 30 : -30, opacity: 0 }}
-            onclick={handleWithUpdateOfMessageStatus}
-            class="p-2 bg-gray-700 shadow-lg z-10 rounded-full active:scale-95 transition-all hover:brightness-90"
-         >
-            <Info size={12} color="white" />
-         </button>
       {/if}
 
       {#if showMessageStatus}
          <div
-            class={clsx('flex flex-col gap-3 p-2 bg-gray-800 rounded-md absolute', {
+            class={clsx('flex flex-col gap-1 p-2 bg-gray-800 rounded-md absolute z-50 shadow-lg', {
                'left-0': isMine,
                'right-0': !isMine,
             })}
          >
-            <Text size="md">
-               Sent: {message.sentAt && formatter.format(new Date(message.sentAt))}
-            </Text>
-
-            {#each message.read.users as status ((status.userId, status.at))}
-               <Text size="md">
-                  Read: {status.userId.substring(0, 5)}
-                  {status.at ? formatter.format(new Date(status.at)) : 'Nothing'}
-               </Text>
-            {/each}
-
-            {#each message.received.users as status (status.userId)}
-               <Text size="md">
-                  Received: {status.userId.substring(0, 5)}
-                  {status.at ? formatter.format(new Date(status.at)) : 'Nothing'}
-               </Text>
-            {/each}
+            <button type="button" class="text-white flex gap-4 items-center px-4 py-2 hover:brightness-150 transition-all">
+               <InfoIcon size={16} class="text-white" />
+               Detalhes
+            </button>
          </div>
       {/if}
    </div>

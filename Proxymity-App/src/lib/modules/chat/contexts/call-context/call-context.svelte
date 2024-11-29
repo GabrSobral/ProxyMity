@@ -58,8 +58,6 @@
 
          $connection?.on('receiveusercalldisconnected', userId => $peerState?.onUserDisconnected(userId));
          $connection?.on('receivechatcall', (chatId, userId) => {
-            console.log({ chatId, userId });
-
             if (chatId && userId) {
                callState = { chatId, userId };
 

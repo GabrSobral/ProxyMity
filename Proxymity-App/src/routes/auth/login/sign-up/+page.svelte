@@ -3,7 +3,7 @@
 </script>
 
 <svelte:head>
-   <title>ProxyMity - Sign Up</title>
+   <title>Sign Up - ProxyMity</title>
 </svelte:head>
 
 <SignUpPage />

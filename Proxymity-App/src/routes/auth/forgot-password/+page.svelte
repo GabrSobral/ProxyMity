@@ -3,7 +3,7 @@
 </script>
 
 <svelte:head>
-   <title>ProxyMity - Forgot Password</title>
+   <title>Forgot Password - ProxyMity</title>
 </svelte:head>
 
 <ForgotPasswordPage />

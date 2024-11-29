@@ -3,7 +3,7 @@
 </script>
 
 <svelte:head>
-   <title>ProxyMity - Reset Password</title>
+   <title>Reset Password - ProxyMity</title>
 </svelte:head>
 
 <ResetPasswordPage />

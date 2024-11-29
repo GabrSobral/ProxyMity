@@ -11,7 +11,7 @@
    import { clickOutside } from '../dialog/click-outside';
 
    let isPanelOpened = writable(false);
-   let triggerId = crypto.getRandomValues(new Uint32Array(10)).toString();
+   let triggerId = crypto.randomUUID();
 
    setContext<IDropdownContext>('dropdown-context', {
       isPanelOpened,

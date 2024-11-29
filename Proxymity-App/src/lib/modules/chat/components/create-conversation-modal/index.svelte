@@ -32,7 +32,7 @@
 <Dialog.Root {isOpened} closeDialog={closeModal}>
    <Dialog.Panel
       class={twMerge(
-         clsx('min-w-[40rem] overflow-auto flex flex-col h-[90%] w-fit transition-all duration-500', {
+         clsx('min-w-[40rem] overflow-auto flex flex-col h-[90%] w-fit max-w-[95%] transition-all duration-500', {
             'max-w-[70rem]': selectedPanel === 'Group',
          })
       )}
@@ -52,7 +52,7 @@
                {@const isActive = item === selectedPanel}
 
                <button
-                  on:click={() => selectPanel(item)}
+                  onclick={() => selectPanel(item)}
                   class={cn(!isActive && 'hover:underline', 'text-white px-2 py-2 relative justify-start hover:bg-transparent')}
                   data-sveltekit-noscroll
                >
