@@ -32,7 +32,10 @@ jobs:
           chmod 600 private_key
 
       - name: Enter on VPS
-        run: scp -i private_key -r * $SSH_USER@$SSH_HOST:/home/ubuntu/ProxyMity
+        run: |
+          echo $SSH_HOST
+          echo $SSH_USER
+          scp -i private_key -r * $SSH_USER@$SSH_HOST:/home/ubuntu/ProxyMity
 
       - name: Build Docker Compose on VPS
         run: ssh -i private_key $SSH_USER@$SSH_HOST "cd /home/ubuntu/ProxyMity && docker-compose up --build -d"
