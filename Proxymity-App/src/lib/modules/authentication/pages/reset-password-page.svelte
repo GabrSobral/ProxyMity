@@ -3,10 +3,10 @@
    import { browser } from '$app/environment';
    import { Eye, EyeOff, Lock, LogIn } from 'lucide-svelte';
 
-   import Text from '$lib/design-system/text.svelte';
-   import Button from '$lib/design-system/button/button.svelte';
-   import InputGroup from '$lib/design-system/Input/InputGroup.svelte';
-   import LoadingSpinning from '$lib/design-system/loading-spinning.svelte';
+   import Text from '$lib/components/ui/text.svelte';
+   import Button from '$lib/components/ui/button/button.svelte';
+   import InputGroup from '$lib/components/ui/Input/InputGroup.svelte';
+   import LoadingSpinning from '$lib/components/ui/loading-spinning.svelte';
 
    import WarningAlert from '../components/warning-alert.svelte';
    import StrongPasswordModal from '../components/strong-password-modal.svelte';

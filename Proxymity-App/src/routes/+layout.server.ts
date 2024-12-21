@@ -1,9 +1,12 @@
-import type { LayoutServerLoad } from './$types';
+/**
+ * Middleware to check if the user is already logged in.
+ * @param event Middleware event
+ * @returns
+ */
+export async function load(event) {
+	const session = await event.locals.auth();
 
-export const load: LayoutServerLoad = async event => {
-   const session = await event.locals.auth();
-
-   return {
-      session,
-   };
-};
+	return {
+		session
+	};
+}

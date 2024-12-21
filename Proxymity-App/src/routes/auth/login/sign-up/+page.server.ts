@@ -6,13 +6,13 @@ import { redirect } from '@sveltejs/kit';
  * @returns
  */
 export async function load(event) {
-   const session = await event.locals.auth();
+	const session = await event.locals.auth();
 
-   if (session) {
-      redirect(303, '/chat');
-   }
+	if (session) {
+		redirect(303, '/');
+	}
 
-   return {
-      session,
-   };
+	return {
+		session
+	};
 }

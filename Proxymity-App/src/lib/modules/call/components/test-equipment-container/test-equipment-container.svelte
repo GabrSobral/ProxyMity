@@ -1,9 +1,9 @@
 <script lang="ts">
    import { ArrowLeft } from 'lucide-svelte';
 
-   import Heading from '$lib/design-system/heading.svelte';
-   import DropdownRoot from '$lib/design-system/dropdown-menu/dropdown-root.svelte';
-   import DropdownTrigger from '$lib/design-system/dropdown-menu/dropdown-trigger.svelte';
+   import Heading from '$lib/components/ui/heading.svelte';
+   import DropdownRoot from '$lib/components/ui/dropdown-menu/dropdown-root.svelte';
+   import DropdownTrigger from '$lib/components/ui/dropdown-menu/dropdown-trigger.svelte';
    import MicrophoneTestAudio from './microphone-test-audio.svelte';
 </script>
 

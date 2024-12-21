@@ -1,5 +1,5 @@
 <script lang="ts">
-   import * as Dialog from '$lib/design-system/dialog';
+   import * as Dialog from '$lib/components/ui/dialog';
    import type { ILocalMessage } from '../../../../../../types/message';
 
    type $$Props = {
@@ -11,9 +11,9 @@
    let { isOpened, closeDialog }: $$Props = $props();
 </script>
 
-<Dialog.Root {isOpened} {closeDialog}>
-   <Dialog.Panel>
+<Dialog.Root controlledOpen={isOpened}>
+   <Dialog.Content>
       <Dialog.Title>Message Status</Dialog.Title>
       <Dialog.Description>Your message was sent successfully.</Dialog.Description>
-   </Dialog.Panel>
+   </Dialog.Content>
 </Dialog.Root>

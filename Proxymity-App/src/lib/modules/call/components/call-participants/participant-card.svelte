@@ -1,6 +1,6 @@
 <script lang="ts">
    import { clsx } from 'clsx';
-   import Text from '$lib/design-system/text.svelte';
+   import Text from '$lib/components/ui/text.svelte';
    import { CameraOff, MicOff, Mic } from 'lucide-svelte';
 
    import type { ConversationState } from '$lib/modules/chat/contexts/chat-context/stores/chat-store-types';

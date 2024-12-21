@@ -7,8 +7,4 @@
     <LangVersion>13</LangVersion>
   </PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Ulid" Version="1.3.3" />
-  </ItemGroup>
-
 </Project>

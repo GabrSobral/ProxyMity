@@ -2,7 +2,7 @@
    import { Menu } from 'lucide-svelte';
    import MessagesContainer from '../../../chat/components/chat/messages-container/index.svelte';
 
-   import Text from '$lib/design-system/text.svelte';
+   import Text from '$lib/components/ui/text.svelte';
 </script>
 
 <aside

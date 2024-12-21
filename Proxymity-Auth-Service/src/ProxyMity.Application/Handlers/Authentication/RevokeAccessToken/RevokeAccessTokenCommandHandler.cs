@@ -57,7 +57,7 @@ public sealed class RevokeAccessTokenCommandHandler(
 
         await dbContext.SaveChangesAsync(cancellationToken);
 
-        logger.LogInformation($"A new acces token was generated to {user.Id} user");
+        logger.LogInformation($"A new access token was generated to {user.Id} user");
 
         return new RevokeAccessTokenResponse(newToken);
     }

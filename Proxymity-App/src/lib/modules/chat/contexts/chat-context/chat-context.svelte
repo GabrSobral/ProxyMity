@@ -1,187 +1,206 @@
-<script lang="ts" context="module">
-   let accessToken: string;
-   let chatStateMod: ChatState;
-   let chatWorkerMod: Worker | null;
-   let connectionMod: HubConnection | null;
+<script lang="ts" module>
+	let accessToken: string;
+	let chatStateMod: ChatState;
+	let chatWorkerMod: Worker | null;
+	let connectionMod: HubConnection | null;
 
-   let typebarRefMod: HTMLInputElement | null;
-   let messagesContainerRefMod: HTMLUListElement | null;
+	let typebarRefMod: HTMLInputElement | null;
+	let messagesContainerRefMod: HTMLUListElement | null;
 
-   let userMod: Session['user'] | undefined;
-   let webSocketEmitterMod: WebSocketEmitter;
+	let userMod: Session['user'] | undefined;
+	let webSocketEmitterMod: WebSocketEmitter;
 
-   webSocketEmitter.subscribe(value => {
-      webSocketEmitterMod = value;
-   });
+	webSocketEmitter.subscribe((value) => (webSocketEmitterMod = value));
+	chatState.subscribe((value) => (chatStateMod = value));
+	connection.subscribe((value) => (connectionMod = value));
+	chatWorker.subscribe((value) => (chatWorkerMod = value));
+	messagesContainer.subscribe((value) => (messagesContainerRefMod = value));
 
-   chatState.subscribe(value => {
-      chatStateMod = value;
-   });
+	if (browser) {
+		page.subscribe((value) => {
+			accessToken = value.data?.session?.accessToken as string;
+			userMod = value.data?.session?.user as Session['user'] | undefined;
+		});
 
-   connection.subscribe(value => {
-      connectionMod = value;
-   });
+		typebarRef.subscribe((value) => (typebarRefMod = value));
+	}
 
-   chatWorker.subscribe(value => {
-      chatWorkerMod = value;
-   });
+	export async function selectConversationAsync(conversation: ConversationState) {
+		if (
+			conversation === chatStateMod.conversations[chatStateMod.selectedConversationIndex] ||
+			!userMod
+		)
+			return;
 
-   messagesContainer.subscribe(value => {
-      messagesContainerRefMod = value;
-   });
+		const { id: conversationId, isGroup: isConversationGroup } = conversation;
 
-   if (browser) {
-      page.subscribe(value => {
-         accessToken = value.data?.session?.accessToken as string;
-         userMod = value.data?.session?.user as Session['user'] | undefined;
-      });
+		if (conversation.notifications > 0 && connectionMod)
+			webSocketEmitterMod.sendReadMessage({
+				userId: userMod.id,
+				conversationId,
+				isConversationGroup
+			});
 
-      typebarRef.subscribe(value => {
-         typebarRefMod = value;
-      });
-   }
+		const unreadMessagesCount = conversation.notifications;
 
-   export async function selectConversationAsync(conversation: ConversationState) {
-      if (conversation === chatStateMod.selectedConversation || !userMod) return;
+		chatDispatch.selectConversation({
+			conversation,
+			typeMessage: typebarRefMod?.value || '',
+			currentUserId: userMod.id
+		});
 
-      const { id: conversationId, isGroup: isConversationGroup } = conversation;
+		document.title = `ProxyMity - Chat | ${conversation.groupName || conversation.participants[0].firstName}`;
 
-      if (conversation.notifications > 0 && connectionMod)
-         webSocketEmitterMod.sendReadMessage({ userId: userMod.id, conversationId, isConversationGroup });
+		if (typebarRefMod) {
+			typebarRefMod.value = conversation.typeMessage;
+		}
 
-      const unreadMessagesCount = conversation.notifications;
+		// Post a message to chat worker to change the pending message status to READ.
+		chatWorkerMod?.postMessage({
+			type: WorkerMethods.READ_CONVERSATION_MESSAGES,
+			payload: { conversationId, whoRead: userMod.id, myId: userMod.id, isConversationGroup }
+		});
 
-      chatDispatch.selectConversation({ conversation, typeMessage: typebarRefMod?.value || '', currentUserId: userMod.id });
+		if (!conversation.hasMessagesFetched) {
+			try {
+				// Get messages from API and set to state
+				const { messages } = await APIGetConversationMessages({ conversationId }, { accessToken });
 
-      document.title = `ProxyMity - Chat | ${conversation.groupName || conversation.participants[0].firstName}`;
+				logSuccess(`Messages was successfully loaded from "${conversationId}" conversation`);
+				chatDispatch.setConversationMessages({
+					conversationId,
+					messages,
+					fromServer: true,
+					currentUserId: userMod.id
+				});
+			} catch (error) {
+				logError('Error fetching conversations, data will be taken from the cache', error);
 
-      if (typebarRefMod) {
-         typebarRefMod.value = conversation.typeMessage;
-      }
+				// Get messages from cache and set to state
+				const messages = await getConversationsMessagesAsyncDB(conversationId);
+				chatDispatch.setConversationMessages({
+					conversationId,
+					messages,
+					fromServer: false,
+					currentUserId: userMod.id
+				});
+			}
+		}
 
-      // Post a message to chat worker to change the pending message status to READ.
-      chatWorkerMod?.postMessage({
-         type: WorkerMethods.READ_CONVERSATION_MESSAGES,
-         payload: { conversationId, whoRead: userMod.id, myId: userMod.id, isConversationGroup },
-      });
-
-      if (!conversation.hasMessagesFetched) {
-         try {
-            // Get messages from API and set to state
-            const { messages } = await APIGetConversationMessages({ conversationId }, { accessToken });
-
-            logSuccess(`Messages was successfully loaded from "${conversationId}" conversation`);
-            chatDispatch.setConversationMessages({ conversationId, messages, fromServer: true, currentUserId: userMod.id });
-         } catch (error) {
-            logError('Error fetching conversations, data will be taken from the cache', error);
-
-            // Get messages from cache and set to state
-            const messages = await getConversationsMessagesAsyncDB(conversationId);
-            chatDispatch.setConversationMessages({ conversationId, messages, fromServer: false, currentUserId: userMod.id });
-         }
-      }
-
-      notificationsDispatch.updateLastMessagesHistory({ ...conversation, notifications: unreadMessagesCount }, userMod?.id);
-   }
+		notificationsDispatch.updateLastMessagesHistory(
+			{ ...conversation, notifications: unreadMessagesCount },
+			userMod?.id
+		);
+	}
 </script>
 
 <script lang="ts">
-   import { onMount } from 'svelte';
-   import { page } from '$app/stores';
-   import { browser } from '$app/environment';
-   import type { Session } from '@auth/sveltekit';
-   import type { HubConnection } from '@microsoft/signalr';
+	import { onMount } from 'svelte';
+	import { page } from '$app/stores';
+	import { browser } from '$app/environment';
+	import type { Session } from '@auth/sveltekit';
+	import type { HubConnection } from '@microsoft/signalr';
 
-   import { typebarRef, chatState, chatDispatch, messagesContainer } from './stores/chat';
-   import type { ConversationState, ChatState } from './stores/chat-store-types';
+	import { typebarRef, chatState, chatDispatch, messagesContainer } from './stores/chat';
+	import type { ConversationState, ChatState } from './stores/chat-store-types';
 
-   import { APIGetUserConversations } from '../../../../../services/api/get-user-conversations';
-   import { APIGetConversationMessages } from '../../../../../services/api/get-conversation-messages';
+	import { APIGetUserConversations } from '../../../../../services/api/get-user-conversations';
+	import { APIGetConversationMessages } from '../../../../../services/api/get-conversation-messages';
 
-   import { getConversationCacheAsyncDB } from '../../../../../services/database/use-cases/get-conversations-state';
-   import { getConversationsMessagesAsyncDB } from '../../../../../services/database/use-cases/get-conversations-messages';
+	import { getConversationCacheAsyncDB } from '../../../../../services/database/use-cases/get-conversations-state';
+	import { getConversationsMessagesAsyncDB } from '../../../../../services/database/use-cases/get-conversations-messages';
 
-   import { chatWorker } from '../../workers/db-worker/initializer';
-   import { WorkerMethods } from '../../workers/db-worker/method-types';
+	import { chatWorker } from '../../workers/db-worker/initializer';
+	import { WorkerMethods } from '../../workers/db-worker/method-types';
 
-   import { showMessageSonner } from '../../../../../contexts/error-context/store';
-   import type { WebSocketEmitter } from '../websocket-context/webSocket-emitter';
-   import { connection, webSocketEmitter } from '../websocket-context/stores/connection';
+	import { showMessageSonner } from '../../../../../contexts/error-context/store';
+	import type { WebSocketEmitter } from '../websocket-context/webSocket-emitter';
+	import { connection, webSocketEmitter } from '../websocket-context/stores/connection';
 
-   import { receiveMessageHandler } from './events/receiveMessageHandler';
-   import { receiveReadMessageHandler } from './events/receiveReadMessageHandler';
-   import { receiveMessageStatusHandler } from './events/receiveMessageStatusHandler';
-   import { receivePendingMessagesHandler } from './events/receivePendingMessagesHandler';
+	import { receiveMessageHandler } from './events/receiveMessageHandler';
+	import { receiveReadMessageHandler } from './events/receiveReadMessageHandler';
+	import { receiveMessageStatusHandler } from './events/receiveMessageStatusHandler';
+	import { receivePendingMessagesHandler } from './events/receivePendingMessagesHandler';
 
-   import { logError, logSuccess } from '../../../../../utils/logging';
-   import { notificationsDispatch, notificationsState } from './stores/notification';
+	import { logError, logSuccess } from '../../../../../utils/logging';
+	import { notificationsDispatch, notificationsState } from './stores/notification';
 
-   type Props = { children: any };
-   let { children }: Props = $props();
+	let { children } = $props();
 
-   let session = $derived($page.data.session);
+	let session = $derived($page.data.session);
 
-   $effect(() => {
-      const { chatId } = $page.params;
+	$effect(() => {
+		const { chatId } = $page.params;
+		const conversation = $chatState.conversations.find((item) => item.id === chatId);
 
-      const conversation = $chatState.conversations.find(item => item.id === chatId);
+		if (conversation) {
+			selectConversationAsync(conversation);
+		}
+	});
 
-      if (conversation) {
-         selectConversationAsync(conversation);
-      }
-   });
+	onMount(() => {
+		if (session?.user && session?.accessToken) {
+			const userId = session?.user?.id;
 
-   onMount(() => {
-      if (session?.user && session?.accessToken) {
-         const userId = session?.user?.id;
+			if (!userId) {
+				logError('User Id not found.');
+				showMessageSonner({ message: 'User Id not found.' });
+				return;
+			}
 
-         if (!userId) {
-            logError('User Id not found.');
-            showMessageSonner({ message: 'User Id not found.' });
-            return;
-         }
+			chatDispatch.setIsFetchingConversations(true);
 
-         chatDispatch.setIsFetchingConversations(true);
+			APIGetUserConversations({ id: userId }, { accessToken: session.accessToken })
+				.then((conversationsData) => {
+					logSuccess('Fetching conversations data was successfully.');
 
-         APIGetUserConversations({ id: userId }, { accessToken: session.accessToken })
-            .then(conversationsData => {
-               logSuccess('Fetching conversations data was successfully.');
+					const filteredData = conversationsData.map((data) => ({
+						...data,
+						participants: data.participants.filter((item) => item.id !== userId)
+					}));
 
-               const filteredData = conversationsData.map(data => ({
-                  ...data,
-                  participants: data.participants.filter(item => item.id !== userId),
-               }));
+					chatDispatch.setConversationInitialState({
+						conversationsData: filteredData,
+						currentUserId: userId
+					});
+					$chatWorker?.postMessage({
+						type: WorkerMethods.SAVE_CONVERSATIONS,
+						payload: filteredData
+					});
+				})
+				.catch((error) => {
+					logError(
+						'Error on trying to fetch conversations, data will be taken from the cache',
+						error.message
+					);
 
-               chatDispatch.setConversationInitialState({ conversationsData: filteredData, currentUserId: userId });
-               $chatWorker?.postMessage({ type: WorkerMethods.SAVE_CONVERSATIONS, payload: filteredData });
-            })
-            .catch(error => {
-               logError('Error on trying to fetch conversations, data will be taken from the cache', error.message);
+					getConversationCacheAsyncDB({ userId })
+						.then((conversationsData) => {
+							chatDispatch.setConversationInitialState({
+								conversationsData,
+								currentUserId: userId
+							});
+						})
+						.catch(logError);
+				})
+				.finally(() => chatDispatch.setIsFetchingConversations(false));
+		}
+	});
 
-               getConversationCacheAsyncDB({ userId })
-                  .then(conversationsData => {
-                     chatDispatch.setConversationInitialState({ conversationsData, currentUserId: userId });
-                  })
-                  .catch(logError);
-            })
-            .finally(() => chatDispatch.setIsFetchingConversations(false));
-      }
-   });
+	$effect(() => {
+		if ($connection) {
+			$connection?.on('receivemessage', receiveMessageHandler);
+			$connection?.on('receivereadmessage', receiveReadMessageHandler);
+			$connection?.on('receivemessagestatus', receiveMessageStatusHandler);
+			$connection?.on('receivependingmessages', receivePendingMessagesHandler);
 
-   $effect(() => {
-      if ($connection) {
-         $connection?.on('receivemessage', receiveMessageHandler);
-         $connection?.on('receivereadmessage', receiveReadMessageHandler);
-         $connection?.on('receivemessagestatus', receiveMessageStatusHandler);
-         $connection?.on('receivependingmessages', receivePendingMessagesHandler);
+			$connection?.on('receiveTyping', (isTyping, authorId, conversationId) => {
+				chatDispatch.handleIsConversationTyping({ conversationId, isTyping, authorId });
+			});
 
-         $connection?.on('receiveTyping', (isTyping, authorId, conversationId) => {
-            chatDispatch.handleIsConversationTyping({ conversationId, isTyping, authorId });
-         });
-
-         logSuccess('Connection events created.');
-      }
-   });
+			logSuccess('Connection events created.');
+		}
+	});
 </script>
 
 {@render children()}

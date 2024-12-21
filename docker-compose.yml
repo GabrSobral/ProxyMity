@@ -16,7 +16,7 @@ services:
       resources:
         limits:
           cpus: "2"
-          memory: "512MB"
+          memory: "126MB"
     depends_on:
       - postgres-auth
       - rabbitmq
@@ -36,7 +36,7 @@ services:
       resources:
         limits:
           cpus: "2"
-          memory: "512MB"
+          memory: "256MB"
     volumes:
       - ./volumes/postgres_data_auth:/var/lib/postgresql/data
     ports:
@@ -59,7 +59,7 @@ services:
       resources:
         limits:
           cpus: "2"
-          memory: "512MB"
+          memory: "126MB"
     depends_on:
       - postgres-chat
       - rabbitmq
@@ -79,7 +79,7 @@ services:
       resources:
         limits:
           cpus: "2"
-          memory: "512MB"
+          memory: "256MB"
     volumes:
       - ./volumes/postgres_data_chat:/var/lib/postgresql/data
     ports:
@@ -109,6 +109,11 @@ services:
       - "9000:9000"
     networks:
       - proxymity-network
+    deploy:
+      resources:
+        limits:
+          cpus: "2"
+          memory: "256MB"
 
 networks:
   proxymity-network:

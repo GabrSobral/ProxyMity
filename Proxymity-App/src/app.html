@@ -1,14 +1,15 @@
 <!doctype html>
-<html lang="en">
-   <head>
-      <meta charset="utf-8" />
-      <link rel="icon" href="%sveltekit.assets%/favicon.svg" />
-      <meta name="viewport" content="width=device-width, initial-scale=1" />
+<html lang="%paraglide.lang%" dir="%paraglide.textDirection%">
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" href="%sveltekit.assets%/favicon.svg" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
 
-      %sveltekit.head%
-   </head>
-   <body data-sveltekit-preload-data="hover" class="w-screen h-screen flex flex-col bg-black transition-all">
-      <div style="display: contents">%sveltekit.body%</div>
-      <div id="portal-target" class="relative"></div>
-   </body>
+		%sveltekit.head%
+	</head>
+
+	<body data-sveltekit-preload-data="hover" class="flex h-screen w-screen flex-col transition-all">
+		<div style="display: contents">%sveltekit.body%</div>
+		<div id="portal-target" class="relative"></div>
+	</body>
 </html>

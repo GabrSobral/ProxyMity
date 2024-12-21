@@ -10,24 +10,24 @@ import { logError } from '../../../../utils/logging.js';
  * @returns
  */
 export async function load(event) {
-   const session = await event.locals.auth();
+	const session = await event.locals.auth();
 
-   if (session?.user) {
-      redirect(303, '/chat');
-   }
+	if (session?.user) {
+		redirect(303, '/');
+	}
 
-   const token = event.url.searchParams.get('token');
-   let isConfirmed = false;
-   let errorMessage = '';
+	const token = event.url.searchParams.get('token');
+	let isConfirmed = false;
+	let errorMessage = '';
 
-   try {
-      await confirmEmailAsync({ token: token || '' }, { accessToken: session?.accessToken });
+	try {
+		await confirmEmailAsync({ token: token || '' }, { accessToken: session?.accessToken });
 
-      isConfirmed = true;
-   } catch (error: any) {
-      logError(error);
-      errorMessage = error?.response?.data;
-   }
+		isConfirmed = true;
+	} catch (error: any) {
+		logError(error);
+		errorMessage = error?.response?.data;
+	}
 
-   return { isConfirmed, error: errorMessage };
+	return { isConfirmed, error: errorMessage };
 }

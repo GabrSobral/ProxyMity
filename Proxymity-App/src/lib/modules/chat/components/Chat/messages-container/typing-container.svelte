@@ -1,51 +1,62 @@
 <script lang="ts">
-   import { fly } from 'svelte/transition';
+	import { fly } from 'svelte/transition';
 
-   import colors from 'tailwindcss/colors';
+	import colors from 'tailwindcss/colors';
 
-   import * as Avatar from '$lib/design-system/avatar';
-   import LoadingDots from '$lib/design-system/loading-dots.svelte';
-   import type { ConversationState } from '$lib/modules/chat/contexts/chat-context/stores/chat-store-types';
-   import { cn } from '$lib/utils';
-   import { chatState } from '$lib/modules/chat/contexts/chat-context/stores/chat';
+	import * as Avatar from '$lib/components/ui/avatar';
+	import LoadingDots from '$lib/components/ui/loading-dots.svelte';
+	import { chatState } from '$lib/modules/chat/contexts/chat-context/stores/chat';
+	import type { ConversationState } from '$lib/modules/chat/contexts/chat-context/stores/chat-store-types';
 
-   interface Props {
-      participantsTyping: {
-         isTyping: boolean;
-         author: ConversationState['participants'][0] | null;
-      }[];
-   }
+	import { cn } from '$lib/utils';
 
-   type $$Props = Props;
+	let participantsTyping = $state<
+		{ author: ConversationState['participants'][0] | null; isTyping: boolean }[]
+	>([]);
 
-   let { participantsTyping } = $props() as Props;
+	$effect(() => {
+		const participants =
+			$chatState.conversations[$chatState.selectedConversationIndex]?.participants || [];
+		const typing = $chatState.conversations[$chatState.selectedConversationIndex]?.typing || [];
+
+		participantsTyping = typing.map((item) => ({
+			isTyping: item.isTyping,
+			author: participants.find((participant) => participant.id === item.authorId) || null
+		}));
+	});
 </script>
 
 {#if participantsTyping.length}
-   <div
-      class={cn('absolute z-[20] bottom-[3.5rem] py-1 mx-1 mb-1 px-4 items-center flex gap-2 bg-gray-900 rounded-lg w-fit', {
-         'bottom-[8.5rem]': $chatState.selectedConversation?.replyMessage,
-      })}
-      transition:fly={{ y: 40, opacity: 0 }}
-   >
-      <div class="flex">
-         {#each participantsTyping as participantTyping (participantTyping.author?.id)}
-            <div class="-ml-2 shadow-lg rounded-full" title={participantTyping.author?.firstName}>
-               <Avatar.Image src="https://github.com/shadcn.png" username={'conversationName'} size={24} />
-               <span class="sr-only">{participantTyping.author?.firstName} is typing...</span>
-            </div>
-         {/each}
-      </div>
+	<div
+		class={cn(
+			'absolute bottom-[3.5rem] z-[20] mx-1 mb-1 flex w-fit items-center gap-2 rounded-lg bg-gray-900 px-4 py-1',
+			{
+				'bottom-[8.5rem]':
+					$chatState.conversations[$chatState.selectedConversationIndex]?.replyMessage
+			}
+		)}
+		transition:fly={{ y: 40, opacity: 0 }}
+	>
+		<div class="flex">
+			{#each participantsTyping as participantTyping (participantTyping.author?.id)}
+				<div class="-ml-2 rounded-full shadow-lg" title={participantTyping.author?.firstName}>
+					<Avatar.Root>
+						<Avatar.Image src="https://github.com/shadcn.png" />
+					</Avatar.Root>
+					<span class="sr-only">{participantTyping.author?.firstName}</span>
+				</div>
+			{/each}
+		</div>
 
-      <span class="flex items-end gap-0 text-white text-xs">
-         {#if participantsTyping.length > 1}
-            are typing
-         {:else}
-            is typing
-         {/if}
-         <span class="mt-[8px]">
-            <LoadingDots size={6} color={colors.purple[500]} />
-         </span>
-      </span>
-   </div>
+		<span class="flex items-end gap-0 text-xs text-white">
+			{#if participantsTyping.length > 1}
+				are typing
+			{:else}
+				is typing
+			{/if}
+			<span class="mt-[8px]">
+				<LoadingDots size={6} color={colors.purple[500]} />
+			</span>
+		</span>
+	</div>
 {/if}

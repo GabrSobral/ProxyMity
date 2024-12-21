@@ -28,6 +28,8 @@
 
       document.documentElement.setAttribute('class', storedTheme || $appTheme);
    });
+
+   let { children } = $props();
 </script>
 
-<slot><!-- optional fallback --></slot>
+{@render children()}

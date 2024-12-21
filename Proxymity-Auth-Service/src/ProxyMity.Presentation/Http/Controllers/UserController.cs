@@ -38,7 +38,7 @@ public class UserController(ISender sender, IHttpContextAccessor httpContextAcce
     /// <param name="provider">Provider Enum</param>
     /// <param name="providerKey">Provider key from user</param>
     /// <response code="200">Returns the user searched</response>
-    /// <response code="400">If the "Id" is null</response>
+    /// <response code="400">If the "ID" is null</response>
     /// <response code="404">If the user was not found</response>
     /// <response code="500">Internal server error</response>
     [AllowAnonymous]

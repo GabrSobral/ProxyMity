@@ -2,7 +2,7 @@
 
 public class UserNotActiveException : Exception
 {
-    public UserNotActiveException(Ulid userId): base($"User account is not active anymore: {userId}")
+    public UserNotActiveException(Guid userId): base($"User account is not active anymore: {userId}")
     {
         
     }
