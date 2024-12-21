@@ -19,10 +19,11 @@ jobs:
 
   deploy-development:
     runs-on: ubuntu-latest
+    needs: build
     env:
       SSH_PRIVATE_KEY: ${{secrets.SERVER_SSH_KEY}}
-      SSH_HOST: ${{secrets.SSH_HOST}}
-      SSH_USER: ${{secrets.SSH_USER}}
+      SSH_HOST: ${{vars.SSH_HOST}}
+      SSH_USER: ${{vars.SSH_USER}}
     environment:
       name: development
     steps:
