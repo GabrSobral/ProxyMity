@@ -21,9 +21,9 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
     env:
-      SSH_PRIVATE_KEY: ${{secrets.SERVER_SSH_KEY}}
-      SSH_HOST: ${{vars.SSH_HOST}}
-      SSH_USER: ${{vars.SSH_USER}}
+      SSH_PRIVATE_KEY: ${{ secrets.SERVER_SSH_KEY }}
+      SSH_HOST: ${{ secrets.SSH_HOST }}
+      SSH_USER: ${{ secrets.SSH_USER }}
     environment:
       name: development
     steps:
@@ -34,15 +34,13 @@ jobs:
 
       - name: Enter on VPS
         run: |
-          echo $SSH_HOST
-          echo $SSH_USER
-          scp -o StrictHostKeyChecking=no  -i private_key -r * $SSH_USER@$SSH_HOST:/home/ubuntu/ProxyMity
+          scp -o StrictHostKeyChecking=no -i private_key -r * $SSH_USER@$SSH_HOST:/home/ubuntu/ProxyMity
 
       - name: Build Docker Compose on VPS
         run: ssh -i private_key $SSH_USER@$SSH_HOST "cd /home/ubuntu/ProxyMity && docker-compose up --build -d"
 
       - name: Copy Nginx Configuration on VPS
-        run: scp -o StrictHostKeyChecking=no  -i private_key nginx/proxy.conf $SSH_USER@$SSH_HOST:/etc/nginx/conf.d/proxy.conf
+        run: scp -o StrictHostKeyChecking=no -i private_key nginx/proxy.conf $SSH_USER@$SSH_HOST:/etc/nginx/conf.d/proxy.conf
 
       - name: Restart Nginx on VPS
         run: ssh -i private_key $SSH_USER@$SSH_HOST "sudo systemctl restart nginx"
