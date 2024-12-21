@@ -32,20 +32,18 @@ jobs:
           echo "$SSH_PRIVATE_KEY" > private_key
           chmod 600 private_key
 
-      # - name: Enter on VPS
-      #   uses: easingthemes/ssh-deploy@main
-      #   with:
-      #     SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-      #     ARGS: "-rlgoDzvc"
-      #     REMOTE_HOST: ${{ secrets.SSH_HOST }}
-      #     REMOTE_USER: ${{ secrets.SSH_USER }}
-      #     SOURCE: "."
-      #     TARGET: "/home/ubuntu/ProxyMity"
+      - name: Enter on VPS
+        uses: easingthemes/ssh-deploy@main
+        with:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          ARGS: "-rlgoDzvc"
+          REMOTE_HOST: ${{ secrets.SSH_HOST }}
+          REMOTE_USER: ${{ secrets.SSH_USER }}
+          SOURCE: "."
+          TARGET: "/home/ubuntu/ProxyMity"
 
       - name: Copy Files to VPS
-        run: |
-          cat private_key
-          scp -o StrictHostKeyChecking=no -i private_key -r * $SSH_USER@$SSH_HOST:/home/ubuntu/ProxyMity
+        run: scp -o StrictHostKeyChecking=no -i private_key -r * $SSH_USER@$SSH_HOST:/home/ubuntu/ProxyMity
 
       - name: Build Docker Compose on VPS
         run: ssh -i private_key $SSH_USER@$SSH_HOST "cd /home/ubuntu/ProxyMity && docker-compose up --build -d"
