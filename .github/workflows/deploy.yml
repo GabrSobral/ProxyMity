@@ -31,10 +31,10 @@ jobs:
         run: |
           echo "$SSH_PRIVATE_KEY" > private_key
           chmod 600 private_key
-          cat private_key
 
       - name: Enter on VPS
         run: |
+          cat private_key
           scp -o StrictHostKeyChecking=no -i private_key -r * $SSH_USER@$SSH_HOST:/home/ubuntu/ProxyMity
 
       - name: Build Docker Compose on VPS
