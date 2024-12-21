@@ -17,15 +17,28 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
 
-      - name: Deploy to VPS
-        env:
-          SSH_PRIVATE_KEY: ${{secrets.SERVER_SSH_KEY}}
-          SSH_HOST: ${{secrets.SSH_HOST}}
-          SSH_USER: ${{secrets.SSH_USER}}
+  deploy-development:
+    runs-on: ubuntu-latest
+    env:
+      SSH_PRIVATE_KEY: ${{secrets.SERVER_SSH_KEY}}
+      SSH_HOST: ${{secrets.SSH_HOST}}
+      SSH_USER: ${{secrets.SSH_USER}}
+    environment:
+      name: development
+    steps:
+      - name: Give VPS Access
         run: |
           echo "$SSH_PRIVATE_KEY" > private_key
           chmod 600 private_key
-          scp -i private_key -r * $SSH_USER@$SSH_HOST:/ProxyMity
-          ssh -i private_key $SSH_USER@$SSH_HOST "cd /ProxyMity && docker-compose up --build -d"
-          scp -i private_key nginx/proxy.conf $SSH_USER@$SSH_HOST:/etc/nginx/conf.d/proxy.conf
-          ssh -i private_key $SSH_USER@$SSH_HOST "sudo systemctl restart nginx"
+
+      - name: Enter on VPS
+        run: scp -i private_key -r * $SSH_USER@$SSH_HOST:/ProxyMity
+
+      - name: Build Docker Compose on VPS
+        run: ssh -i private_key $SSH_USER@$SSH_HOST "cd /ProxyMity && docker-compose up --build -d"
+
+      - name: Copy Nginx Configuration on VPS
+        run: scp -i private_key nginx/proxy.conf $SSH_USER@$SSH_HOST:/etc/nginx/conf.d/proxy.conf
+
+      - name: Restart Nginx on VPS
+        run: ssh -i private_key $SSH_USER@$SSH_HOST "sudo systemctl restart nginx"
