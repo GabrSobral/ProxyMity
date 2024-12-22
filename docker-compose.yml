@@ -1,5 +1,3 @@
-version: "3.4"
-
 services:
   proxymity.auth:
     container_name: "ProxyMity.Auth"
@@ -7,7 +5,7 @@ services:
     restart: always
     build:
       context: ./Proxymity-Auth-Service/src
-      dockerfile: ./Proxymity-Auth-Service/src/ProxyMity.Auth/Dockerfile
+      dockerfile: ./ProxyMity.Auth/Dockerfile
     ports:
       - "5001:5001"
     environment:
@@ -50,7 +48,7 @@ services:
     restart: always
     build:
       context: ./Proxymity-Chat-Service/src
-      dockerfile: ./Proxymity-Chat-Service/src/ProxyMity.Chat/Dockerfile
+      dockerfile: ./ProxyMity.Chat/Dockerfile
     ports:
       - "5000:5000"
     environment:
